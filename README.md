@@ -1,63 +1,63 @@
 # Portfolio
 
-Sitio personal de Alan Rueda — ingeniero de sistemas enfocado en CMS, trabajando con Drupal y WordPress.
+Personal site of Alan Rueda — systems engineer focused on CMS work, building with Drupal and WordPress.
 
 ## Stack
 
-- **Next.js 16** con App Router
+- **Next.js 16** with the App Router
 - **React 19**
 - **Tailwind CSS v4**
 - **TypeScript**
-- Tipografía **Geist**, cargada con `next/font`
+- **Geist** typeface, loaded through `next/font`
 
-## Empezar
+## Getting started
 
 ```bash
 npm install
 npm run dev
 ```
 
-Abre [http://localhost:3000](http://localhost:3000). La página se recarga sola al guardar.
+Open [http://localhost:3000](http://localhost:3000). The page reloads as you save.
 
 ## Scripts
 
-| Comando                | Qué hace                     |
-| ---------------------- | ---------------------------- |
-| `npm run dev`          | Servidor de desarrollo       |
-| `npm run build`        | Build de producción          |
-| `npm run start`        | Sirve el build de producción |
-| `npm run lint`         | Busca errores con ESLint     |
-| `npm run format`       | Formatea todo el proyecto    |
-| `npm run format:check` | Revisa el formato sin tocar  |
+| Command                | What it does               |
+| ---------------------- | -------------------------- |
+| `npm run dev`          | Development server         |
+| `npm run build`        | Production build           |
+| `npm run start`        | Serve the production build |
+| `npm run lint`         | Check for errors (ESLint)  |
+| `npm run format`       | Format the whole project   |
+| `npm run format:check` | Check formatting only      |
 
-## Estructura
+## Structure
 
 ```
 app/
-├── layout.tsx     # Layout raíz: fuentes y estructura HTML
-├── page.tsx       # Página principal
-├── globals.css    # Tailwind + variables de tema
-└── components/    # Secciones del sitio
+├── layout.tsx     # Root layout: fonts and HTML shell
+├── page.tsx       # Home page
+├── globals.css    # Tailwind + theme variables
+└── components/    # Page sections
 ```
 
-El tema claro/oscuro sale de variables CSS en `globals.css` y sigue la preferencia del sistema.
+The light/dark theme comes from CSS variables in `globals.css` and follows the system preference.
 
-## Formato y calidad de código
+## Formatting and code quality
 
-El proyecto usa **Prettier** (formato) y **ESLint** (errores). Se ejecutan automáticamente en cada `git commit`.
+This project uses **Prettier** for formatting and **ESLint** for errors. Both run automatically on every `git commit`.
 
-### Qué pasa al hacer commit
+### What happens on commit
 
-Un hook de Git (Husky + lint-staged) revisa **solo los archivos que estás commiteando**:
+A Git hook (Husky + lint-staged) checks **only the files you are committing**:
 
-1. Prettier los formatea y añade los cambios al commit automáticamente.
-2. ESLint los revisa. **Si encuentra algún error o warning, el commit se cancela.**
+1. Prettier formats them and adds the changes to the commit automatically.
+2. ESLint checks them. **If it reports any error or warning, the commit is aborted.**
 
-Si se cancela, arregla lo que reporta ESLint y vuelve a commitear. No se pierde nada: tus archivos quedan como estaban.
+If the commit is aborted, fix what ESLint reports and commit again. Nothing is lost — your files are left exactly as they were.
 
-### Formatear al guardar (VS Code)
+### Format on save (VS Code)
 
-Instala la extensión `esbenp.prettier-vscode` y crea `.vscode/settings.json`:
+Install the `esbenp.prettier-vscode` extension and create `.vscode/settings.json`:
 
 ```json
 {
@@ -66,17 +66,17 @@ Instala la extensión `esbenp.prettier-vscode` y crea `.vscode/settings.json`:
 }
 ```
 
-### Configuración
+### Configuration
 
-| Archivo                         | Para qué                            |
-| ------------------------------- | ----------------------------------- |
-| `.prettierrc.json`              | Reglas de formato                   |
-| `.prettierignore`               | Archivos que Prettier ignora        |
-| `.husky/pre-commit`             | El hook que corre antes del commit  |
-| `lint-staged` en `package.json` | Qué se ejecuta y sobre qué archivos |
+| File                            | Purpose                            |
+| ------------------------------- | ---------------------------------- |
+| `.prettierrc.json`              | Formatting rules                   |
+| `.prettierignore`               | Files Prettier skips               |
+| `.husky/pre-commit`             | The hook that runs before a commit |
+| `lint-staged` in `package.json` | What runs, and on which files      |
 
-> Los colaboradores nuevos solo necesitan `npm install` — el hook se instala solo.
+> New contributors only need `npm install` — the hook installs itself.
 
 ## Deploy
 
-Se despliega en [Vercel](https://vercel.com/new). Conecta el repositorio y cada push a la rama principal publica automáticamente.
+Deployed on [Vercel](https://vercel.com/new). Connect the repository and every push to the main branch ships automatically.
