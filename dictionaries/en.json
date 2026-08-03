@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "title": "Alan Rueda — Systems engineer focused on CMS",
+    "description": "Portfolio of Alan Rueda. Drupal and WordPress sites that are fast and easy to maintain."
+  },
+  "hero": {
+    "greeting": "Hi, I'm Alan",
+    "tagline": "Drupal & WordPress"
+  },
+  "about": {
+    "heading": "About me",
+    "body": "I'm a systems engineer focused on CMS work. I build with Drupal and WordPress, making sites that are fast and easy to maintain."
+  },
+  "projects": {
+    "heading": "Projects",
+    "typeLabel": "Type",
+    "items": [
+      {
+        "title": "Corporate site in Drupal",
+        "type": "Drupal",
+        "description": "A fast site the team can manage on its own.",
+        "technologies": ["Drupal", "PHP", "Twig"]
+      },
+      {
+        "title": "WordPress store",
+        "type": "WordPress",
+        "description": "An e-commerce site built with WordPress.",
+        "technologies": ["WordPress", "PHP", "ACF"]
+      }
+    ]
+  },
+  "languages": {
+    "label": "Language",
+    "es": "Spanish",
+    "en": "English"
+  }
+}
