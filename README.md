@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Portfolio
 
-## Getting Started
+Sitio personal de Alan Rueda — ingeniero de sistemas enfocado en CMS, trabajando con Drupal y WordPress.
 
-First, run the development server:
+## Stack
+
+- **Next.js 16** con App Router
+- **React 19**
+- **Tailwind CSS v4**
+- **TypeScript**
+- Tipografía **Geist**, cargada con `next/font`
+
+## Empezar
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abre [http://localhost:3000](http://localhost:3000). La página se recarga sola al guardar.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Comando                | Qué hace                     |
+| ---------------------- | ---------------------------- |
+| `npm run dev`          | Servidor de desarrollo       |
+| `npm run build`        | Build de producción          |
+| `npm run start`        | Sirve el build de producción |
+| `npm run lint`         | Busca errores con ESLint     |
+| `npm run format`       | Formatea todo el proyecto    |
+| `npm run format:check` | Revisa el formato sin tocar  |
+
+## Estructura
+
+```
+app/
+├── layout.tsx     # Layout raíz: fuentes y estructura HTML
+├── page.tsx       # Página principal
+├── globals.css    # Tailwind + variables de tema
+└── components/    # Secciones del sitio
+```
+
+El tema claro/oscuro sale de variables CSS en `globals.css` y sigue la preferencia del sistema.
 
 ## Formato y calidad de código
 
 El proyecto usa **Prettier** (formato) y **ESLint** (errores). Se ejecutan automáticamente en cada `git commit`.
-
-### Comandos
-
-```bash
-npm run format        # formatea todo el proyecto
-npm run format:check  # solo revisa, no modifica
-npm run lint          # busca errores de código
-```
 
 ### Qué pasa al hacer commit
 
@@ -63,17 +77,6 @@ Instala la extensión `esbenp.prettier-vscode` y crea `.vscode/settings.json`:
 
 > Los colaboradores nuevos solo necesitan `npm install` — el hook se instala solo.
 
-## Learn More
+## Deploy
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Se despliega en [Vercel](https://vercel.com/new). Conecta el repositorio y cada push a la rama principal publica automáticamente.
