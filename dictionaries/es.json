@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "title": "Alan Rueda — Ingeniero de sistemas enfocado en CMS",
+    "description": "Portfolio de Alan Rueda. Sitios en Drupal y WordPress, rápidos y fáciles de mantener."
+  },
+  "hero": {
+    "greeting": "Hola, soy Alan",
+    "tagline": "Drupal & WordPress"
+  },
+  "about": {
+    "heading": "Sobre mí",
+    "body": "Soy ingeniero de Sistemas enfocado en CMS. Trabajo con Drupal y WordPress creando sitios rápidos y fáciles de mantener."
+  },
+  "projects": {
+    "heading": "Proyectos",
+    "typeLabel": "Tipo",
+    "items": [
+      {
+        "title": "Sitio corporativo en Drupal",
+        "type": "Drupal",
+        "description": "Sitio rápido y fácil de administrar para el equipo.",
+        "technologies": ["Drupal", "PHP", "Twig"]
+      },
+      {
+        "title": "Tienda en WordPress",
+        "type": "WordPress",
+        "description": "Sitio de e-commerce construido con WordPress.",
+        "technologies": ["WordPress", "PHP", "ACF"]
+      }
+    ]
+  },
+  "languages": {
+    "label": "Idioma",
+    "es": "Español",
+    "en": "Inglés"
+  }
+}

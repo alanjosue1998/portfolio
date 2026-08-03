@@ -34,13 +34,69 @@ Open [http://localhost:3000](http://localhost:3000). The page reloads as you sav
 
 ```
 app/
-├── layout.tsx     # Root layout: fonts and HTML shell
-├── page.tsx       # Home page
-├── globals.css    # Tailwind + theme variables
-└── components/    # Page sections
+├── [lang]/
+│   ├── layout.tsx   # Root layout: fonts and HTML shell
+│   └── page.tsx     # Home page
+├── components/      # Page sections
+├── globals.css      # Tailwind + theme variables
+dictionaries/        # Translated strings, one file per locale
+├── es.json
+└── en.json
+lib/
+├── i18n.ts          # Supported locales and the default
+└── dictionaries.ts  # Loads the dictionary for the current locale
+proxy.ts             # Redirects "/" to a locale
 ```
 
 The light/dark theme comes from CSS variables in `globals.css` and follows the system preference.
+
+## Internationalization
+
+The site is bilingual. Every route lives under a locale segment, so `/es` and
+`/en` are the two entry points and `/` redirects to one of them.
+
+**No user-facing text belongs in a component.** Strings live in
+`dictionaries/*.json` and components read them:
+
+```tsx
+import { getDictionary } from "@/lib/dictionaries";
+
+export default async function About() {
+  const dict = await getDictionary();
+  return <h2>{dict.about.heading}</h2>;
+}
+```
+
+`getDictionary()` takes no arguments. It reads the locale from the `[lang]` root
+segment via [`next/root-params`](https://nextjs.org/docs/app/api-reference/functions/next-root-params),
+so the locale never has to be passed down through props — any Server Component
+can call it directly.
+
+### Adding a string
+
+1. Add the key to **both** `dictionaries/es.json` and `dictionaries/en.json`.
+2. Read it with `dict.your.key`.
+
+`Dictionary` is typed from `es.json`, so if the two files drift out of shape it
+is a compile error, not a missing string in production.
+
+### Adding a locale
+
+1. Add it to `locales` in `lib/i18n.ts`.
+2. Create `dictionaries/<locale>.json`.
+3. Add a loader entry in `lib/dictionaries.ts`.
+
+Both pages are prerendered at build time, one per locale, via
+`generateStaticParams` in the root layout.
+
+### Locale detection
+
+`proxy.ts` reads the `Accept-Language` header and redirects `/` to the best
+supported match, honouring quality values and ignoring region subtags
+(`en-GB` matches `en`). Requests it cannot match fall back to `defaultLocale`.
+
+> Note: `proxy.ts` is what earlier Next.js versions called `middleware.ts`. The
+> `middleware` convention is deprecated in Next.js 16.
 
 ## Formatting and code quality
 
