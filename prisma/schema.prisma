@@ -1,0 +1,23 @@
+// Prisma schema. The connection URL lives in `prisma.config.ts`, which reads it
+// from `.env` — see https://pris.ly/prisma-config-env-vars.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// A portfolio project, rendered by `app/components/Projects.tsx`.
+model Project {
+  id           String   @id @default(uuid())
+  title        String
+  /// The CMS or stack the project is built on, e.g. "Drupal".
+  type         String
+  description  String
+  technologies String[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
