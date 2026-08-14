@@ -29,6 +29,13 @@
       }
     ]
   },
+  "location": {
+    "heading": "Dónde estoy",
+    "city": "Ibarra, Imbabura",
+    "country": "Ecuador",
+    "description": "Mapa que arranca en el planeta y desciende hasta Ibarra, en la provincia de Imbabura, Ecuador.",
+    "unavailable": "No se pudo cargar el mapa. Estoy en"
+  },
   "languages": {
     "label": "Idioma",
     "es": "Español",

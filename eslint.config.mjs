@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Static assets, including the minified maplibre-gl worker that
+    // `scripts/copy-map-worker.mjs` drops in `public/maplibre`.
+    "public/**",
   ]),
 ]);
 

@@ -1,5 +1,6 @@
 import About from "@/app/components/About";
 import LanguageSwitcher from "@/app/components/LanguageSwitcher";
+import Location from "@/app/components/Location";
 import { getDictionary } from "@/lib/dictionaries";
 
 export default async function Home() {
@@ -11,6 +12,7 @@ export default async function Home() {
       <h1>{dict.hero.greeting}</h1>
       <p>{dict.hero.tagline}</p>
       <About />
+      <Location />
     </main>
   );
 }

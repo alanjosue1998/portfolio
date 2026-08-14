@@ -29,6 +29,13 @@
       }
     ]
   },
+  "location": {
+    "heading": "Where I am",
+    "city": "Ibarra, Imbabura",
+    "country": "Ecuador",
+    "description": "A map that starts on the planet and descends to Ibarra, in the province of Imbabura, Ecuador.",
+    "unavailable": "The map could not be loaded. I'm in"
+  },
   "languages": {
     "label": "Language",
     "es": "Spanish",
