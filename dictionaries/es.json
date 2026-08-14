@@ -4,7 +4,8 @@
     "description": "Portfolio de Alan Rueda. Sitios en Drupal y WordPress, rápidos y fáciles de mantener."
   },
   "hero": {
-    "greeting": "Hola, soy Alan",
+    "greeting": "Hola",
+    "name": "Soy Alan Guamán",
     "tagline": "Drupal & WordPress"
   },
   "about": {
@@ -30,7 +31,6 @@
     ]
   },
   "location": {
-    "heading": "Dónde estoy",
     "city": "Ibarra, Imbabura",
     "country": "Ecuador",
     "description": "Mapa que arranca en el planeta y desciende hasta Ibarra, en la provincia de Imbabura, Ecuador.",

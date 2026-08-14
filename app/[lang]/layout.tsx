@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { lang } from "next/root-params";
 
 import ThemeScript from "@/app/components/ThemeScript";
+import { spaceGrotesk } from "@/app/fonts";
 import { getDictionary } from "@/lib/dictionaries";
 import { locales } from "@/lib/i18n";
 
@@ -35,7 +36,7 @@ export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
   return (
     <html
       lang={await lang()}
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
       <head>
         <ThemeScript />
