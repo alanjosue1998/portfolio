@@ -50,9 +50,11 @@ type Props = {
   /** Describes the map for anyone who cannot see it. */
   description: string;
   unavailable: string;
+  /** Laid over the bottom of the map: the greeting and the portrait. */
+  children: React.ReactNode;
 };
 
-export default function LocationMap({ city, country, description, unavailable }: Props) {
+export default function LocationMap({ city, country, description, unavailable, children }: Props) {
   const container = useRef<HTMLDivElement>(null);
   const [arrived, setArrived] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -71,7 +73,7 @@ export default function LocationMap({ city, country, description, unavailable }:
      * also keeps its bulk out of the JavaScript the rest of the page needs.
      */
     const started = import("maplibre-gl")
-      .then(({ Map, Marker, setWorkerUrl }) => {
+      .then(({ AttributionControl, Map, Marker, setWorkerUrl }) => {
         if (cancelled) return;
 
         setWorkerUrl(WORKER_URL);
@@ -94,7 +96,35 @@ export default function LocationMap({ city, country, description, unavailable }:
            * zoom.
            */
           scrollZoom: false,
+          /**
+           * The credit OpenFreeMap asks for cannot stay in its usual corner:
+           * the portrait sits there, and the gradient behind the greeting would
+           * paint straight over it. Moved rather than hidden — it is the
+           * condition the tiles come with.
+           */
+          attributionControl: false,
         });
+
+        map.addControl(new AttributionControl({ compact: true }), "top-right");
+
+        /**
+         * Folds the credit into its ⓘ. `compact` alone only picks the
+         * collapsible shape — maplibre-gl still renders it open, and folds it
+         * away only once the map is dragged. Spelled out it is a paragraph
+         * lying across the top of a map barely 300px tall.
+         *
+         * Called at the end of the flight rather than at startup, because
+         * maplibre-gl rebuilds this control every time attribution data
+         * arrives and would undo an earlier fold. It also means the credit is
+         * spelled out for the whole of the descent, and only tidies itself
+         * away once the greeting appears.
+         */
+        function foldCredit(instance: MapLibreMap) {
+          const credit = instance.getContainer().querySelector(".maplibregl-ctrl-attrib");
+
+          credit?.classList.remove("maplibregl-compact-show");
+          credit?.removeAttribute("open");
+        }
 
         let styleLoaded = false;
         let flown = false;
@@ -136,6 +166,7 @@ export default function LocationMap({ city, country, description, unavailable }:
                * starts out on the far side of the planet.
                */
               new Marker({ color: "#dc2626" }).setLngLat(IBARRA).addTo(map);
+              foldCredit(map);
               setArrived(true);
             });
 
@@ -210,7 +241,7 @@ export default function LocationMap({ city, country, description, unavailable }:
   }
 
   return (
-    <div className="relative h-80 w-full overflow-hidden rounded-lg border border-border sm:h-[28rem]">
+    <div className="relative h-72 w-full overflow-hidden rounded-lg sm:h-[22rem]">
       <div
         ref={container}
         role="img"
@@ -218,12 +249,28 @@ export default function LocationMap({ city, country, description, unavailable }:
         className="h-full w-full bg-border"
       />
 
-      {/* Held back until the flight lands, so it reads as the destination. */}
-      {arrived && (
-        <p className="pointer-events-none absolute top-4 left-4 rounded bg-surface/90 px-3 py-2 font-semibold text-foreground shadow">
-          {city} — {country}
-        </p>
-      )}
+      {/*
+        Dissolves the bottom of the map into the page — there is no border now,
+        so this is what ends it — and gives the greeting a ground light or dark
+        enough to be read against whatever terrain happens to be underneath.
+      */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background via-background/85 to-transparent" />
+
+      {/*
+        Everything that sits on the map is grouped down here. The city label
+        used to live in the top-left corner, where on a narrow screen it ran
+        straight into the attribution across from it.
+      */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col gap-3 p-5 sm:p-6">
+        {/* Held back until the flight lands, so it reads as the destination. */}
+        {arrived && (
+          <p className="self-start rounded bg-surface/90 px-3 py-1.5 text-sm font-semibold text-foreground shadow">
+            {city} — {country}
+          </p>
+        )}
+
+        <div className="flex items-end justify-between gap-4">{children}</div>
+      </div>
     </div>
   );
 }

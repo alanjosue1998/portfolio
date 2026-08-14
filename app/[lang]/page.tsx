@@ -15,10 +15,10 @@ export default async function Home() {
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-4 py-10 sm:px-6">
       <SiteHeader />
-      <h1>{dict.hero.greeting}</h1>
+      {/* The map opens the page, and carries the greeting and the portrait. */}
+      <Location />
       <p>{dict.hero.tagline}</p>
       <About />
-      <Location />
     </main>
   );
 }
