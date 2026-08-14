@@ -17,12 +17,13 @@ export type Dictionary = Awaited<ReturnType<typeof loaders.es>>;
 
 /**
  * Reads the locale from the `[lang]` root segment, so callers never pass it in
- * and it never has to be drilled through props.
+ * and it never has to be drilled through props. It comes back undefined under
+ * the second root layout, `app/(admin)`, which has no `[lang]` segment.
  */
 export async function getDictionary(): Promise<Dictionary> {
   const locale = await lang();
 
-  if (!isLocale(locale)) notFound();
+  if (!locale || !isLocale(locale)) notFound();
 
   return loaders[locale]();
 }
