@@ -83,10 +83,11 @@ export default function LocationMap({ city, country, description, unavailable }:
           style: STYLES[scheme],
           center: START,
           /**
-           * Wide enough to read as a planet rather than a map, close enough
-           * that it fills the frame instead of floating in it.
+           * Close enough that the planet fills the frame rather than sitting
+           * in the middle of it, while still curving away at the edges — past
+           * roughly 4 the globe stops reading as one.
            */
-          zoom: 1.2,
+          zoom: 2.2,
           /**
            * The map sits in the middle of the page, and swallowing wheel events
            * would trap anyone scrolling past it. Dragging and the buttons still
