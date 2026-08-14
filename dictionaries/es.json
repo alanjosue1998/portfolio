@@ -36,6 +36,14 @@
     "description": "Mapa que arranca en el planeta y desciende hasta Ibarra, en la provincia de Imbabura, Ecuador.",
     "unavailable": "No se pudo cargar el mapa. Estoy en"
   },
+  "menu": {
+    "open": "Abrir menú",
+    "close": "Cerrar menú",
+    "theme": "Tema",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "system": "Auto"
+  },
   "languages": {
     "label": "Idioma",
     "es": "Español",
