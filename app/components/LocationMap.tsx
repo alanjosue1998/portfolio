@@ -240,8 +240,13 @@ export default function LocationMap({ city, country, description, unavailable, c
     );
   }
 
+  /**
+   * Square corners: with the bottom already dissolving into the page, rounded
+   * ones only softened the two edges that are still meant to be edges.
+   * `overflow-hidden` stays — it is what keeps the canvas inside the frame.
+   */
   return (
-    <div className="relative h-72 w-full overflow-hidden rounded-lg sm:h-[22rem]">
+    <div className="relative h-72 w-full overflow-hidden sm:h-[22rem]">
       <div
         ref={container}
         role="img"
