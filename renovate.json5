@@ -1,0 +1,71 @@
+// Renovate opens the dependency-update pull requests. The app is enabled on the
+// repository from GitHub; this file is what tells it how to behave here.
+//
+// JSON5 rather than JSON so the reasoning can live next to the settings —
+// Renovate reads either.
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+
+  extends: ["config:recommended"],
+
+  // Ecuador, so the schedules below mean what they say locally.
+  timezone: "America/Guayaquil",
+
+  // One batch a week instead of a pull request the moment anything ships.
+  schedule: ["before 9am on monday"],
+  prConcurrentLimit: 5,
+  labels: ["dependencies"],
+
+  // A few days on the shelf filters out the releases that get pulled or
+  // patched within hours of publishing.
+  minimumReleaseAge: "3 days",
+
+  postUpdateOptions: ["npmDedupe"],
+
+  // Refreshes transitive dependencies that no direct update would ever move.
+  // Without it the lockfile keeps whatever it resolved the day it was written,
+  // advisories and all.
+  lockFileMaintenance: {
+    enabled: true,
+    schedule: ["before 9am on the first day of the month"],
+  },
+
+  // Security fixes ignore the weekly schedule and the shelf time above.
+  vulnerabilityAlerts: {
+    labels: ["dependencies", "security"],
+    schedule: ["at any time"],
+  },
+
+  /**
+   * Nothing is automerged on purpose: the repository has no CI, so a merged
+   * pull request would have had nothing check it. Worth revisiting once a
+   * workflow runs lint, tsc and build.
+   */
+  packageRules: [
+    /**
+     * These four move as a set. React and its type packages disagreeing is a
+     * wall of type errors, and `eslint-config-next` is pinned to the exact
+     * version of `next`.
+     */
+    {
+      matchPackageNames: ["react", "react-dom", "@types/react", "@types/react-dom"],
+      groupName: "React",
+    },
+    {
+      matchPackageNames: ["next", "eslint-config-next"],
+      groupName: "Next.js",
+    },
+    /**
+     * The Prisma CLI, the client and the driver adapter are released together
+     * and check each other's versions at runtime.
+     */
+    {
+      matchPackageNames: ["prisma", "@prisma/**"],
+      groupName: "Prisma",
+    },
+    {
+      matchPackageNames: ["tailwindcss", "@tailwindcss/**", "prettier-plugin-tailwindcss"],
+      groupName: "Tailwind CSS",
+    },
+  ],
+}
