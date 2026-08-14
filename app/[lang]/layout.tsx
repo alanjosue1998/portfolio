@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { lang } from "next/root-params";
 
+import ThemeScript from "@/app/components/ThemeScript";
 import { getDictionary } from "@/lib/dictionaries";
 import { locales } from "@/lib/i18n";
 
@@ -36,6 +37,9 @@ export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
       lang={await lang()}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <ThemeScript />
+      </head>
       <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );

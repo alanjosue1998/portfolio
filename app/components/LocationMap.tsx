@@ -18,7 +18,10 @@ const START: [number, number] = [20, 25];
  * gets it printed twice: the wording matches but the markup does not, so the
  * control cannot tell the two apart.
  */
-const STYLE_URL = "https://tiles.openfreemap.org/styles/liberty";
+const STYLES = {
+  light: "https://tiles.openfreemap.org/styles/liberty",
+  dark: "https://tiles.openfreemap.org/styles/dark",
+} as const;
 
 /**
  * maplibre-gl parses vector tiles in a worker, and it works out where that
@@ -29,6 +32,17 @@ const STYLE_URL = "https://tiles.openfreemap.org/styles/liberty";
  * `public/maplibre` — see `scripts/copy-map-worker.mjs` — removes the guess.
  */
 const WORKER_URL = "/maplibre/maplibre-gl-worker.mjs";
+
+type Scheme = keyof typeof STYLES;
+
+/** The same three-state rule the colours follow — see `app/globals.css`. */
+function currentScheme(): Scheme {
+  const chosen = document.documentElement.dataset.theme;
+
+  if (chosen === "light" || chosen === "dark") return chosen;
+
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
 
 type Props = {
   city: string;
@@ -56,18 +70,23 @@ export default function LocationMap({ city, country, description, unavailable }:
      * imported once we are in the browser. Keeping it out of the module graph
      * also keeps its bulk out of the JavaScript the rest of the page needs.
      */
-    import("maplibre-gl")
+    const started = import("maplibre-gl")
       .then(({ Map, Marker, setWorkerUrl }) => {
         if (cancelled) return;
 
         setWorkerUrl(WORKER_URL);
 
+        let scheme = currentScheme();
+
         map = new Map({
           container: element,
-          style: STYLE_URL,
+          style: STYLES[scheme],
           center: START,
-          // Far enough out that the planet reads as a ball with space around it.
-          zoom: 0,
+          /**
+           * Wide enough to read as a planet rather than a map, close enough
+           * that it fills the frame instead of floating in it.
+           */
+          zoom: 1.2,
           /**
            * The map sits in the middle of the page, and swallowing wheel events
            * would trap anyone scrolling past it. Dragging and the buttons still
@@ -77,6 +96,7 @@ export default function LocationMap({ city, country, description, unavailable }:
         });
 
         let styleLoaded = false;
+        let flown = false;
 
         map.on("error", () => {
           // Tile hiccups after the style is up are not worth a fallback; a
@@ -85,16 +105,22 @@ export default function LocationMap({ city, country, description, unavailable }:
         });
 
         /**
-         * `style.load` rather than `load`: `load` holds out until every source
-         * has finished, which on a slow or flaky connection can be never, and
-         * the flight would never start. The projection, the marker and the
-         * camera only need the style.
+         * `on` rather than `once`: swapping the light and dark styles loads a
+         * whole new stylesheet, and the globe projection has to be set again
+         * each time or the map drops back to a flat mercator.
+         *
+         * `style.load` rather than `load`, too. `load` holds out until every
+         * source has finished, which on a slow or flaky connection can be
+         * never, and the flight would never start.
          */
-        map.once("style.load", () => {
+        map.on("style.load", () => {
           styleLoaded = true;
           if (!map) return;
 
           map.setProjection({ type: "globe" });
+
+          if (flown) return;
+          flown = true;
 
           // Long enough on the whole planet to register it before the descent.
           timer = setTimeout(() => {
@@ -135,36 +161,65 @@ export default function LocationMap({ city, country, description, unavailable }:
             });
           }, 2000);
         });
+
+        /**
+         * A bright street map under a dark page reads as a hole in it, so the
+         * map follows the theme. Both routes into a change are watched: the
+         * attribute the menu writes, and the system setting behind "Auto".
+         */
+        function follow() {
+          const next = currentScheme();
+          if (!map || next === scheme) return;
+
+          scheme = next;
+          map.setStyle(STYLES[next]);
+        }
+
+        const themeAttribute = new MutationObserver(follow);
+        themeAttribute.observe(document.documentElement, {
+          attributes: true,
+          attributeFilter: ["data-theme"],
+        });
+
+        const systemSetting = window.matchMedia("(prefers-color-scheme: dark)");
+        systemSetting.addEventListener("change", follow);
+
+        return () => {
+          themeAttribute.disconnect();
+          systemSetting.removeEventListener("change", follow);
+        };
       })
       .catch(() => setFailed(true));
 
     return () => {
       cancelled = true;
       clearTimeout(timer);
+      // Stops watching the theme, whether or not the map ever got built.
+      started.then((stopWatching) => stopWatching?.());
       map?.remove();
     };
   }, []);
 
   if (failed) {
     return (
-      <p className="text-gray-500">
+      <p className="text-muted">
         {unavailable} {city}, {country}.
       </p>
     );
   }
 
   return (
-    <div className="relative h-80 w-full overflow-hidden rounded-lg sm:h-[28rem]">
+    <div className="relative h-80 w-full overflow-hidden rounded-lg border border-border sm:h-[28rem]">
       <div
         ref={container}
         role="img"
         aria-label={description}
-        className="h-full w-full bg-gray-200"
+        className="h-full w-full bg-border"
       />
 
       {/* Held back until the flight lands, so it reads as the destination. */}
       {arrived && (
-        <p className="pointer-events-none absolute top-4 left-4 rounded bg-white/90 px-3 py-2 font-semibold shadow">
+        <p className="pointer-events-none absolute top-4 left-4 rounded bg-surface/90 px-3 py-2 font-semibold text-foreground shadow">
           {city} — {country}
         </p>
       )}
