@@ -119,7 +119,11 @@ export default function LocationMap({ city, country, description, unavailable }:
              */
             map.flyTo({
               center: IBARRA,
-              zoom: 12.5,
+              /**
+               * Close enough to place Ibarra in Imbabura, far enough that the
+               * streets around it are nobody's business.
+               */
+              zoom: 10,
               duration: 7000,
               /**
                * Below the 1.42 default. `flyTo` front-loads the zoom as the
