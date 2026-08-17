@@ -55,6 +55,18 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/*
+ * The portrait on the map is an anchor pointing at #about. The browser does
+ * the scrolling either way; this only asks for it to be animated, and only for
+ * a visitor who has not told their system they would rather it were not. A
+ * bare `scroll-behavior: smooth` would override that preference for everyone.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
