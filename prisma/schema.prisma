@@ -10,6 +10,41 @@ datasource db {
   provider = "postgresql"
 }
 
+/// Site-wide profile settings, edited from `/admin`. The site has a single
+/// owner, so this table holds exactly one row and `id` is pinned to a constant
+/// instead of being generated — that is what lets the admin `upsert` it without
+/// first having to look up which row to write.
+model Profile {
+  id String @id @default("main")
+
+  /// Absolute URL of the portrait in Vercel Blob. Null until one is uploaded,
+  /// which is why `Location` still has to render its placeholder.
+  imageUrl  String?
+  updatedAt DateTime @updatedAt
+}
+
+/// A link to somewhere else — email, GitHub, LinkedIn, a CV, anything.
+///
+/// One generic table rather than a column per network: the admin offers the
+/// usual ones as presets, but adding a new place to be found is then a row
+/// rather than a migration.
+model ContactLink {
+  id String @id @default(uuid())
+
+  /// Picks the icon in `app/components/Contact.tsx`. Free-form on purpose —
+  /// anything the component does not recognise falls back to a generic mark.
+  platform String
+  /// What the link says, and what a screen reader announces.
+  label String
+  /// Stored ready to use: `mailto:` for email, `https://` for the rest.
+  url String
+  /// Ascending. Ties are broken by `createdAt` so the order is never arbitrary.
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([position, createdAt])
+}
+
 /// A portfolio project, rendered by `app/components/Projects.tsx`.
 model Project {
   id           String   @id @default(uuid())

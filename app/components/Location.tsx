@@ -1,4 +1,7 @@
+import Image from "next/image";
+
 import { getDictionary } from "@/lib/dictionaries";
+import prisma from "@/lib/prisma";
 
 import LocationMap from "./LocationMap";
 
@@ -9,7 +12,10 @@ import LocationMap from "./LocationMap";
  * a pile of string props.
  */
 export default async function Location() {
-  const dict = await getDictionary();
+  const [dict, profile] = await Promise.all([
+    getDictionary(),
+    prisma.profile.findUnique({ where: { id: "main" } }),
+  ]);
 
   return (
     <LocationMap
@@ -24,28 +30,42 @@ export default async function Location() {
       </div>
 
       {/*
-        Waiting on a photo. Replace the whole element with a `next/image` when
-        one exists; the circle is only here to hold the space and show where it
-        goes. Hidden from screen readers because an empty frame has nothing to
-        announce.
+        The portrait is uploaded from `/admin`; the dashed circle below holds
+        the space until one is. It stays hidden from screen readers because an
+        empty frame has nothing to announce.
+
+        `96` is the rendered width at `sm:size-24`, doubled by the optimiser for
+        retina. `preload` — `priority` is deprecated as of Next 16 — because
+        this sits in the opening panel and would otherwise load late.
       */}
-      <div
-        aria-hidden="true"
-        className="flex size-20 shrink-0 items-center justify-center rounded-full border-2 border-dashed border-muted bg-surface/70 text-muted sm:size-24"
-      >
-        <svg
-          width="28"
-          height="28"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
+      {profile?.imageUrl ? (
+        <Image
+          src={profile.imageUrl}
+          alt={dict.hero.name}
+          width={96}
+          height={96}
+          preload
+          className="size-20 shrink-0 rounded-full border-2 border-surface object-cover shadow sm:size-24"
+        />
+      ) : (
+        <div
+          aria-hidden="true"
+          className="flex size-20 shrink-0 items-center justify-center rounded-full border-2 border-dashed border-muted bg-surface/70 text-muted sm:size-24"
         >
-          <circle cx="12" cy="8.5" r="3.5" />
-          <path d="M4.5 20a7.5 7.5 0 0 1 15 0" />
-        </svg>
-      </div>
+          <svg
+            width="28"
+            height="28"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          >
+            <circle cx="12" cy="8.5" r="3.5" />
+            <path d="M4.5 20a7.5 7.5 0 0 1 15 0" />
+          </svg>
+        </div>
+      )}
     </LocationMap>
   );
 }
