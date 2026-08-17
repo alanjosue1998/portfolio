@@ -1,4 +1,5 @@
 import About from "@/app/components/About";
+import Contact from "@/app/components/Contact";
 import Location from "@/app/components/Location";
 import SiteHeader from "@/app/components/SiteHeader";
 import { getDictionary } from "@/lib/dictionaries";
@@ -19,6 +20,8 @@ export default async function Home() {
       <Location />
       <p>{dict.hero.tagline}</p>
       <About />
+      {/* Renders nothing until at least one link exists in the admin. */}
+      <Contact />
     </main>
   );
 }

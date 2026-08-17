@@ -30,6 +30,9 @@
       }
     ]
   },
+  "contact": {
+    "heading": "Contact"
+  },
   "location": {
     "city": "Ibarra, Imbabura",
     "country": "Ecuador",
