@@ -30,6 +30,9 @@
       }
     ]
   },
+  "skills": {
+    "heading": "Skills"
+  },
   "contact": {
     "heading": "Contacto"
   },
