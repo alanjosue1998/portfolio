@@ -26,8 +26,12 @@ jobs:
         # Without a health check the steps can start before Postgres accepts
         # connections, and the build fails for a reason that has nothing to do
         # with the change under review.
+        #
+        # `-U postgres` is not optional: the check runs inside the container as
+        # root, and `pg_isready` defaults to the operating system user as the
+        # database role, so it asks for a `root` role that does not exist.
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U postgres"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
