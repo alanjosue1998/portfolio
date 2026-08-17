@@ -48,8 +48,27 @@ export async function createProject(
     };
   }
 
+  /**
+   * The cover is optional, so an empty file input is not an error — only a
+   * file that was chosen and then failed to upload is. `uploadImage` cannot
+   * tell those apart, hence the check on the entry before calling it.
+   */
+  const chosen = formData.get("image");
+  const hasCover = chosen instanceof File && chosen.size > 0;
+  let imageUrl: string | null = null;
+
+  if (hasCover) {
+    const uploaded = await uploadImage(chosen, "projects");
+
+    if (!uploaded.ok) {
+      return { status: "error", message: uploaded.message };
+    }
+
+    imageUrl = uploaded.url;
+  }
+
   await prisma.project.create({
-    data: { title, type, description, technologies },
+    data: { title, type, description, technologies, imageUrl },
   });
 
   revalidateSite();
@@ -63,50 +82,97 @@ export async function deleteProject(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   if (!id) return;
 
-  await prisma.project.delete({ where: { id } });
+  const project = await prisma.project.delete({ where: { id } });
+
+  /**
+   * Best effort, and deliberately after the row is gone: a cover left in the
+   * store is a few stray kilobytes, while a delete that fails here should not
+   * keep the project itself on the site.
+   */
+  if (project.imageUrl) {
+    try {
+      await del(project.imageUrl);
+    } catch {
+      // Left behind in the store; harmless.
+    }
+  }
+
+  revalidateSite();
+}
+
+export async function createSkill(_previous: FormState, formData: FormData): Promise<FormState> {
+  await requireSession();
+
+  const name = String(formData.get("name") ?? "").trim();
+  const category = String(formData.get("category") ?? "").trim();
+  const position = Number(formData.get("position") ?? 0);
+
+  if (!name || !category) {
+    return { status: "error", message: "Nombre y categoría son obligatorios." };
+  }
+
+  await prisma.skill.create({
+    data: { name, category, position: Number.isFinite(position) ? position : 0 },
+  });
+
+  revalidateSite();
+
+  return { status: "ok", message: `Se añadió “${name}”.` };
+}
+
+export async function deleteSkill(formData: FormData) {
+  await requireSession();
+
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+
+  await prisma.skill.delete({ where: { id } });
 
   revalidateSite();
 }
 
 /**
- * Kept under Vercel's 4.5MB request ceiling so the action can answer with the
- * message below instead of the upload dying in the platform.
+ * Kept under Vercel's 4.5MB request ceiling so the action can answer with its
+ * own message instead of the upload dying in the platform.
  */
 const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
 
-export async function saveProfileImage(
-  _previous: FormState,
-  formData: FormData,
-): Promise<FormState> {
-  await requireSession();
-
-  const file = formData.get("image");
-
+/**
+ * Validates a file off a form and puts it in Vercel Blob.
+ *
+ * Shared by the portrait and the project cover, which differ only in the
+ * folder they land in. Returns a result rather than throwing so each caller
+ * can hand the message straight back to its own form.
+ */
+async function uploadImage(
+  file: FormDataEntryValue | null,
+  folder: string,
+): Promise<{ ok: true; url: string } | { ok: false; message: string }> {
   if (!(file instanceof File) || file.size === 0) {
-    return { status: "error", message: "Elige una imagen." };
+    return { ok: false, message: "Elige una imagen." };
   }
 
   if (!file.type.startsWith("image/")) {
-    return { status: "error", message: "El archivo tiene que ser una imagen." };
+    return { ok: false, message: "El archivo tiene que ser una imagen." };
   }
 
   if (file.size > MAX_IMAGE_BYTES) {
-    return { status: "error", message: "La imagen no puede pasar de 4 MB." };
+    return { ok: false, message: "La imagen no puede pasar de 4 MB." };
   }
 
-  /**
-   * `addRandomSuffix` keeps a re-upload from colliding with the previous file,
-   * and means the new URL differs from the old one — so the CDN and every
-   * browser that cached the last portrait fetch this one instead of serving a
-   * stale copy from the same address.
-   */
-  let uploaded;
-
   try {
-    uploaded = await put(`profile/${file.name}`, file, {
+    /**
+     * `addRandomSuffix` keeps a re-upload from colliding with the previous
+     * file, and means the new URL differs from the old one — so the CDN and
+     * every browser that cached the last image fetch this one instead of
+     * serving a stale copy from the same address.
+     */
+    const uploaded = await put(`${folder}/${file.name}`, file, {
       access: "public",
       addRandomSuffix: true,
     });
+
+    return { ok: true, url: uploaded.url };
   } catch (error) {
     /**
      * Letting this throw hands the admin a runtime error page over a form that
@@ -115,15 +181,28 @@ export async function saveProfileImage(
      * The message is passed through rather than replaced with a guess. An
      * earlier version blamed a missing `BLOB_READ_WRITE_TOKEN` for every
      * failure, which sent the reader hunting for a token that was already
-     * there while the store quietly rejected public uploads. This page is
+     * there while the store quietly rejected public uploads. These pages are
      * behind a session and the SDK's errors name configuration, not secrets.
      */
     console.error("Blob upload failed", error);
 
     return {
-      status: "error",
+      ok: false,
       message: `No se pudo subir la imagen. ${error instanceof Error ? error.message : String(error)}`,
     };
+  }
+}
+
+export async function saveProfileImage(
+  _previous: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  await requireSession();
+
+  const uploaded = await uploadImage(formData.get("image"), "profile");
+
+  if (!uploaded.ok) {
+    return { status: "error", message: uploaded.message };
   }
 
   const previous = await prisma.profile.findUnique({ where: { id: "main" } });

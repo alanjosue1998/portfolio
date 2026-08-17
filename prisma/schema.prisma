@@ -45,6 +45,25 @@ model ContactLink {
   @@index([position, createdAt])
 }
 
+/// One thing worth listing under Skills, rendered by
+/// `app/components/Skills.tsx`.
+///
+/// `category` is a free-form string rather than an enum: the groupings on a
+/// portfolio shift as the work does, and a new heading should be something you
+/// type into the admin, not a migration.
+model Skill {
+  id String @id @default(uuid())
+
+  name     String
+  /// Groups the tags on the public site, e.g. "CMS" or "Backend".
+  category String
+  /// Ascending, within the category. Ties broken by `createdAt`.
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([position, createdAt])
+}
+
 /// A portfolio project, rendered by `app/components/Projects.tsx`.
 model Project {
   id           String   @id @default(uuid())
@@ -53,6 +72,9 @@ model Project {
   type         String
   description  String
   technologies String[]
+  /// Cover image in Vercel Blob. Null when none was uploaded, which is why the
+  /// card has to hold its own without one.
+  imageUrl     String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }

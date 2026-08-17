@@ -1,7 +1,9 @@
 import About from "@/app/components/About";
 import Contact from "@/app/components/Contact";
 import Location from "@/app/components/Location";
+import Projects from "@/app/components/Projects";
 import SiteHeader from "@/app/components/SiteHeader";
+import Skills from "@/app/components/Skills";
 import { getDictionary } from "@/lib/dictionaries";
 
 export default async function Home() {
@@ -20,7 +22,9 @@ export default async function Home() {
       <Location />
       <p>{dict.hero.tagline}</p>
       <About />
-      {/* Renders nothing until at least one link exists in the admin. */}
+      {/* Each of these renders nothing until the admin has something to show. */}
+      <Skills />
+      <Projects />
       <Contact />
     </main>
   );

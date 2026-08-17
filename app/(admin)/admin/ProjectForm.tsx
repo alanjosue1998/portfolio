@@ -48,6 +48,25 @@ export default function ProjectForm() {
         </p>
       </div>
 
+      {/*
+        Optional, unlike the portrait: a project with no cover still renders as
+        a card, just without the image on top.
+      */}
+      <div className="flex flex-col gap-1">
+        <label htmlFor="image">Portada</label>
+        <input
+          id="image"
+          name="image"
+          type="file"
+          accept="image/*"
+          aria-describedby="image-hint"
+          className="text-sm"
+        />
+        <p id="image-hint" className="text-sm text-gray-500">
+          Opcional. JPG, PNG o WebP, máximo 4 MB.
+        </p>
+      </div>
+
       {state && (
         <p role="alert" className={state.status === "error" ? "text-red-600" : "text-green-700"}>
           {state.message}
