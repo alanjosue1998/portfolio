@@ -44,7 +44,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "dotenv": "^17.4.2",
-    "eslint": "^10.0.0",
+    "eslint": "^9.39.5",
     "eslint-config-next": "16.3.1",
     "husky": "^9.1.7",
     "lint-staged": "^17.3.0",
@@ -53,6 +53,6 @@
     "prisma": "^7.9.1",
     "tailwindcss": "^4",
     "tsx": "^4.23.5",
-    "typescript": "^7.0.0"
+    "typescript": "^6.0.3"
   }
 }

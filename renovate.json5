@@ -67,5 +67,29 @@
       matchPackageNames: ["tailwindcss", "@tailwindcss/**", "prettier-plugin-tailwindcss"],
       groupName: "Tailwind CSS",
     },
+    /**
+     * Both of these were merged and both broke `npm run lint`, from opposite
+     * ends of the same config.
+     *
+     * `typescript-eslint` declares `typescript: ">=4.8.4 <6.1.0"`, so TypeScript
+     * 7 makes it refuse to load at all. Its support is still unimplemented and
+     * blocked on ESLint gaining async parsers — see
+     * https://github.com/typescript-eslint/typescript-eslint/issues/10940.
+     *
+     * ESLint 10 changed the rule context API, and the `eslint-plugin-react`
+     * bundled inside `eslint-config-next` still calls `context.getFilename()`,
+     * so every React rule throws.
+     *
+     * Both ceilings come off once `eslint-config-next` ships versions that
+     * handle them; until then a pull request for either is only noise.
+     */
+    {
+      matchPackageNames: ["typescript"],
+      allowedVersions: "<7",
+    },
+    {
+      matchPackageNames: ["eslint"],
+      allowedVersions: "<10",
+    },
   ],
 }
