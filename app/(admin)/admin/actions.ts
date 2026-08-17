@@ -100,10 +100,31 @@ export async function saveProfileImage(
    * browser that cached the last portrait fetch this one instead of serving a
    * stale copy from the same address.
    */
-  const uploaded = await put(`profile/${file.name}`, file, {
-    access: "public",
-    addRandomSuffix: true,
-  });
+  let uploaded;
+
+  try {
+    uploaded = await put(`profile/${file.name}`, file, {
+      access: "public",
+      addRandomSuffix: true,
+    });
+  } catch (error) {
+    /**
+     * Letting this throw hands the admin a runtime error page over a form that
+     * was working a second ago.
+     *
+     * The message is passed through rather than replaced with a guess. An
+     * earlier version blamed a missing `BLOB_READ_WRITE_TOKEN` for every
+     * failure, which sent the reader hunting for a token that was already
+     * there while the store quietly rejected public uploads. This page is
+     * behind a session and the SDK's errors name configuration, not secrets.
+     */
+    console.error("Blob upload failed", error);
+
+    return {
+      status: "error",
+      message: `No se pudo subir la imagen. ${error instanceof Error ? error.message : String(error)}`,
+    };
+  }
 
   const previous = await prisma.profile.findUnique({ where: { id: "main" } });
 
