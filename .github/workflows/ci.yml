@@ -1,0 +1,65 @@
+# The only thing that compiles the project on a pull request. Vercel used to do
+# it through preview deployments, which are off now (see `vercel.json`), and a
+# dependency major that breaks the build should fail here rather than on `main`.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # `next build` prerenders `/[lang]`, and the components on that page read
+    # the database through Prisma, so the build needs a reachable Postgres.
+    # This one is created and thrown away with the job — the credentials below
+    # are not secrets and never leave the runner.
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        # Without a health check the steps can start before Postgres accepts
+        # connections, and the build fails for a reason that has nothing to do
+        # with the change under review.
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+      # Better Auth reads these on its own and refuses to start without a
+      # secret. This one only ever signs cookies nobody reads.
+      BETTER_AUTH_SECRET: throwaway-secret-for-ci
+      BETTER_AUTH_URL: http://localhost:3000
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      # `postinstall` runs `prisma generate`, so the client under
+      # `generated/prisma` exists from here on.
+      - run: npm ci
+
+      # The schema has to exist before the build queries it.
+      - name: Apply migrations
+        run: npx prisma migrate deploy
+
+      - run: npm run lint
+
+      # `next build` reports type errors too, but this runs first because it
+      # fails in seconds rather than minutes.
+      - name: Type-check
+        run: npx tsc --noEmit
+
+      - run: npm run build

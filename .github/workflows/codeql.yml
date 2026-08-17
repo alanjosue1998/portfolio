@@ -1,0 +1,37 @@
+# Static analysis over the code we wrote, which is what Dependency Review does
+# not look at. The admin panel, the sign-in flow and the upload handlers are
+# where an injection or a path traversal would live.
+name: CodeQL
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  # Advisories land long after code is merged, so a weekly pass re-scans a tree
+  # that has not changed. Monday morning, same as Renovate's batch.
+  schedule:
+    - cron: "0 12 * * 1"
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+
+    permissions:
+      # Needed to upload the results to the Security tab.
+      security-events: write
+      actions: read
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: github/codeql-action/init@v4
+        with:
+          languages: javascript-typescript
+          # Nothing to compile for CodeQL to read JavaScript and TypeScript,
+          # so it skips the build the other languages need.
+          build-mode: none
+
+      - uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:javascript-typescript"

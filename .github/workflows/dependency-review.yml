@@ -1,0 +1,22 @@
+# Fails a pull request that introduces a dependency with a known vulnerability.
+# Almost every pull request here is Renovate bumping something, so this is the
+# check that matches what actually arrives.
+#
+# Requires the Dependency graph to be enabled on the repository, under
+# Settings -> Advanced Security. Free on public repositories.
+name: Dependency Review
+
+on: [pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # No floating `v5` tag is published for this action — only exact
+      # releases — so the version is pinned and Renovate keeps it current.
+      - uses: actions/dependency-review-action@v5.0.0
