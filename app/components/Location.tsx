@@ -30,27 +30,47 @@ export default async function Location() {
       </div>
 
       {/*
-        The portrait is uploaded from `/admin`; the dashed circle below holds
+        The portrait is uploaded from `/admin`; the dashed square below holds
         the space until one is. It stays hidden from screen readers because an
         empty frame has nothing to announce.
 
-        `96` is the rendered width at `sm:size-24`, doubled by the optimiser for
-        retina. `preload` — `priority` is deprecated as of Next 16 — because
-        this sits in the opening panel and would otherwise load late.
+        `176` is the rendered width at `sm:size-44`, doubled by the optimiser
+        for retina. `preload` — `priority` is deprecated as of Next 16 —
+        because this sits in the opening panel and would otherwise load late.
+
+        The right margin pulls it in off the edge; the greeting opposite is
+        anchored by the wrapper's `justify-between`, so nudging this one is
+        what moves it without disturbing the other.
+
+        The link is a plain anchor rather than a click handler: it scrolls
+        without JavaScript, takes keyboard focus on its own, and offers the
+        usual right-click menu. `pointer-events-auto` is not optional — the
+        overlay wrapper in `LocationMap` switches pointer events off so the map
+        underneath stays draggable, and without this the link would be dead.
+
+        The zoom lives on the image while the anchor clips it, so the picture
+        grows inside a frame that stays put instead of the whole thing swelling
+        and shoving the greeting sideways.
       */}
       {profile?.imageUrl ? (
-        <Image
-          src={profile.imageUrl}
-          alt={dict.hero.name}
-          width={96}
-          height={96}
-          preload
-          className="size-20 shrink-0 rounded-full border-2 border-surface object-cover shadow sm:size-24"
-        />
+        <a
+          href="#about"
+          aria-label={dict.about.heading}
+          className="group pointer-events-auto mr-4 block shrink-0 overflow-hidden rounded-2xl border-2 border-surface shadow focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:mr-8"
+        >
+          <Image
+            src={profile.imageUrl}
+            alt={dict.hero.name}
+            width={176}
+            height={176}
+            preload
+            className="size-32 object-cover motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover:scale-110 sm:size-44"
+          />
+        </a>
       ) : (
         <div
           aria-hidden="true"
-          className="flex size-20 shrink-0 items-center justify-center rounded-full border-2 border-dashed border-muted bg-surface/70 text-muted sm:size-24"
+          className="mr-4 flex size-32 shrink-0 items-center justify-center rounded-2xl border-2 border-dashed border-muted bg-surface/70 text-muted sm:mr-8 sm:size-44"
         >
           <svg
             width="28"
