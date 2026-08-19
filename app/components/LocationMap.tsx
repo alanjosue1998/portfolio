@@ -87,9 +87,10 @@ export default function LocationMap({ city, country, description, unavailable, c
           /**
            * Close enough that the planet fills the frame rather than sitting
            * in the middle of it, while still curving away at the edges — past
-           * roughly 4 the globe stops reading as one.
+           * roughly 4 the globe stops reading as one. At 2.2 it opened as a
+           * marble with page on every side of it.
            */
-          zoom: 2.2,
+          zoom: 3,
           /**
            * The map sits in the middle of the page, and swallowing wheel events
            * would trap anyone scrolling past it. Dragging and the buttons still
