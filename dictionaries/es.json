@@ -30,6 +30,15 @@
       }
     ]
   },
+  "certificates": {
+    "heading": "Certificados",
+    "credentialId": "ID de credencial",
+    "verify": "Verificar credencial",
+    "image": {
+      "view": "Ver el certificado a tamaño completo",
+      "close": "Cerrar"
+    }
+  },
   "skills": {
     "heading": "Skills"
   },

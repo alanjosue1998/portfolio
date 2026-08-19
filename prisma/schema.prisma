@@ -33,11 +33,11 @@ model ContactLink {
 
   /// Picks the icon in `app/components/Contact.tsx`. Free-form on purpose —
   /// anything the component does not recognise falls back to a generic mark.
-  platform String
+  platform  String
   /// What the link says, and what a screen reader announces.
-  label String
+  label     String
   /// Stored ready to use: `mailto:` for email, `https://` for the rest.
-  url String
+  url       String
   /// Ascending. Ties are broken by `createdAt` so the order is never arbitrary.
   position  Int      @default(0)
   createdAt DateTime @default(now())
@@ -54,12 +54,41 @@ model ContactLink {
 model Skill {
   id String @id @default(uuid())
 
-  name     String
+  name      String
   /// Groups the tags on the public site, e.g. "CMS" or "Backend".
-  category String
+  category  String
   /// Ascending, within the category. Ties broken by `createdAt`.
   position  Int      @default(0)
   createdAt DateTime @default(now())
+
+  @@index([position, createdAt])
+}
+
+/// A certificate or credential, rendered by `app/components/Certificates.tsx`.
+///
+/// Everything but the title and the issuer is optional: a certificate that was
+/// printed without a code, or whose issuer verifies nothing, is still worth
+/// listing, and the card is built to hold together with any of these missing.
+model Certificate {
+  id String @id @default(uuid())
+
+  title         String
+  /// Who awarded it — "Acquia", "Platzi", a university.
+  issuer        String
+  /// Stored as the first of the month. Certificates are dated to the month at
+  /// best, so the day is an invention; `app/components/Certificates.tsx` reads
+  /// it back in UTC and prints only the month and the year.
+  issuedAt      DateTime?
+  /// The code printed on the certificate, the one the issuer verifies against.
+  credentialId  String?
+  /// Where that verification happens. Stored ready to use, `https://`.
+  credentialUrl String?
+  /// A photo or a scan, in Vercel Blob. Null when none was uploaded, which is
+  /// why the card has to hold its own without one.
+  imageUrl      String?
+  /// Ascending. Ties are broken by `createdAt` so the order is never arbitrary.
+  position      Int       @default(0)
+  createdAt     DateTime  @default(now())
 
   @@index([position, createdAt])
 }

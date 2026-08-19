@@ -100,6 +100,116 @@ export async function deleteProject(formData: FormData) {
   revalidateSite();
 }
 
+export async function createCertificate(
+  _previous: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  await requireSession();
+
+  const title = String(formData.get("title") ?? "").trim();
+  const issuer = String(formData.get("issuer") ?? "").trim();
+  const credentialId = String(formData.get("credentialId") ?? "").trim() || null;
+  const rawCredentialUrl = String(formData.get("credentialUrl") ?? "").trim();
+  const rawIssuedAt = String(formData.get("issuedAt") ?? "").trim();
+  const position = Number(formData.get("position") ?? 0);
+
+  if (!title || !issuer) {
+    return {
+      status: "error",
+      message: "El título y la entidad son obligatorios.",
+    };
+  }
+
+  /**
+   * `<input type="month">` hands back `YYYY-MM`. Pinning it to the first of
+   * the month in UTC keeps the stored instant on the month that was typed
+   * whatever timezone the server runs in — the public card reads it back the
+   * same way.
+   */
+  let issuedAt: Date | null = null;
+
+  if (rawIssuedAt) {
+    const parsed = new Date(`${rawIssuedAt}-01T00:00:00Z`);
+
+    if (Number.isNaN(parsed.getTime())) {
+      return { status: "error", message: "La fecha no es válida." };
+    }
+
+    issuedAt = parsed;
+  }
+
+  /**
+   * Optional, so a blank field is not an error — only one that was filled in
+   * with something that could not be a link. `certificate` is not `email`,
+   * which is all `normaliseUrl` needs to treat it as a web address.
+   */
+  const credentialUrl = rawCredentialUrl ? normaliseUrl(rawCredentialUrl, "certificate") : null;
+
+  if (rawCredentialUrl && !credentialUrl) {
+    return {
+      status: "error",
+      message: "El enlace de verificación no es válido (https://…).",
+    };
+  }
+
+  /**
+   * The photo is optional, so an empty file input is not an error — only a
+   * file that was chosen and then failed to upload is.
+   */
+  const chosen = formData.get("image");
+  let imageUrl: string | null = null;
+
+  if (chosen instanceof File && chosen.size > 0) {
+    const uploaded = await uploadImage(chosen, "certificates");
+
+    if (!uploaded.ok) {
+      return { status: "error", message: uploaded.message };
+    }
+
+    imageUrl = uploaded.url;
+  }
+
+  await prisma.certificate.create({
+    data: {
+      title,
+      issuer,
+      issuedAt,
+      credentialId,
+      credentialUrl,
+      imageUrl,
+      position: Number.isFinite(position) ? position : 0,
+    },
+  });
+
+  revalidateSite();
+
+  return { status: "ok", message: `Se añadió “${title}”.` };
+}
+
+export async function deleteCertificate(formData: FormData) {
+  await requireSession();
+
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+
+  const certificate = await prisma.certificate.delete({ where: { id } });
+
+  /**
+   * Best effort, and deliberately after the row is gone: a photo left in the
+   * store is a few stray kilobytes, while a delete that fails here should not
+   * keep the certificate itself on the site.
+   */
+  if (certificate.imageUrl) {
+    try {
+      await del(certificate.imageUrl);
+    } catch {
+      // Left behind in the store; harmless.
+    }
+  }
+
+  revalidateSite();
+}
+
 export async function createSkill(_previous: FormState, formData: FormData): Promise<FormState> {
   await requireSession();
 
@@ -140,9 +250,10 @@ const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
 /**
  * Validates a file off a form and puts it in Vercel Blob.
  *
- * Shared by the portrait and the project cover, which differ only in the
- * folder they land in. Returns a result rather than throwing so each caller
- * can hand the message straight back to its own form.
+ * Shared by the portrait, the project cover and the certificate photo,
+ * which differ only in the folder they land in. Returns a result rather
+ * than throwing so each caller can hand the message straight back to its
+ * own form.
  */
 async function uploadImage(
   file: FormDataEntryValue | null,

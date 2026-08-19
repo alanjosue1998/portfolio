@@ -1,4 +1,5 @@
 import About from "@/app/components/About";
+import Certificates from "@/app/components/Certificates";
 import Contact from "@/app/components/Contact";
 import Location from "@/app/components/Location";
 import Projects from "@/app/components/Projects";
@@ -25,6 +26,7 @@ export default async function Home() {
       {/* Each of these renders nothing until the admin has something to show. */}
       <Skills />
       <Projects />
+      <Certificates />
       <Contact />
     </main>
   );
