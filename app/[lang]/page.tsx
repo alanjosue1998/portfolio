@@ -1,5 +1,6 @@
 import About from "@/app/components/About";
 import Contact from "@/app/components/Contact";
+import ContactCta from "@/app/components/ContactCta";
 import Location from "@/app/components/Location";
 import Projects from "@/app/components/Projects";
 import SiteHeader from "@/app/components/SiteHeader";
@@ -21,6 +22,9 @@ export default async function Home() {
       {/* The map opens the page, and carries the greeting and the portrait. */}
       <Location />
       <p>{dict.hero.tagline}</p>
+      {/* The one call to action above the fold. Renders nothing until an
+          email link exists in the admin. */}
+      <ContactCta />
       <About />
       {/* Each of these renders nothing until the admin has something to show. */}
       <Skills />
