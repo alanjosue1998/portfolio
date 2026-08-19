@@ -342,6 +342,28 @@ export async function saveProfileImage(
   return { status: "ok", message: "Foto actualizada." };
 }
 
+export async function saveAbout(_previous: FormState, formData: FormData): Promise<FormState> {
+  await requireSession();
+
+  /**
+   * Stored as null rather than as an empty string: `app/components/About.tsx`
+   * falls back to the dictionary, and clearing the field is how you ask for
+   * that text back.
+   */
+  const aboutEs = String(formData.get("aboutEs") ?? "").trim() || null;
+  const aboutEn = String(formData.get("aboutEn") ?? "").trim() || null;
+
+  await prisma.profile.upsert({
+    where: { id: "main" },
+    create: { id: "main", aboutEs, aboutEn },
+    update: { aboutEs, aboutEn },
+  });
+
+  revalidateSite();
+
+  return { status: "ok", message: "Texto actualizado." };
+}
+
 /**
  * `mailto:` and `tel:` have no `//`, so a bare address has to be recognised
  * before it is treated as a web address. Anything without a scheme is assumed
