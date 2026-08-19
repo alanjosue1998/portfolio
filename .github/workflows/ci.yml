@@ -18,7 +18,7 @@ jobs:
     # are not secrets and never leave the runner.
     services:
       postgres:
-        image: postgres:17
+        image: postgres:18
         env:
           POSTGRES_PASSWORD: postgres
         ports:
@@ -60,6 +60,13 @@ jobs:
         run: npx prisma migrate deploy
 
       - run: npm run lint
+
+      # `LayoutProps`, `PageProps` and `RouteContext` are global types Next.js
+      # writes into `.next/types`, and `tsconfig.json` includes that directory.
+      # A fresh checkout has no `.next`, so `tsc` would fail on those names
+      # alone. Locally it passes because `next dev` already generated them.
+      - name: Generate route types
+        run: npx next typegen
 
       # `next build` reports type errors too, but this runs first because it
       # fails in seconds rather than minutes.
