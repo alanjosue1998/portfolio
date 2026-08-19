@@ -7,6 +7,7 @@ const sections = [
   { href: "/admin", label: "Información de perfil" },
   { href: "/admin/skills", label: "Skills" },
   { href: "/admin/projects", label: "Proyectos" },
+  { href: "/admin/certificates", label: "Certificados" },
 ];
 
 export default function AdminNav() {
