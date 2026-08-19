@@ -19,7 +19,17 @@ model Profile {
 
   /// Absolute URL of the portrait in Vercel Blob. Null until one is uploaded,
   /// which is why `Location` still has to render its placeholder.
-  imageUrl  String?
+  imageUrl String?
+
+  /// The "About me" text, one column per locale.
+  ///
+  /// Null rather than empty when nothing has been written: the site shipped
+  /// with a paragraph in `dictionaries/*.json`, and `app/components/About.tsx`
+  /// falls back to it, so an unset column means "keep what was there" instead
+  /// of blanking the section.
+  aboutEs String?
+  aboutEn String?
+
   updatedAt DateTime @updatedAt
 }
 
