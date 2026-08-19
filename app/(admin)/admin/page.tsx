@@ -1,6 +1,15 @@
+/**
+ * Read straight off disk rather than through `getDictionary`, which reads the
+ * locale from the `[lang]` root segment — and the panel is the other root, so
+ * there is no locale there to read. Only the fallback paragraphs are wanted
+ * anyway, to show under each field.
+ */
+import en from "@/dictionaries/en.json";
+import es from "@/dictionaries/es.json";
 import prisma from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 
+import AboutForm from "./AboutForm";
 import ContactLinkForm from "./ContactLinkForm";
 import ProfileForm from "./ProfileForm";
 import { deleteContactLink } from "./actions";
@@ -19,6 +28,14 @@ export default async function ProfilePage() {
       <section className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold">Foto de perfil</h2>
         <ProfileForm imageUrl={profile?.imageUrl ?? null} />
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="text-lg font-semibold">Sobre mí</h2>
+        <AboutForm
+          current={{ es: profile?.aboutEs ?? null, en: profile?.aboutEn ?? null }}
+          fallback={{ es: es.about.body, en: en.about.body }}
+        />
       </section>
 
       <section className="flex flex-col gap-4">
