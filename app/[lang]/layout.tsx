@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { lang } from "next/root-params";
@@ -41,7 +42,20 @@ export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
       <head>
         <ThemeScript />
       </head>
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        {children}
+
+        {/*
+          Vercel's page-view counter. It lives in this layout and not in
+          `app/(admin)/layout.tsx`, the site's other root: the panel is a tool
+          for one person, and counting my own visits to it would only be
+          noise in the numbers for the pages visitors actually reach.
+
+          It does nothing outside a Vercel deployment, so `next dev` and the
+          CI build carry it without sending anything anywhere.
+        */}
+        <Analytics />
+      </body>
     </html>
   );
 }
