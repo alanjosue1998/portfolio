@@ -44,6 +44,37 @@
   --border: #44403c;
 }
 
+/*
+ * Which of the two icons in `ThemeToggle` is on screen.
+ *
+ * It is decided here rather than in React because the pages are prerendered:
+ * their HTML cannot know which theme is in play, so an icon chosen in JavaScript
+ * would paint the wrong one and visibly flip once React hydrated. These are the
+ * same three rules as the palette above, in the same order and for the same
+ * reason — the explicit choice comes last, so it wins in both directions.
+ */
+:root .theme-icon-moon {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-icon-sun {
+    display: none;
+  }
+
+  :root:not([data-theme="light"]) .theme-icon-moon {
+    display: block;
+  }
+}
+
+:root[data-theme="dark"] .theme-icon-sun {
+  display: none;
+}
+
+:root[data-theme="dark"] .theme-icon-moon {
+  display: block;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

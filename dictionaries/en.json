@@ -54,11 +54,11 @@
   },
   "menu": {
     "open": "Open menu",
-    "close": "Close menu",
-    "theme": "Theme",
-    "light": "Light",
-    "dark": "Dark",
-    "system": "Auto"
+    "close": "Close menu"
+  },
+  "theme": {
+    "toDark": "Switch to the dark theme",
+    "toLight": "Switch to the light theme"
   },
   "languages": {
     "label": "Language",

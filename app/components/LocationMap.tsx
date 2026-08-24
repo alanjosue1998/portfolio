@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from "react";
 
 import "maplibre-gl/dist/maplibre-gl.css";
 
+import { resolvedTheme, subscribeToTheme } from "./theme";
+
 /** Ibarra, Imbabura. The city centre — deliberately not a street address. */
 const IBARRA: [number, number] = [-78.1225, 0.3517];
 
@@ -32,17 +34,6 @@ const STYLES = {
  * `public/maplibre` — see `scripts/copy-map-worker.mjs` — removes the guess.
  */
 const WORKER_URL = "/maplibre/maplibre-gl-worker.mjs";
-
-type Scheme = keyof typeof STYLES;
-
-/** The same three-state rule the colours follow — see `app/globals.css`. */
-function currentScheme(): Scheme {
-  const chosen = document.documentElement.dataset.theme;
-
-  if (chosen === "light" || chosen === "dark") return chosen;
-
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-}
 
 type Props = {
   city: string;
@@ -78,7 +69,7 @@ export default function LocationMap({ city, country, description, unavailable, c
 
         setWorkerUrl(WORKER_URL);
 
-        let scheme = currentScheme();
+        let scheme = resolvedTheme();
 
         map = new Map({
           container: element,
@@ -197,30 +188,18 @@ export default function LocationMap({ city, country, description, unavailable, c
 
         /**
          * A bright street map under a dark page reads as a hole in it, so the
-         * map follows the theme. Both routes into a change are watched: the
-         * attribute the menu writes, and the system setting behind "Auto".
+         * map follows the theme. `subscribeToTheme` watches every route into a
+         * change — the button, another tab, and the system setting.
          */
         function follow() {
-          const next = currentScheme();
+          const next = resolvedTheme();
           if (!map || next === scheme) return;
 
           scheme = next;
           map.setStyle(STYLES[next]);
         }
 
-        const themeAttribute = new MutationObserver(follow);
-        themeAttribute.observe(document.documentElement, {
-          attributes: true,
-          attributeFilter: ["data-theme"],
-        });
-
-        const systemSetting = window.matchMedia("(prefers-color-scheme: dark)");
-        systemSetting.addEventListener("change", follow);
-
-        return () => {
-          themeAttribute.disconnect();
-          systemSetting.removeEventListener("change", follow);
-        };
+        return subscribeToTheme(follow);
       })
       .catch(() => setFailed(true));
 

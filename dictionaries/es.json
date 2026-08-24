@@ -54,11 +54,11 @@
   },
   "menu": {
     "open": "Abrir menú",
-    "close": "Cerrar menú",
-    "theme": "Tema",
-    "light": "Claro",
-    "dark": "Oscuro",
-    "system": "Auto"
+    "close": "Cerrar menú"
+  },
+  "theme": {
+    "toDark": "Cambiar al tema oscuro",
+    "toLight": "Cambiar al tema claro"
   },
   "languages": {
     "label": "Idioma",
