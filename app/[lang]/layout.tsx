@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { lang } from "next/root-params";
 
 import ThemeScript from "@/app/components/ThemeScript";
+import ThemeToggle from "@/app/components/ThemeToggle";
 import { spaceGrotesk } from "@/app/fonts";
 import { getDictionary } from "@/lib/dictionaries";
 import { locales } from "@/lib/i18n";
@@ -34,6 +35,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
+  const dict = await getDictionary();
+
   return (
     <html
       lang={await lang()}
@@ -44,6 +47,14 @@ export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
       </head>
       <body className="flex min-h-full flex-col">
         {children}
+
+        {/*
+          Pinned to the viewport rather than placed in the page, so it belongs to
+          the layout and not to `page.tsx`. Last in the body, which is also last
+          in the tab order: a control that follows the page around should not
+          stand between a visitor and the page itself.
+        */}
+        <ThemeToggle labels={dict.theme} />
 
         {/*
           Vercel's page-view counter. It lives in this layout and not in
