@@ -10,9 +10,6 @@ import { resolvedTheme, subscribeToTheme } from "./theme";
 /** Ibarra, Imbabura. The city centre — deliberately not a street address. */
 const IBARRA: [number, number] = [-78.1225, 0.3517];
 
-/** Where the globe sits before the descent, half a planet away from Ecuador. */
-const START: [number, number] = [20, 25];
-
 /**
  * OpenFreeMap serves these tiles with no API key and no request limit, and its
  * TileJSON carries the credit it asks for in return, so the attribution control
@@ -74,10 +71,16 @@ export default function LocationMap({ city, country, description, unavailable, c
         map = new Map({
           container: element,
           style: STYLES[scheme],
-          center: START,
           /**
-           * Close enough that the planet fills the frame rather than sitting
-           * in the middle of it, while still curving away at the edges — past
+           * Already over Ibarra, from as far out as the globe still reads as
+           * one. The camera only ever descends from here: it used to open half
+           * a planet away and travel across, which read as the planet spinning
+           * rather than as a descent onto somewhere.
+           */
+          center: IBARRA,
+          /**
+           * Close enough that the planet fills the frame rather than sitting in
+           * the middle of it, while still curving away at the edges — past
            * roughly 4 the globe stops reading as one. At 2.2 it opened as a
            * marble with page on every side of it.
            */
@@ -145,7 +148,7 @@ export default function LocationMap({ city, country, description, unavailable, c
           if (flown) return;
           flown = true;
 
-          // Long enough on the whole planet to register it before the descent.
+          // Long enough out in space to register the planet before the descent.
           timer = setTimeout(() => {
             if (!map) return;
 
@@ -153,9 +156,11 @@ export default function LocationMap({ city, country, description, unavailable, c
               if (!map) return;
 
               /**
-               * The pin waits for the landing. Added up front it hangs off the
-               * rim of the globe, half-faded over the Atlantic, because Ibarra
-               * starts out on the far side of the planet.
+               * The pin waits for the landing, like the city label it appears
+               * with: both are the answer to where this is, and the descent is
+               * the question. Dropped in at the start it would also spend most
+               * of the run as a marker over a continent, pointing at nothing
+               * anyone can see yet.
                */
               new Marker({ color: "#dc2626" }).setLngLat(IBARRA).addTo(map);
               foldCredit(map);
@@ -163,25 +168,23 @@ export default function LocationMap({ city, country, description, unavailable, c
             });
 
             /**
-             * `flyTo` turns into an instant jump when the operating system asks
-             * for reduced motion, which is why `essential` stays unset: nobody
-             * needs to sit through a seven-second flight to find out where I am.
+             * `easeTo` and not `flyTo`, and no `center`: the camera is already
+             * over Ibarra, so all that is left is to come down. `flyTo` exists
+             * to carry the camera somewhere else, arcing out and back in, and
+             * the arc is what made the planet look like it was turning.
+             *
+             * Like `flyTo`, it turns into an instant jump when the operating
+             * system asks for reduced motion, which is why `essential` stays
+             * unset: nobody needs to sit through seven seconds of descent to
+             * find out where I am.
              */
-            map.flyTo({
-              center: IBARRA,
+            map.easeTo({
               /**
                * Close enough to place Ibarra in Imbabura, far enough that the
                * streets around it are nobody's business.
                */
               zoom: 10,
               duration: 7000,
-              /**
-               * Below the 1.42 default. `flyTo` front-loads the zoom as the
-               * curve rises, and at 1.5 the camera was already on top of Ibarra
-               * less than halfway through, leaving most of the flight as a slow
-               * crawl. A flatter curve spreads the descent across the whole run.
-               */
-              curve: 1,
             });
           }, 2000);
         });
