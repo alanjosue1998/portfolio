@@ -61,6 +61,12 @@ jobs:
 
       - run: npm run lint
 
+      # The Husky + lint-staged hook already formats what it sees, but it only
+      # sees commits made from a checkout that ran `npm install`. It misses an
+      # edit through the GitHub web editor, a `--no-verify` commit, and a
+      # conflict resolved by hand. This is the check that covers those.
+      - run: npm run format:check
+
       # `LayoutProps`, `PageProps` and `RouteContext` are global types Next.js
       # writes into `.next/types`, and `tsconfig.json` includes that directory.
       # A fresh checkout has no `.next`, so `tsc` would fail on those names
