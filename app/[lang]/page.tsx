@@ -15,9 +15,14 @@ export default async function Home() {
    * monitor, `mx-auto` centres what is left, and the padding keeps it off the
    * edge on a phone. Everything inside is fluid, so the one rule covers every
    * screen without a breakpoint of its own.
+   *
+   * Padded at the bottom only. The map is the first thing here and it is meant
+   * to meet the top of the window: a strip of page above it made it look like a
+   * card that had been placed on the page rather than the thing the page opens
+   * with.
    */
   return (
-    <main className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 py-10 sm:px-6">
+    <main className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 pb-10 sm:px-6">
       {/* The map opens the page, and carries the greeting and the portrait. */}
       <Location />
       <p>{dict.hero.tagline}</p>

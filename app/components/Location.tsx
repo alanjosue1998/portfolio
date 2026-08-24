@@ -48,15 +48,16 @@ export default async function Location() {
         overlay wrapper in `LocationMap` switches pointer events off so the map
         underneath stays draggable, and without this the link would be dead.
 
-        The zoom lives on the image while the anchor clips it, so the picture
-        grows inside a frame that stays put instead of the whole thing swelling
-        and shoving the greeting sideways.
+        Hovering used to zoom the picture, which looked like something but said
+        nothing. A caption slides up instead, because the one thing this element
+        needs to say is that it goes somewhere: it is a link to the About
+        section and, until now, only a screen reader was told so.
       */}
       {profile?.imageUrl ? (
         <a
           href="#about"
           aria-label={dict.about.heading}
-          className="group pointer-events-auto mr-4 block shrink-0 overflow-hidden rounded-2xl border-2 border-surface shadow focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent sm:mr-8"
+          className="group pointer-events-auto relative mr-4 block shrink-0 overflow-hidden rounded-2xl border-2 border-surface shadow focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent motion-safe:transition-transform motion-safe:duration-300 motion-safe:hover:-translate-y-0.5 sm:mr-8"
         >
           <Image
             src={profile.imageUrl}
@@ -64,8 +65,40 @@ export default async function Location() {
             width={176}
             height={176}
             preload
-            className="size-32 object-cover motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover:scale-110 sm:size-44"
+            className="size-32 object-cover sm:size-44"
           />
+
+          {/*
+            Parked just below the frame and slid up into it, so the picture is
+            never covered until someone asks. `group-focus-visible` matters as
+            much as the hover: a caption only a mouse can reach is a caption
+            half the people who need it never see.
+
+            The transition is the only part held back for reduced motion — the
+            caption still arrives, it just arrives at once.
+
+            Hidden from assistive tech because the anchor's `aria-label` already
+            says this, and saying it twice is worse than saying it once.
+          */}
+          <span
+            aria-hidden="true"
+            className="absolute inset-x-0 bottom-0 flex translate-y-full items-center justify-center gap-1 bg-surface/95 py-1.5 text-xs font-medium text-foreground group-hover:translate-y-0 group-focus-visible:translate-y-0 motion-safe:transition-transform motion-safe:duration-300"
+          >
+            {dict.about.heading}
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M8 3.5v9M4 8.5l4 4 4-4" />
+            </svg>
+          </span>
         </a>
       ) : (
         <div

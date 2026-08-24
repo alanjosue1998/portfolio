@@ -113,12 +113,47 @@ body {
  * Space Grotesk carries the headings only. Its variable is defined by
  * `next/font/local` in `app/fonts.ts` and lands on <html>; the fallbacks cover
  * the moment before the file arrives.
+ *
+ * Inside `@layer base` so that a utility class on a heading still wins. These
+ * rules used to sit outside every layer, which beats Tailwind's utilities: the
+ * `font-semibold` on the skill categories in `Skills.tsx` was being quietly
+ * overridden by the 500 below, and any `text-*` added to an `h2` would have met
+ * the same fate.
  */
-h1,
-h2,
-h3 {
-  font-family: var(--font-display), var(--font-geist-sans), sans-serif;
-  font-weight: 500;
+@layer base {
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display), var(--font-geist-sans), sans-serif;
+    font-weight: 500;
+  }
+
+  /*
+   * Tailwind's preflight strips every heading of its size, so an `h2` with no
+   * class of its own came out at the body's 1rem — the section titles read as
+   * bold paragraphs. Sized here rather than in each component so a new section
+   * arrives the right size without being told.
+   *
+   * `h1` and `h3` keep their own classes: the greeting over the map, the card
+   * titles and the skill categories each have a size that belongs to their
+   * layout rather than to the document.
+   */
+  h2 {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+
+  /*
+   * sm: — one step up, and no further. The greeting over the map is the `h1`
+   * and carries 1.5rem/1.875rem from `Location.tsx`; a section title that
+   * matched it would leave the page with no first heading.
+   */
+  @media (width >= 40rem) {
+    h2 {
+      font-size: 1.5rem;
+      line-height: 2rem;
+    }
+  }
 }
 
 /*
