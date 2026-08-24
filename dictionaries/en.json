@@ -52,17 +52,15 @@
     "description": "A map that starts on the planet and descends to Ibarra, in the province of Imbabura, Ecuador.",
     "unavailable": "The map could not be loaded. I'm in"
   },
-  "menu": {
-    "open": "Open menu",
-    "close": "Close menu"
-  },
   "theme": {
     "toDark": "Switch to the dark theme",
     "toLight": "Switch to the light theme"
   },
   "languages": {
     "label": "Language",
-    "es": "Spanish",
-    "en": "English"
+    "switchTo": {
+      "es": "Switch to Spanish",
+      "en": "Switch to English"
+    }
   }
 }

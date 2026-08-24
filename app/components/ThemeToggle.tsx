@@ -10,6 +10,12 @@ export type ThemeLabels = {
   toLight: string;
 };
 
+type Props = {
+  labels: ThemeLabels;
+  /** The shape it shares with the language control — see `CornerControls`. */
+  className: string;
+};
+
 /**
  * Nothing is chosen while rendering on the server and there is no system setting
  * to read either, so the fallback the palette uses is the honest answer. It only
@@ -21,15 +27,15 @@ function readServerTheme(): ResolvedTheme {
 }
 
 /**
- * One button, pinned to the corner of the viewport: a sun while the page is
- * light, a moon while it is dark. It names the theme that is on, not the one a
- * click would bring.
+ * A sun while the page is light, a moon while it is dark: the icon names the
+ * theme that is on, not the one a click would bring. Where it sits and what it
+ * looks like belong to `CornerControls`, which owns the corner.
  *
  * There is no third state for "follow the system". A visitor who has never
  * clicked is already following it — that is what no `data-theme` attribute
  * means — and a two-icon button is the trade for switching in one click.
  */
-export default function ThemeToggle({ labels }: { labels: ThemeLabels }) {
+export default function ThemeToggle({ labels, className }: Props) {
   const theme = useSyncExternalStore(subscribeToTheme, resolvedTheme, readServerTheme);
 
   return (
@@ -42,7 +48,7 @@ export default function ThemeToggle({ labels }: { labels: ThemeLabels }) {
        * button being "on".
        */
       aria-label={theme === "dark" ? labels.toLight : labels.toDark}
-      className="fixed right-4 bottom-4 z-20 flex h-12 w-12 items-center justify-center rounded-full border border-border bg-surface text-foreground shadow-lg hover:border-accent hover:text-accent sm:right-6 sm:bottom-6"
+      className={className}
     >
       {/*
        * Both icons ship in the markup and CSS shows one. Drawn here rather than
