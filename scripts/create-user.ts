@@ -3,6 +3,8 @@ import "dotenv/config";
 
 import { stdin, stdout } from "node:process";
 
+import { createLocalAccountIssuer } from "better-auth/db";
+
 import { auth } from "../lib/auth";
 import prisma from "../lib/prisma";
 
@@ -125,21 +127,36 @@ async function main() {
     // Hashed before the user row exists, so a failure here leaves nothing behind.
     const hash = await ctx.password.hash(password);
 
-    const user = await ctx.internalAdapter.createUser({
-      email,
-      name: name || email.split("@")[0],
-      // Nobody emails this account, so there is no verification link to follow.
-      emailVerified: true,
-    });
+    const user = await ctx.internalAdapter.createUser(
+      {
+        email,
+        name: name || email.split("@")[0],
+        // Nobody emails this account, so there is no verification link to follow.
+        emailVerified: true,
+      },
+      /**
+       * Where the identity came from. Better Auth hands it to the
+       * `user.validateUserInfo` gate, which `lib/auth.ts` does not configure —
+       * so today it only has to be honest: the account this script creates
+       * signs in with an email and a password.
+       */
+      { method: "email-password" },
+    );
 
     /**
      * The password lives on an account row rather than on the user, which is
      * how Better Auth keeps room for social logins later. `credential` is the
      * provider it looks for when signing in with an email and a password.
+     *
+     * An account is identified by `(issuer, accountId)`. For a password account
+     * that pair is the `local:credential` issuer and the user's own ID, and
+     * `createLocalAccountIssuer` is the same helper Better Auth's own sign-up
+     * route calls — the string is its business, not this script's.
      */
     await ctx.internalAdapter.linkAccount({
       userId: user.id,
       providerId: "credential",
+      issuer: createLocalAccountIssuer("credential"),
       accountId: user.id,
       password: hash,
     });

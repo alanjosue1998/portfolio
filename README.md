@@ -39,12 +39,15 @@ app/
 │   └── page.tsx     # Home page
 ├── components/      # Page sections
 ├── globals.css      # Tailwind + theme variables
+├── sitemap.ts       # /sitemap.xml, one entry per locale
+└── robots.ts        # /robots.txt
 dictionaries/        # Translated strings, one file per locale
 ├── es.json
 └── en.json
 lib/
 ├── i18n.ts          # Supported locales and the default
-└── dictionaries.ts  # Loads the dictionary for the current locale
+├── dictionaries.ts  # Loads the dictionary for the current locale
+└── site.ts          # The absolute origin the site is served from
 proxy.ts             # Redirects "/" to a locale
 ```
 
@@ -136,3 +139,8 @@ Install the `esbenp.prettier-vscode` extension and create `.vscode/settings.json
 ## Deploy
 
 Deployed on [Vercel](https://vercel.com/new). Connect the repository and every push to the main branch ships automatically.
+
+`/sitemap.xml` and `/robots.txt` are generated at build time and need to know
+the origin the site is served from. On Vercel that is the project's production
+domain, picked up automatically. Set `NEXT_PUBLIC_SITE_URL` to override it once
+there is a custom domain; without either, the URLs point at `localhost:3000`.
