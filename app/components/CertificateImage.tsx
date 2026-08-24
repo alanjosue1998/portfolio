@@ -41,13 +41,17 @@ export default function CertificateImage({ src, title, labels }: Props) {
           The alt is empty on purpose: the title sits directly below and the
           button already carries a label, so a screen reader has the name twice
           before ever reaching the image.
+
+          `sizes` matches the grid in `Projects.tsx`, and for the same reason:
+          from a 768px viewport up the column has stopped growing and a card is a
+          flat 348px, so `50vw` would order twice the file the frame can use.
         */}
         <Image
           src={src}
           alt=""
           width={640}
           height={480}
-          sizes="(min-width: 640px) 50vw, 100vw"
+          sizes="(min-width: 768px) 348px, (min-width: 640px) 50vw, 100vw"
           className="aspect-[4/3] w-full object-cover transition-opacity group-hover:opacity-90"
         />
       </button>

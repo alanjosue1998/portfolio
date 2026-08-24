@@ -30,10 +30,13 @@ export default async function Projects() {
               and `object-cover` crops rather than squashing them to fit.
 
               The alt is empty on purpose: the title sits directly below, and a
-              screen reader announcing the project name twice is noise. `sizes`
-              tells the optimiser a card is half the 1280px column on desktop
-              and the full width of a phone, so it stops sending the largest
-              file to the smallest screen.
+              screen reader announcing the project name twice is noise.
+
+              `sizes` is measured off the column rather than off the viewport
+              once the column stops growing. `max-w-3xl` counts its padding inside the
+              768, so from a 768px viewport up a card is a flat 348px and
+              declaring `50vw` there asks for a file twice the frame it lands in.
+              Below that the column is the viewport and `50vw` is honest again.
             */}
             {project.imageUrl && (
               <Image
@@ -41,7 +44,7 @@ export default async function Projects() {
                 alt=""
                 width={640}
                 height={360}
-                sizes="(min-width: 640px) 50vw, 100vw"
+                sizes="(min-width: 768px) 348px, (min-width: 640px) 50vw, 100vw"
                 className="aspect-video w-full object-cover"
               />
             )}
