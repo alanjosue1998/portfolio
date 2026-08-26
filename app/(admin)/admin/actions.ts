@@ -148,7 +148,7 @@ export async function createCertificate(
   if (rawCredentialUrl && !credentialUrl) {
     return {
       status: "error",
-      message: "El enlace de verificación no es válido (https://…).",
+      message: "El enlace de verificación tiene que ser https:// — http:// no se acepta.",
     };
   }
 
@@ -384,9 +384,10 @@ function normaliseUrl(raw: string, platform: string): string | null {
 
   try {
     const parsed = new URL(withScheme);
-    // Anything else — `javascript:` above all — has no business being rendered
-    // into an href on the public site.
-    return parsed.protocol === "https:" || parsed.protocol === "http:" ? parsed.toString() : null;
+    // `https:` only. `javascript:` above all has no business being rendered
+    // into an href on the public site, and `http:` either warns in the address
+    // bar or gets upgraded — neither reads as credible on a public page.
+    return parsed.protocol === "https:" ? parsed.toString() : null;
   } catch {
     return null;
   }
@@ -413,7 +414,7 @@ export async function createContactLink(
       message:
         platform === "email"
           ? "Escribe un correo válido."
-          : "Escribe una dirección válida (https://…).",
+          : "Escribe una dirección https:// válida — http:// no se acepta.",
     };
   }
 
