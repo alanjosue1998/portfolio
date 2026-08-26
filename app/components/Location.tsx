@@ -34,7 +34,7 @@ export default async function Location() {
         the space until one is. It stays hidden from screen readers because an
         empty frame has nothing to announce.
 
-        `176` is the rendered width at `sm:size-44`, doubled by the optimiser
+        `144` is the rendered width at `sm:size-36`, doubled by the optimiser
         for retina. `preload` — `priority` is deprecated as of Next 16 —
         because this sits in the opening panel and would otherwise load late.
 
@@ -62,10 +62,10 @@ export default async function Location() {
           <Image
             src={profile.imageUrl}
             alt={dict.hero.name}
-            width={176}
-            height={176}
+            width={144}
+            height={144}
             preload
-            className="size-32 object-cover sm:size-44"
+            className="size-28 object-cover sm:size-36"
           />
 
           {/*
@@ -103,7 +103,7 @@ export default async function Location() {
       ) : (
         <div
           aria-hidden="true"
-          className="mr-4 flex size-32 shrink-0 items-center justify-center rounded-2xl border-2 border-dashed border-muted bg-surface/70 text-muted sm:mr-8 sm:size-44"
+          className="mr-4 flex size-28 shrink-0 items-center justify-center rounded-2xl border-2 border-dashed border-muted bg-surface/70 text-muted sm:mr-8 sm:size-36"
         >
           <svg
             width="28"

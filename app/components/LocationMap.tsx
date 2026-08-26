@@ -184,6 +184,22 @@ export default function LocationMap({ city, country, description, unavailable, c
                * streets around it are nobody's business.
                */
               zoom: 10,
+              /**
+               * Centres the landing on the map that can still be seen rather
+               * than on the frame. The greeting and the portrait cover the
+               * bottom of it, so a pin in the geometric middle sits low, close
+               * to the things laid over it; holding the bottom back lifts it
+               * into the clear part.
+               *
+               * Padding rather than a `Marker` offset, which would slide the
+               * pin off the city it is pointing at. This moves the camera, so
+               * the pin stays on Ibarra and Ibarra is what moves up the frame.
+               *
+               * Set here and not on the constructor: the opening globe is
+               * framed against the whole map, which is what lets the planet
+               * fill it instead of sitting high in it.
+               */
+              padding: { top: 0, right: 0, bottom: 96, left: 0 },
               duration: 7000,
             });
           }, 2000);
@@ -229,7 +245,7 @@ export default function LocationMap({ city, country, description, unavailable, c
    * `overflow-hidden` stays — it is what keeps the canvas inside the frame.
    */
   return (
-    <div className="relative h-72 w-full overflow-hidden sm:h-[22rem]">
+    <div className="relative h-60 w-full overflow-hidden sm:h-72">
       <div
         ref={container}
         role="img"
@@ -242,22 +258,26 @@ export default function LocationMap({ city, country, description, unavailable, c
         so this is what ends it — and gives the greeting a ground light or dark
         enough to be read against whatever terrain happens to be underneath.
       */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background via-background/85 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background via-background/85 to-transparent" />
 
       {/*
-        Everything that sits on the map is grouped down here. The city label
-        used to live in the top-left corner, where on a narrow screen it ran
-        straight into the attribution across from it.
-      */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col gap-3 p-5 sm:p-6">
-        {/* Held back until the flight lands, so it reads as the destination. */}
-        {arrived && (
-          <p className="self-start rounded bg-surface/90 px-3 py-1.5 text-sm font-semibold text-foreground shadow">
-            {city} — {country}
-          </p>
-        )}
+        The place, in the corner the eye starts from. It sat with the greeting
+        for a while because on a narrow screen it ran straight into the
+        attribution across from it — but `foldCredit` tucks that away into its
+        ⓘ at the same moment this appears, so the two no longer meet.
 
-        <div className="flex items-end justify-between gap-4">{children}</div>
+        Still held back until the flight lands, so it reads as the destination
+        rather than as a caption that was always there.
+      */}
+      {arrived && (
+        <p className="pointer-events-none absolute top-5 left-5 rounded bg-surface/90 px-3 py-1.5 text-sm font-semibold text-foreground shadow sm:top-6 sm:left-6">
+          {city} — {country}
+        </p>
+      )}
+
+      {/* The greeting and the portrait, over the bottom of the map. */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 sm:p-6">
+        {children}
       </div>
     </div>
   );
