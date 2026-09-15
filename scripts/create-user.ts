@@ -3,8 +3,6 @@ import "dotenv/config";
 
 import { stdin, stdout } from "node:process";
 
-import { createLocalAccountIssuer } from "better-auth/db";
-
 import { auth } from "../lib/auth";
 import prisma from "../lib/prisma";
 
@@ -148,15 +146,13 @@ async function main() {
      * how Better Auth keeps room for social logins later. `credential` is the
      * provider it looks for when signing in with an email and a password.
      *
-     * An account is identified by `(issuer, accountId)`. For a password account
-     * that pair is the `local:credential` issuer and the user's own ID, and
-     * `createLocalAccountIssuer` is the same helper Better Auth's own sign-up
-     * route calls — the string is its business, not this script's.
+     * An account is identified by `(providerId, accountId)`. For a password
+     * account that pair is `credential` and the user's own ID — the same row
+     * Better Auth's own sign-up route writes.
      */
     await ctx.internalAdapter.linkAccount({
       userId: user.id,
       providerId: "credential",
-      issuer: createLocalAccountIssuer("credential"),
       accountId: user.id,
       password: hash,
     });
