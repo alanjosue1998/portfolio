@@ -3,7 +3,7 @@
 import type { AdminDictionary } from "@/lib/admin-i18n";
 
 import { createEducation } from "./actions";
-import { FIELD, FormStatus, HINT, SUBMIT } from "./form-ui";
+import { BilingualField, FIELD, FormStatus, HINT, SUBMIT } from "./form-ui";
 import { useAdminForm } from "./use-admin-form";
 
 type Props = {
@@ -16,16 +16,13 @@ export default function EducationForm({ t, common }: Props) {
 
   return (
     <form {...formProps} className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1">
-        <label htmlFor="degree">{t.degree}</label>
-        <input
-          id="degree"
-          name="degree"
-          required
-          placeholder={t.degreePlaceholder}
-          className={FIELD}
-        />
-      </div>
+      <BilingualField
+        name="degree"
+        label={t.degree}
+        labels={common}
+        required
+        placeholder={t.degreePlaceholder}
+      />
 
       <div className="flex flex-col gap-1">
         <label htmlFor="institution">{t.institution}</label>

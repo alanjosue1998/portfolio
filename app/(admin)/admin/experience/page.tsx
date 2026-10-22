@@ -48,7 +48,15 @@ export default async function ExperiencePage() {
                     {job.location && ` · ${job.location}`} · {month.format(job.startedAt)} –{" "}
                     {job.endedAt ? month.format(job.endedAt) : dict.experience.ongoing}
                   </p>
-                  <h3 className="font-semibold">{job.role}</h3>
+                  <h3 className="font-semibold">
+                    {job.role}
+                    {job.roleEn && (
+                      <span lang="en" className="font-normal text-muted">
+                        {" "}
+                        · EN: {job.roleEn}
+                      </span>
+                    )}
+                  </h3>
                   <p className="mt-1 text-sm whitespace-pre-line">{job.description}</p>
 
                   {job.technologies.length > 0 && (

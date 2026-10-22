@@ -47,7 +47,10 @@
     "from": "Desde",
     "to": "Hasta",
     "toHint": "Vacío si sigue en curso.",
-    "title": "Título"
+    "title": "Título",
+    "spanish": "Español",
+    "english": "Inglés",
+    "englishHint": "Opcional. Si lo dejas vacío, la versión en inglés del sitio usa el texto en español."
   },
   "profile": {
     "photoHeading": "Foto de perfil",

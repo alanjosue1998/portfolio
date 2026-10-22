@@ -3,7 +3,7 @@
 import type { AdminDictionary } from "@/lib/admin-i18n";
 
 import { createSkill } from "./actions";
-import { FIELD, FormStatus, HINT, SUBMIT } from "./form-ui";
+import { BilingualField, FIELD, FormStatus, HINT, SUBMIT } from "./form-ui";
 import { useAdminForm } from "./use-admin-form";
 
 type Props = {
@@ -23,31 +23,22 @@ export default function SkillForm({ categories, t, common }: Props) {
 
   return (
     <form {...formProps} className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1">
-        <label htmlFor="name">{t.name}</label>
-        <input id="name" name="name" required placeholder="Drupal" className={FIELD} />
-      </div>
+      <BilingualField name="name" label={t.name} labels={common} required placeholder="Drupal" />
 
-      <div className="flex flex-col gap-1">
-        <label htmlFor="category">{t.category}</label>
-        <input
-          id="category"
-          name="category"
-          required
-          list="skill-categories"
-          placeholder="CMS"
-          aria-describedby="category-hint"
-          className={FIELD}
-        />
-        <datalist id="skill-categories">
-          {categories.map((category) => (
-            <option key={category} value={category} />
-          ))}
-        </datalist>
-        <p id="category-hint" className={HINT}>
-          {t.categoryHint}
-        </p>
-      </div>
+      <BilingualField
+        name="category"
+        label={t.category}
+        labels={common}
+        required
+        placeholder="CMS"
+        list="skill-categories"
+        hint={t.categoryHint}
+      />
+      <datalist id="skill-categories">
+        {categories.map((category) => (
+          <option key={category} value={category} />
+        ))}
+      </datalist>
 
       <div className="flex flex-col gap-1">
         <label htmlFor="position">{common.position}</label>
