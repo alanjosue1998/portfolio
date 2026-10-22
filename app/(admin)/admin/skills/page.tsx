@@ -1,10 +1,11 @@
-import { getAdminDictionary } from "@/lib/admin-i18n";
+import { fill, getAdminDictionary } from "@/lib/admin-i18n";
 import prisma from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 
 import SkillForm from "../SkillForm";
+import DeleteButton from "../DeleteButton";
+import EditDialog from "../EditDialog";
 import { deleteSkill } from "../actions";
-import { DELETE } from "../form-ui";
 
 export default async function SkillsPage() {
   await requireSession();
@@ -69,12 +70,26 @@ export default async function SkillsPage() {
                         </span>
                       </span>
 
-                      <form action={deleteSkill}>
-                        <input type="hidden" name="id" value={skill.id} />
-                        <button type="submit" className={DELETE}>
-                          {dict.common.delete}
-                        </button>
-                      </form>
+                      <div className="flex shrink-0 items-center gap-4">
+                        <EditDialog
+                          trigger={dict.common.edit}
+                          title={fill(dict.common.editTitle, { name: skill.name })}
+                          cancel={dict.common.cancel}
+                        >
+                          <SkillForm
+                            categories={[...byCategory.keys()]}
+                            t={dict.skillForm}
+                            common={dict.common}
+                            initial={skill}
+                          />
+                        </EditDialog>
+                        <DeleteButton
+                          action={deleteSkill}
+                          id={skill.id}
+                          label={dict.common.delete}
+                          confirmation={fill(dict.common.confirmDelete, { name: skill.name })}
+                        />
+                      </div>
                     </li>
                   ))}
                 </ul>

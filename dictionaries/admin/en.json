@@ -50,7 +50,13 @@
     "title": "Title",
     "spanish": "Spanish",
     "english": "English",
-    "englishHint": "Optional. Left empty, the English site shows the Spanish text."
+    "englishHint": "Optional. Left empty, the English site shows the Spanish text.",
+    "edit": "Edit",
+    "editTitle": "Edit “{name}”",
+    "cancel": "Cancel",
+    "saveChanges": "Save changes",
+    "confirmDelete": "Delete “{name}”? This cannot be undone.",
+    "keepImage": "Optional. Leave it empty to keep the current one."
   },
   "profile": {
     "photoHeading": "Profile photo",
@@ -168,6 +174,8 @@
     "chooseImage": "Choose an image.",
     "notImage": "The file has to be an image.",
     "imageTooBig": "The image cannot be larger than 4 MB.",
-    "uploadFailed": "The image could not be uploaded."
+    "uploadFailed": "The image could not be uploaded.",
+    "updated": "Saved changes to “{name}”.",
+    "gone": "It no longer exists — it may have been deleted in another tab."
   }
 }

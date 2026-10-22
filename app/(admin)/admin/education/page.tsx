@@ -1,10 +1,12 @@
-import { getAdminDictionary, getAdminLocale } from "@/lib/admin-i18n";
+import { fill, getAdminDictionary, getAdminLocale } from "@/lib/admin-i18n";
 import prisma from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 
 import EducationForm from "../EducationForm";
+import DeleteButton from "../DeleteButton";
+import EditDialog from "../EditDialog";
 import { deleteEducation } from "../actions";
-import { DELETE, ITEM } from "../form-ui";
+import { ITEM } from "../form-ui";
 
 export default async function EducationPage() {
   await requireSession();
@@ -58,12 +60,21 @@ export default async function EducationPage() {
                   </h3>
                 </div>
 
-                <form action={deleteEducation}>
-                  <input type="hidden" name="id" value={study.id} />
-                  <button type="submit" className={DELETE}>
-                    {dict.common.delete}
-                  </button>
-                </form>
+                <div className="flex shrink-0 items-center gap-4">
+                  <EditDialog
+                    trigger={dict.common.edit}
+                    title={fill(dict.common.editTitle, { name: study.degree })}
+                    cancel={dict.common.cancel}
+                  >
+                    <EducationForm t={dict.educationForm} common={dict.common} initial={study} />
+                  </EditDialog>
+                  <DeleteButton
+                    action={deleteEducation}
+                    id={study.id}
+                    label={dict.common.delete}
+                    confirmation={fill(dict.common.confirmDelete, { name: study.degree })}
+                  />
+                </div>
               </li>
             ))}
           </ul>

@@ -1,12 +1,14 @@
 import Image from "next/image";
 
-import { getAdminDictionary, getAdminLocale } from "@/lib/admin-i18n";
+import { fill, getAdminDictionary, getAdminLocale } from "@/lib/admin-i18n";
 import prisma from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 
 import CertificateForm from "../CertificateForm";
+import DeleteButton from "../DeleteButton";
+import EditDialog from "../EditDialog";
 import { deleteCertificate } from "../actions";
-import { DELETE, ITEM } from "../form-ui";
+import { ITEM } from "../form-ui";
 
 export default async function CertificatesPage() {
   await requireSession();
@@ -87,12 +89,25 @@ export default async function CertificatesPage() {
                   </div>
                 </div>
 
-                <form action={deleteCertificate}>
-                  <input type="hidden" name="id" value={certificate.id} />
-                  <button type="submit" className={DELETE}>
-                    {dict.common.delete}
-                  </button>
-                </form>
+                <div className="flex shrink-0 items-center gap-4">
+                  <EditDialog
+                    trigger={dict.common.edit}
+                    title={fill(dict.common.editTitle, { name: certificate.title })}
+                    cancel={dict.common.cancel}
+                  >
+                    <CertificateForm
+                      t={dict.certificateForm}
+                      common={dict.common}
+                      initial={certificate}
+                    />
+                  </EditDialog>
+                  <DeleteButton
+                    action={deleteCertificate}
+                    id={certificate.id}
+                    label={dict.common.delete}
+                    confirmation={fill(dict.common.confirmDelete, { name: certificate.title })}
+                  />
+                </div>
               </li>
             ))}
           </ul>

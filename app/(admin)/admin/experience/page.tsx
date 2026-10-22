@@ -1,10 +1,12 @@
-import { getAdminDictionary, getAdminLocale } from "@/lib/admin-i18n";
+import { fill, getAdminDictionary, getAdminLocale } from "@/lib/admin-i18n";
 import prisma from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 
 import ExperienceForm from "../ExperienceForm";
+import DeleteButton from "../DeleteButton";
+import EditDialog from "../EditDialog";
 import { deleteExperience } from "../actions";
-import { DELETE, ITEM } from "../form-ui";
+import { ITEM } from "../form-ui";
 
 export default async function ExperiencePage() {
   await requireSession();
@@ -64,12 +66,21 @@ export default async function ExperiencePage() {
                   )}
                 </div>
 
-                <form action={deleteExperience}>
-                  <input type="hidden" name="id" value={job.id} />
-                  <button type="submit" className={DELETE}>
-                    {dict.common.delete}
-                  </button>
-                </form>
+                <div className="flex shrink-0 items-center gap-4">
+                  <EditDialog
+                    trigger={dict.common.edit}
+                    title={fill(dict.common.editTitle, { name: job.role })}
+                    cancel={dict.common.cancel}
+                  >
+                    <ExperienceForm t={dict.experienceForm} common={dict.common} initial={job} />
+                  </EditDialog>
+                  <DeleteButton
+                    action={deleteExperience}
+                    id={job.id}
+                    label={dict.common.delete}
+                    confirmation={fill(dict.common.confirmDelete, { name: job.role })}
+                  />
+                </div>
               </li>
             ))}
           </ul>

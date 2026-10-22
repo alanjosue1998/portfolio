@@ -50,7 +50,13 @@
     "title": "Título",
     "spanish": "Español",
     "english": "Inglés",
-    "englishHint": "Opcional. Si lo dejas vacío, la versión en inglés del sitio usa el texto en español."
+    "englishHint": "Opcional. Si lo dejas vacío, la versión en inglés del sitio usa el texto en español.",
+    "edit": "Editar",
+    "editTitle": "Editar “{name}”",
+    "cancel": "Cancelar",
+    "saveChanges": "Guardar cambios",
+    "confirmDelete": "¿Borrar “{name}”? No se puede deshacer.",
+    "keepImage": "Opcional. Si no eliges otra, se mantiene la actual."
   },
   "profile": {
     "photoHeading": "Foto de perfil",
@@ -168,6 +174,8 @@
     "chooseImage": "Elige una imagen.",
     "notImage": "El archivo tiene que ser una imagen.",
     "imageTooBig": "La imagen no puede pasar de 4 MB.",
-    "uploadFailed": "No se pudo subir la imagen."
+    "uploadFailed": "No se pudo subir la imagen.",
+    "updated": "Se guardaron los cambios en “{name}”.",
+    "gone": "Ya no existe: puede que se haya borrado en otra pestaña."
   }
 }

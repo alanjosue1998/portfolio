@@ -1,23 +1,36 @@
 "use client";
 
+import type { Certificate } from "@/generated/prisma/browser";
 import type { AdminDictionary } from "@/lib/admin-i18n";
 
-import { createCertificate } from "./actions";
-import { BilingualField, FIELD, FormStatus, HINT, SUBMIT } from "./form-ui";
+import { createCertificate, updateCertificate } from "./actions";
+import { BilingualField, FIELD, FormStatus, HINT, monthValue, SUBMIT } from "./form-ui";
 import { useAdminForm } from "./use-admin-form";
 
 type Props = {
   t: AdminDictionary["certificateForm"];
   common: AdminDictionary["common"];
+  /** The row to edit. Without it the form creates a new one. */
+  initial?: Certificate;
 };
 
-export default function CertificateForm({ t, common }: Props) {
-  const { state, pending, formProps } = useAdminForm(createCertificate);
+export default function CertificateForm({ t, common, initial }: Props) {
+  const editing = initial !== undefined;
+  const { state, pending, formProps } = useAdminForm(
+    editing ? updateCertificate : createCertificate,
+  );
+  // Inside the edit dialog the create form is still on the page behind it.
+  const p = editing ? "edit-" : "";
 
   return (
     <form {...formProps} className="flex flex-col gap-4">
+      {editing && <input type="hidden" name="id" value={initial.id} />}
+
       <BilingualField
         name="title"
+        idPrefix={p}
+        defaultValue={initial?.title}
+        defaultValueEn={initial?.titleEn}
         label={common.title}
         labels={common}
         required
@@ -25,11 +38,12 @@ export default function CertificateForm({ t, common }: Props) {
       />
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="issuer">{t.issuer}</label>
+        <label htmlFor={`${p}issuer`}>{t.issuer}</label>
         <input
-          id="issuer"
+          id={`${p}issuer`}
           name="issuer"
           required
+          defaultValue={initial?.issuer}
           placeholder={t.issuerPlaceholder}
           className={FIELD}
         />
@@ -40,75 +54,79 @@ export default function CertificateForm({ t, common }: Props) {
         asking for a day invents one. The action pins it to the first.
       */}
       <div className="flex flex-col gap-1">
-        <label htmlFor="issuedAt">{t.date}</label>
+        <label htmlFor={`${p}issuedAt`}>{t.date}</label>
         <input
-          id="issuedAt"
+          id={`${p}issuedAt`}
           name="issuedAt"
           type="month"
-          aria-describedby="issuedAt-hint"
+          defaultValue={monthValue(initial?.issuedAt)}
+          aria-describedby={`${p}issuedAt-hint`}
           className={FIELD}
         />
-        <p id="issuedAt-hint" className={HINT}>
+        <p id={`${p}issuedAt-hint`} className={HINT}>
           {t.dateHint}
         </p>
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="credentialId">{t.credentialId}</label>
+        <label htmlFor={`${p}credentialId`}>{t.credentialId}</label>
         <input
-          id="credentialId"
+          id={`${p}credentialId`}
           name="credentialId"
-          aria-describedby="credentialId-hint"
+          defaultValue={initial?.credentialId ?? undefined}
+          aria-describedby={`${p}credentialId-hint`}
           className={FIELD}
         />
-        <p id="credentialId-hint" className={HINT}>
+        <p id={`${p}credentialId-hint`} className={HINT}>
           {t.credentialIdHint}
         </p>
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="credentialUrl">{t.credentialUrl}</label>
+        <label htmlFor={`${p}credentialUrl`}>{t.credentialUrl}</label>
         <input
-          id="credentialUrl"
+          id={`${p}credentialUrl`}
           name="credentialUrl"
-          aria-describedby="credentialUrl-hint"
+          defaultValue={initial?.credentialUrl ?? undefined}
+          aria-describedby={`${p}credentialUrl-hint`}
           className={FIELD}
         />
-        <p id="credentialUrl-hint" className={HINT}>
+        <p id={`${p}credentialUrl-hint`} className={HINT}>
           {t.credentialUrlHint}
         </p>
       </div>
 
       {/*
         Optional, unlike the portrait: a certificate with no photo still
-        renders as a card, just without the image on top.
+        renders as a card, just without the image on top. When editing, an
+        empty input keeps the photo that is there.
       */}
       <div className="flex flex-col gap-1">
-        <label htmlFor="image">{t.photo}</label>
+        <label htmlFor={`${p}image`}>{t.photo}</label>
         <input
-          id="image"
+          id={`${p}image`}
           name="image"
           type="file"
           accept="image/*"
-          aria-describedby="image-hint"
+          aria-describedby={`${p}image-hint`}
           className="text-sm"
         />
-        <p id="image-hint" className={HINT}>
-          {t.photoHint}
+        <p id={`${p}image-hint`} className={HINT}>
+          {editing && initial.imageUrl ? common.keepImage : t.photoHint}
         </p>
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="position">{common.position}</label>
+        <label htmlFor={`${p}position`}>{common.position}</label>
         <input
-          id="position"
+          id={`${p}position`}
           name="position"
           type="number"
-          defaultValue={0}
-          aria-describedby="position-hint"
+          defaultValue={initial?.position ?? 0}
+          aria-describedby={`${p}position-hint`}
           className={`${FIELD} w-24`}
         />
-        <p id="position-hint" className={HINT}>
+        <p id={`${p}position-hint`} className={HINT}>
           {common.positionHint}
         </p>
       </div>
@@ -116,7 +134,7 @@ export default function CertificateForm({ t, common }: Props) {
       <FormStatus state={state} />
 
       <button type="submit" disabled={pending} className={SUBMIT}>
-        {pending ? common.saving : t.submit}
+        {pending ? common.saving : editing ? common.saveChanges : t.submit}
       </button>
     </form>
   );
