@@ -3,6 +3,8 @@ import Image from "next/image";
 import { getDictionary } from "@/lib/dictionaries";
 import prisma from "@/lib/prisma";
 
+import SectionHeading from "./SectionHeading";
+
 export default async function Projects() {
   const [dict, projects] = await Promise.all([
     getDictionary(),
@@ -13,15 +15,15 @@ export default async function Projects() {
   if (projects.length === 0) return null;
 
   return (
-    <section className="flex flex-col gap-6">
-      <h2>{dict.projects.heading}</h2>
+    <section className="flex flex-col gap-5">
+      <SectionHeading>{dict.projects.heading}</SectionHeading>
 
       {/* One column on a phone, two from `sm` up. */}
-      <ul className="grid gap-6 sm:grid-cols-2">
+      <ul className="grid gap-5 sm:grid-cols-2">
         {projects.map((project) => (
           <li
             key={project.id}
-            className="flex flex-col overflow-hidden rounded-xl border border-border bg-surface"
+            className="flex flex-col overflow-hidden rounded-2xl border border-border bg-surface transition-[border-color,box-shadow,translate] duration-200 hover:border-accent hover:shadow-[0_8px_24px_-12px_rgb(28_25_23/0.25)] motion-safe:hover:-translate-y-0.5"
           >
             {/*
               The cover is optional, and a card without one has to hold its own
@@ -49,17 +51,23 @@ export default async function Projects() {
               />
             )}
 
-            <div className="flex flex-col gap-2 p-5">
-              <p className="text-sm text-muted">
-                {dict.projects.typeLabel}: {project.type}
+            <div className="flex flex-1 flex-col gap-2.5 px-6 pt-5 pb-6">
+              {/* A badge says "type" by being a badge; the word stays for
+                  screen readers, which get no badge. */}
+              <p className="self-start rounded-full bg-accent-soft px-2.5 py-0.5 text-xs font-semibold text-accent-strong">
+                <span className="sr-only">{dict.projects.typeLabel}: </span>
+                {project.type}
               </p>
-              <h3 className="text-lg">{project.title}</h3>
-              <p>{project.description}</p>
+              <h3 className="text-xl leading-snug">{project.title}</h3>
+              <p className="text-[15px] text-muted">{project.description}</p>
 
               {project.technologies.length > 0 && (
-                <ul className="mt-2 flex flex-wrap gap-2 border-t border-border pt-3">
+                <ul className="mt-auto flex flex-wrap gap-1.5 pt-2">
                   {project.technologies.map((technology) => (
-                    <li key={technology} className="rounded bg-background px-2 py-1 text-xs">
+                    <li
+                      key={technology}
+                      className="rounded-md border border-border bg-background px-2 py-0.5 font-mono text-xs"
+                    >
                       {technology}
                     </li>
                   ))}

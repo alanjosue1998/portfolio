@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { useRef } from "react";
 
+import { CloseIcon } from "./icons";
+
 export type CertificateImageLabels = {
   view: string;
   close: string;
@@ -90,20 +92,9 @@ export default function CertificateImage({ src, title, labels }: Props) {
           type="button"
           onClick={() => dialog.current?.close()}
           aria-label={labels.close}
-          className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
+          className="absolute top-4 right-4 flex h-11 w-11 items-center justify-center rounded-full bg-black/60 text-white hover:bg-black/80"
         >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 16 16"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.75"
-            strokeLinecap="round"
-            aria-hidden="true"
-          >
-            <path d="M4 4l8 8M12 4l-8 8" />
-          </svg>
+          <CloseIcon size={20} />
         </button>
       </dialog>
     </>

@@ -1,6 +1,8 @@
 import { getDictionary } from "@/lib/dictionaries";
 import prisma from "@/lib/prisma";
 
+import SectionHeading from "./SectionHeading";
+
 export default async function Skills() {
   const [dict, skills] = await Promise.all([
     getDictionary(),
@@ -25,24 +27,30 @@ export default async function Skills() {
   }
 
   return (
-    <section className="flex flex-col gap-6">
-      <h2>{dict.skills.heading}</h2>
+    <section className="flex flex-col gap-5">
+      <SectionHeading>{dict.skills.heading}</SectionHeading>
 
-      <div className="flex flex-col gap-5">
+      {/* A card per category, as many to a row as fit at 220px each. */}
+      <div className="grid gap-4 sm:grid-cols-[repeat(auto-fit,minmax(220px,1fr))]">
         {[...byCategory].map(([category, group]) => (
-          <div key={category} className="flex flex-col gap-2">
+          <div
+            key={category}
+            className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-5"
+          >
             {/*
               A heading rather than a styled paragraph: this is a real level in
               the outline, and a screen reader listing headings should find the
               categories under Skills.
             */}
-            <h3 className="text-sm font-semibold tracking-wide text-muted uppercase">{category}</h3>
+            <h3 className="font-sans text-xs font-semibold tracking-[0.08em] text-muted uppercase">
+              {category}
+            </h3>
 
             <ul className="flex flex-wrap gap-2">
               {group.map((skill) => (
                 <li
                   key={skill.id}
-                  className="rounded-lg border border-border bg-surface px-3 py-1.5 text-sm"
+                  className="rounded-full bg-accent-soft px-3 py-1.5 text-sm font-medium text-accent-strong"
                 >
                   {skill.name}
                 </li>

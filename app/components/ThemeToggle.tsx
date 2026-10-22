@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 
+import { MoonIcon, SunIcon } from "./icons";
 import { applyTheme, resolvedTheme, subscribeToTheme, type ResolvedTheme } from "./theme";
 
 export type ThemeLabels = {
@@ -51,38 +52,11 @@ export default function ThemeToggle({ labels, className }: Props) {
       className={className}
     >
       {/*
-       * Both icons ship in the markup and CSS shows one. Drawn here rather than
-       * pulled from an icon package, like the bars in `Menu`.
+       * Both icons ship in the markup and CSS shows one. They come from
+       * `./icons`, like every other icon on the site.
        */}
-      <svg
-        className="theme-icon-sun"
-        width="20"
-        height="20"
-        viewBox="0 0 20 20"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.75"
-        strokeLinecap="round"
-        aria-hidden="true"
-      >
-        <circle cx="10" cy="10" r="3.5" />
-        <path d="M10 4.5V2.5M10 15.5V17.5M4.5 10H2.5M15.5 10H17.5M13.9 6.1L15.3 4.7M6.1 6.1L4.7 4.7M13.9 13.9L15.3 15.3M6.1 13.9L4.7 15.3" />
-      </svg>
-
-      <svg
-        className="theme-icon-moon"
-        width="20"
-        height="20"
-        viewBox="0 0 20 20"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.75"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M17.5 10.7A7.5 7.5 0 1 1 9.3 2.5A5.8 5.8 0 0 0 17.5 10.7Z" />
-      </svg>
+      <SunIcon className="theme-icon-sun" />
+      <MoonIcon className="theme-icon-moon" />
     </button>
   );
 }

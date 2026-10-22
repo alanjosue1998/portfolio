@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 import "maplibre-gl/dist/maplibre-gl.css";
 
+import { MapPinIcon } from "./icons";
 import { resolvedTheme, subscribeToTheme } from "./theme";
 
 /** Ibarra, Imbabura. The city centre — deliberately not a street address. */
@@ -162,7 +163,16 @@ export default function LocationMap({ city, country, description, unavailable, c
                * of the run as a marker over a continent, pointing at nothing
                * anyone can see yet.
                */
-              new Marker({ color: "#dc2626" }).setLngLat(IBARRA).addTo(map);
+              /**
+               * In the page's accent rather than maplibre-gl's stock red, which
+               * was the one colour on the page that belonged to nothing else.
+               * Read from the stylesheet so it follows `globals.css`; it keeps
+               * the colour of the theme it landed in, which a later toggle does
+               * not repaint — a pin is too small for that to matter.
+               */
+              const accent = getComputedStyle(element).getPropertyValue("--accent").trim();
+
+              new Marker({ color: accent || undefined }).setLngLat(IBARRA).addTo(map);
               foldCredit(map);
               setArrived(true);
             });
@@ -270,13 +280,14 @@ export default function LocationMap({ city, country, description, unavailable, c
         rather than as a caption that was always there.
       */}
       {arrived && (
-        <p className="pointer-events-none absolute top-5 left-5 rounded bg-surface/90 px-3 py-1.5 text-sm font-semibold text-foreground shadow sm:top-6 sm:left-6">
-          {city} — {country}
+        <p className="pointer-events-none absolute top-5 left-5 flex h-8 items-center gap-1.5 rounded-lg border border-border bg-surface/95 px-3 text-[13px] font-medium text-foreground shadow-[0_2px_8px_-4px_rgb(0_0_0/0.2)] sm:top-6 sm:left-6">
+          <MapPinIcon size={16} className="shrink-0 text-accent" />
+          {city} · {country}
         </p>
       )}
 
       {/* The greeting and the portrait, over the bottom of the map. */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 sm:p-6">
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 py-5 sm:py-6">
         {children}
       </div>
     </div>

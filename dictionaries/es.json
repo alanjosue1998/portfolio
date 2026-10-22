@@ -6,6 +6,7 @@
   "hero": {
     "greeting": "Hola",
     "name": "Soy Alan Guamán",
+    "role": "Ingeniero de sistemas enfocado en CMS",
     "tagline": "Drupal & WordPress"
   },
   "about": {
@@ -44,13 +45,19 @@
   },
   "contact": {
     "heading": "Contacto",
-    "cta": "Escríbeme"
+    "cta": "Escríbeme",
+    "subtitle": "¿Tienes un proyecto en Drupal o WordPress? Hablemos.",
+    "cv": "Descargar CV"
   },
   "location": {
     "city": "Ibarra, Imbabura",
     "country": "Ecuador",
     "description": "Mapa que arranca en el planeta y desciende hasta Ibarra, en la provincia de Imbabura, Ecuador.",
     "unavailable": "No se pudo cargar el mapa. Estoy en"
+  },
+  "footer": {
+    "name": "Alan Guamán",
+    "place": "Hecho en Ibarra, Ecuador"
   },
   "theme": {
     "toDark": "Cambiar al tema oscuro",

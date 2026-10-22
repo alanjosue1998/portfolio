@@ -5,6 +5,8 @@ import { defaultLocale } from "@/lib/i18n";
 import prisma from "@/lib/prisma";
 
 import CertificateImage from "./CertificateImage";
+import { VerifiedIcon } from "./icons";
+import SectionHeading from "./SectionHeading";
 
 export default async function Certificates() {
   const [dict, locale, certificates] = await Promise.all([
@@ -33,15 +35,15 @@ export default async function Certificates() {
   });
 
   return (
-    <section className="flex flex-col gap-6">
-      <h2>{dict.certificates.heading}</h2>
+    <section className="flex flex-col gap-5">
+      <SectionHeading>{dict.certificates.heading}</SectionHeading>
 
       {/* One column on a phone, two from `sm` up — the same grid as Projects. */}
-      <ul className="grid gap-6 sm:grid-cols-2">
+      <ul className="grid gap-5 sm:grid-cols-2">
         {certificates.map((certificate) => (
           <li
             key={certificate.id}
-            className="flex flex-col overflow-hidden rounded-xl border border-border bg-surface"
+            className="flex flex-col overflow-hidden rounded-2xl border border-border bg-surface transition-colors duration-200 hover:border-accent"
           >
             {/* Optional, and a card without one has to hold its own rather
                 than leave a gap. */}
@@ -53,13 +55,13 @@ export default async function Certificates() {
               />
             )}
 
-            <div className="flex flex-col gap-2 p-5">
+            <div className="flex flex-1 flex-col gap-2 px-6 pt-5 pb-6">
               <p className="text-sm text-muted">
                 {certificate.issuer}
                 {certificate.issuedAt && ` · ${month.format(certificate.issuedAt)}`}
               </p>
 
-              <h3 className="text-lg">{certificate.title}</h3>
+              <h3 className="text-lg leading-snug">{certificate.title}</h3>
 
               {certificate.credentialId && (
                 <p className="text-sm text-muted">
@@ -76,9 +78,10 @@ export default async function Certificates() {
                   href={certificate.credentialUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-auto pt-3 text-sm font-semibold text-accent hover:underline"
+                  className="mt-auto inline-flex items-center gap-1.5 self-start rounded-md pt-3 text-sm font-semibold text-accent underline-offset-4 hover:text-accent-strong hover:underline"
                 >
-                  {dict.certificates.verify} →
+                  <VerifiedIcon size={16} />
+                  {dict.certificates.verify}
                 </a>
               )}
             </div>
