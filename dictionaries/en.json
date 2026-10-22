@@ -69,5 +69,18 @@
       "es": "Switch to Spanish",
       "en": "Switch to English"
     }
+  },
+  "cv": {
+    "bar": "Actions",
+    "link": "Download CV",
+    "name": "Alan Josué Guamán Rueda",
+    "title": "CV — Alan Josué Guamán Rueda",
+    "description": "Résumé of Alan Josué Guamán Rueda, systems engineer focused on CMS.",
+    "print": "Download PDF",
+    "back": "Back to the portfolio",
+    "profile": "Profile",
+    "experience": "Experience",
+    "education": "Education",
+    "present": "Present"
   }
 }

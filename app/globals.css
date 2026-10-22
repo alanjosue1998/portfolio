@@ -214,3 +214,55 @@ body {
 .maplibregl-map .maplibregl-ctrl-attrib a {
   color: var(--muted);
 }
+
+/*
+ * The CV page as a PDF. The browser's "Save as PDF" is the whole pipeline, so
+ * these rules are its entire design. See `app/[lang]/cv/page.tsx`.
+ */
+@page {
+  size: A4;
+  margin: 15mm;
+}
+
+@media print {
+  /*
+   * Paper is always the light theme. All three selectors the dark palette can
+   * arrive through are named here: `:root` alone would lose to
+   * `:root:not([data-theme="light"])` on specificity, and a visitor whose
+   * system is dark would print near-white text that browsers then lay on white
+   * paper, since they leave backgrounds out by default. Last in the file, so it
+   * also wins the tie with `:root[data-theme="dark"]`.
+   */
+  :root,
+  :root:not([data-theme="light"]),
+  :root[data-theme="dark"] {
+    --background: #ffffff;
+    --foreground: #1c1917;
+    --accent: #b45309;
+    --accent-strong: #92400e;
+    --accent-soft: #fbeedd;
+    --on-accent: #ffffff;
+    --muted: #57534e;
+    --surface: #ffffff;
+    --border: #d6d3d1;
+  }
+
+  /* Small enough that a CV fits its pages; still comfortable on A4. */
+  html {
+    font-size: 10.5pt;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  /* No CV entry is split across two sheets. */
+  .cv-entry {
+    break-inside: avoid;
+  }
+
+  /* A heading stranded at the foot of a page, its entries on the next. */
+  h2 {
+    break-after: avoid;
+  }
+}
