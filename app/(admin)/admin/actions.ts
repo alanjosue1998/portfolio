@@ -18,9 +18,12 @@ export type FormState = { status: "error" | "ok"; message: string } | undefined;
  * `app/[lang]/layout.tsx` prerenders one page per locale, and Prisma queries
  * are invisible to Next's cache, so an edit here only reaches visitors once
  * those pages are rebuilt.
+ *
+ * `"layout"` rather than `"page"`: it takes every page under the locale with
+ * it — the home and the CV alike — so a new route cannot be forgotten here.
  */
 function revalidateSite() {
-  revalidatePath("/[lang]", "page");
+  revalidatePath("/[lang]", "layout");
 }
 
 export async function createProject(
@@ -439,6 +442,152 @@ export async function deleteContactLink(formData: FormData) {
   if (!id) return;
 
   await prisma.contactLink.delete({ where: { id } });
+
+  revalidateSite();
+}
+
+/**
+ * `<input type="month">` hands back `YYYY-MM`, pinned here to the first of the
+ * month in UTC, the same way `createCertificate` stores `issuedAt`. Blank is
+ * `null`; anything unparseable is `undefined`, so the caller can tell the two
+ * apart.
+ */
+function parseMonth(raw: FormDataEntryValue | null): Date | null | undefined {
+  const value = String(raw ?? "").trim();
+  if (!value) return null;
+
+  const parsed = new Date(`${value}-01T00:00:00Z`);
+  return Number.isNaN(parsed.getTime()) ? undefined : parsed;
+}
+
+/**
+ * Shared by experience and education: a start is required, an end is optional
+ * (ongoing), and the end cannot come before the start.
+ */
+function parsePeriod(
+  formData: FormData,
+): { ok: true; startedAt: Date; endedAt: Date | null } | { ok: false; message: string } {
+  const startedAt = parseMonth(formData.get("startedAt"));
+  const endedAt = parseMonth(formData.get("endedAt"));
+
+  if (!startedAt) {
+    return { ok: false, message: "La fecha de inicio es obligatoria." };
+  }
+
+  if (endedAt === undefined) {
+    return { ok: false, message: "La fecha de fin no es válida." };
+  }
+
+  if (endedAt && endedAt < startedAt) {
+    return { ok: false, message: "La fecha de fin no puede ser anterior a la de inicio." };
+  }
+
+  return { ok: true, startedAt, endedAt };
+}
+
+export async function createExperience(
+  _previous: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  await requireSession();
+
+  const company = String(formData.get("company") ?? "").trim();
+  const role = String(formData.get("role") ?? "").trim();
+  const location = String(formData.get("location") ?? "").trim() || null;
+  const description = String(formData.get("description") ?? "").trim();
+  const technologies = String(formData.get("technologies") ?? "")
+    .split(",")
+    .map((technology) => technology.trim())
+    .filter(Boolean);
+  const position = Number(formData.get("position") ?? 0);
+
+  if (!company || !role || !description) {
+    return {
+      status: "error",
+      message: "La empresa, el cargo y la descripción son obligatorios.",
+    };
+  }
+
+  const period = parsePeriod(formData);
+
+  if (!period.ok) {
+    return { status: "error", message: period.message };
+  }
+
+  await prisma.experience.create({
+    data: {
+      company,
+      role,
+      location,
+      startedAt: period.startedAt,
+      endedAt: period.endedAt,
+      description,
+      technologies,
+      position: Number.isFinite(position) ? position : 0,
+    },
+  });
+
+  revalidateSite();
+
+  return { status: "ok", message: `Se añadió “${role}” en ${company}.` };
+}
+
+export async function deleteExperience(formData: FormData) {
+  await requireSession();
+
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+
+  await prisma.experience.delete({ where: { id } });
+
+  revalidateSite();
+}
+
+export async function createEducation(
+  _previous: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  await requireSession();
+
+  const institution = String(formData.get("institution") ?? "").trim();
+  const degree = String(formData.get("degree") ?? "").trim();
+  const position = Number(formData.get("position") ?? 0);
+
+  if (!institution || !degree) {
+    return {
+      status: "error",
+      message: "La institución y el título son obligatorios.",
+    };
+  }
+
+  const period = parsePeriod(formData);
+
+  if (!period.ok) {
+    return { status: "error", message: period.message };
+  }
+
+  await prisma.education.create({
+    data: {
+      institution,
+      degree,
+      startedAt: period.startedAt,
+      endedAt: period.endedAt,
+      position: Number.isFinite(position) ? position : 0,
+    },
+  });
+
+  revalidateSite();
+
+  return { status: "ok", message: `Se añadió “${degree}”.` };
+}
+
+export async function deleteEducation(formData: FormData) {
+  await requireSession();
+
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+
+  await prisma.education.delete({ where: { id } });
 
   revalidateSite();
 }
