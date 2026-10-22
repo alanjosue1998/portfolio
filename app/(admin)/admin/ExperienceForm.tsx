@@ -1,14 +1,10 @@
 "use client";
 
-import { useActionState } from "react";
-
 import type { AdminDictionary } from "@/lib/admin-i18n";
 
 import { createExperience } from "./actions";
-import type { FormState } from "./actions";
-import { FIELD, FormStatus, HINT, SUBMIT } from "./form-ui";
-
-const initialState: FormState = undefined;
+import { BilingualField, FIELD, FormStatus, HINT, SUBMIT } from "./form-ui";
+import { useAdminForm } from "./use-admin-form";
 
 type Props = {
   t: AdminDictionary["experienceForm"];
@@ -16,33 +12,30 @@ type Props = {
 };
 
 export default function ExperienceForm({ t, common }: Props) {
-  const [state, action, pending] = useActionState(createExperience, initialState);
+  const { state, pending, formProps } = useAdminForm(createExperience);
 
   return (
-    <form action={action} className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1">
-        <label htmlFor="role">{t.role}</label>
-        <input id="role" name="role" required placeholder={t.rolePlaceholder} className={FIELD} />
-      </div>
+    <form {...formProps} className="flex flex-col gap-4">
+      <BilingualField
+        name="role"
+        label={t.role}
+        labels={common}
+        required
+        placeholder={t.rolePlaceholder}
+      />
 
       <div className="flex flex-col gap-1">
         <label htmlFor="company">{t.company}</label>
         <input id="company" name="company" required className={FIELD} />
       </div>
 
-      <div className="flex flex-col gap-1">
-        <label htmlFor="location">{t.location}</label>
-        <input
-          id="location"
-          name="location"
-          placeholder={t.locationPlaceholder}
-          aria-describedby="location-hint"
-          className={FIELD}
-        />
-        <p id="location-hint" className={HINT}>
-          {common.optional}
-        </p>
-      </div>
+      <BilingualField
+        name="location"
+        label={t.location}
+        labels={common}
+        placeholder={t.locationPlaceholder}
+        hint={common.optional}
+      />
 
       {/* `month`, like the certificate date: a CV dates a job to the month. */}
       <div className="flex flex-wrap gap-4">
@@ -66,10 +59,13 @@ export default function ExperienceForm({ t, common }: Props) {
         </div>
       </div>
 
-      <div className="flex flex-col gap-1">
-        <label htmlFor="description">{common.description}</label>
-        <textarea id="description" name="description" rows={4} required className={FIELD} />
-      </div>
+      <BilingualField
+        name="description"
+        label={common.description}
+        labels={common}
+        required
+        rows={4}
+      />
 
       <div className="flex flex-col gap-1">
         <label htmlFor="technologies">{common.technologies}</label>

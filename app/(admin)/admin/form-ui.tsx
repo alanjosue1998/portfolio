@@ -1,3 +1,5 @@
+import type { AdminDictionary } from "@/lib/admin-i18n";
+
 import type { FormState } from "./actions";
 
 /**
@@ -28,5 +30,83 @@ export function FormStatus({ state }: { state: FormState }) {
     <p role="alert" className={state.status === "error" ? "text-danger" : "text-success"}>
       {state.message}
     </p>
+  );
+}
+
+type BilingualFieldProps = {
+  /** The Spanish field's name; the English one is the same with `En` added. */
+  name: string;
+  label: string;
+  labels: Pick<AdminDictionary["common"], "spanish" | "english" | "englishHint">;
+  /** Applies to the Spanish field only: the English one is always optional. */
+  required?: boolean;
+  /** A textarea of this many rows, rather than a single-line input. */
+  rows?: number;
+  placeholder?: string;
+  /** A `datalist` id to suggest from, on the Spanish field. */
+  list?: string;
+  /** Under both, for what applies to the pair. */
+  hint?: string;
+};
+
+/**
+ * A text stored in both languages — `role` and `roleEn`, say — as one labelled
+ * pair. Spanish is the text every page can fall back to, so it carries the
+ * `required`; the English half only says what `/en` shows instead.
+ */
+export function BilingualField({
+  name,
+  label,
+  labels,
+  required,
+  rows,
+  placeholder,
+  list,
+  hint,
+}: BilingualFieldProps) {
+  const english = `${name}En`;
+  const Control = rows ? "textarea" : "input";
+
+  return (
+    <fieldset className="flex flex-col gap-1">
+      <legend className="mb-1">{label}</legend>
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="flex flex-col gap-1">
+          <label htmlFor={name} className={HINT}>
+            {labels.spanish}
+          </label>
+          <Control
+            id={name}
+            name={name}
+            lang="es"
+            rows={rows}
+            required={required}
+            placeholder={placeholder}
+            list={list}
+            className={FIELD}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label htmlFor={english} className={HINT}>
+            {labels.english}
+          </label>
+          <Control
+            id={english}
+            name={english}
+            lang="en"
+            rows={rows}
+            aria-describedby={`${english}-hint`}
+            className={FIELD}
+          />
+          <p id={`${english}-hint`} className={HINT}>
+            {labels.englishHint}
+          </p>
+        </div>
+      </div>
+
+      {hint && <p className={HINT}>{hint}</p>}
+    </fieldset>
   );
 }

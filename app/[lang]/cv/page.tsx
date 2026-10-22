@@ -5,8 +5,8 @@ import BottomBar, { BAR_ITEM } from "@/app/components/BottomBar";
 import CvPrintButton from "@/app/components/CvPrintButton";
 import { ArrowLeftIcon } from "@/app/components/icons";
 import { getDictionary } from "@/lib/dictionaries";
-import { defaultLocale, type Locale } from "@/lib/i18n";
-import { socialMetadata } from "@/lib/metadata";
+import { defaultLocale, localized, type Locale } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/metadata";
 import prisma from "@/lib/prisma";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -19,9 +19,9 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: dict.cv.title,
     description: dict.cv.description,
-    ...socialMetadata({
+    ...pageMetadata({
       locale: locale as Locale,
-      path: `/${locale}/cv`,
+      page: "/cv",
       title: dict.cv.title,
       description: dict.cv.description,
     }),
@@ -58,10 +58,11 @@ function CvSection({ title, children }: { title: string; children: React.ReactNo
  * Prerendered once per locale like the home page, and refreshed by the same
  * `revalidateSite()` in the admin's actions.
  *
- * Only the headings, the labels and the dates follow the locale. The text in
- * the rows is stored in one language — whatever was typed into the admin — so
- * it reads the same on `/es/cv` and `/en/cv`. The profile is the exception: it
- * has a column per language, as it does on the home page.
+ * Everything follows the locale: the headings, labels and dates from the
+ * dictionaries, and the rows' own text through `localized()` — each has an
+ * optional English column (`roleEn`, `titleEn`…) that `/en/cv` uses, falling
+ * back to the Spanish one until it is filled in. Company and institution names
+ * stay as written, the way a CV keeps proper names.
  */
 export default async function CvPage() {
   const [dict, locale, profile, links, jobs, studies, skills, projects, certificates] =
@@ -101,10 +102,13 @@ export default async function CvPage() {
 
   // Grouped the way `Skills` groups them: a category surfaces where its first
   // skill sits in the admin's order.
-  const byCategory = new Map<string, string[]>();
+  const byCategory = new Map<string, { label: string; names: string[] }>();
 
   for (const skill of skills) {
-    byCategory.set(skill.category, [...(byCategory.get(skill.category) ?? []), skill.name]);
+    const group = byCategory.get(skill.category) ?? { label: skill.category, names: [] };
+    group.names.push(localized(locale, skill.name, skill.nameEn));
+    group.label = localized(locale, group.label, skill.categoryEn);
+    byCategory.set(skill.category, group);
   }
 
   return (
@@ -149,12 +153,18 @@ export default async function CvPage() {
                 <li key={job.id} className="cv-entry flex flex-col gap-1">
                   <div className="flex flex-wrap items-baseline justify-between gap-x-4">
                     <h3 className="font-semibold">
-                      {job.role} · {job.company}
+                      {localized(locale, job.role, job.roleEn)} · {job.company}
                     </h3>
                     <p className="text-sm text-muted">{period(job.startedAt, job.endedAt)}</p>
                   </div>
-                  {job.location && <p className="text-sm text-muted">{job.location}</p>}
-                  <p className="leading-relaxed whitespace-pre-line">{job.description}</p>
+                  {job.location && (
+                    <p className="text-sm text-muted">
+                      {localized(locale, job.location, job.locationEn)}
+                    </p>
+                  )}
+                  <p className="leading-relaxed whitespace-pre-line">
+                    {localized(locale, job.description, job.descriptionEn)}
+                  </p>
                   {job.technologies.length > 0 && (
                     <p className="text-sm text-muted">{job.technologies.join(" · ")}</p>
                   )}
@@ -173,7 +183,9 @@ export default async function CvPage() {
                   className="cv-entry flex flex-wrap items-baseline justify-between gap-x-4"
                 >
                   <div>
-                    <h3 className="font-semibold">{study.degree}</h3>
+                    <h3 className="font-semibold">
+                      {localized(locale, study.degree, study.degreeEn)}
+                    </h3>
                     <p className="text-sm">{study.institution}</p>
                   </div>
                   <p className="text-sm text-muted">{period(study.startedAt, study.endedAt)}</p>
@@ -186,9 +198,9 @@ export default async function CvPage() {
         {byCategory.size > 0 && (
           <CvSection title={dict.skills.heading}>
             <dl className="grid gap-x-4 gap-y-1.5 sm:grid-cols-[max-content_1fr] print:grid-cols-[max-content_1fr]">
-              {[...byCategory].map(([category, names]) => (
+              {[...byCategory].map(([category, { label, names }]) => (
                 <div key={category} className="contents">
-                  <dt className="font-semibold">{category}</dt>
+                  <dt className="font-semibold">{label}</dt>
                   <dd>{names.join(", ")}</dd>
                 </div>
               ))}
@@ -203,9 +215,12 @@ export default async function CvPage() {
               {projects.map((project) => (
                 <li key={project.id} className="cv-entry flex flex-col gap-1">
                   <h3 className="font-semibold">
-                    {project.title} <span className="font-normal text-muted">· {project.type}</span>
+                    {localized(locale, project.title, project.titleEn)}{" "}
+                    <span className="font-normal text-muted">· {project.type}</span>
                   </h3>
-                  <p className="leading-relaxed">{project.description}</p>
+                  <p className="leading-relaxed">
+                    {localized(locale, project.description, project.descriptionEn)}
+                  </p>
                   {project.technologies.length > 0 && (
                     <p className="text-sm text-muted">{project.technologies.join(" · ")}</p>
                   )}
@@ -220,7 +235,9 @@ export default async function CvPage() {
             <ul className="flex flex-col gap-3 print:gap-2">
               {certificates.map((certificate) => (
                 <li key={certificate.id} className="cv-entry">
-                  <h3 className="font-semibold">{certificate.title}</h3>
+                  <h3 className="font-semibold">
+                    {localized(locale, certificate.title, certificate.titleEn)}
+                  </h3>
                   <p className="text-sm text-muted">
                     {certificate.issuer}
                     {certificate.issuedAt && ` · ${month.format(certificate.issuedAt)}`}

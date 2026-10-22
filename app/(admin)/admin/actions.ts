@@ -25,6 +25,39 @@ function revalidateSite() {
   revalidatePath("/[lang]", "layout");
 }
 
+/**
+ * The order field, as an `Int` column will take it. `<input type="number">`
+ * still lets `1.5` or `1e12` through, and either would fail the insert with an
+ * error page instead of a message, so anything that is not a modest whole
+ * number counts as the default.
+ */
+function parsePosition(raw: FormDataEntryValue | null) {
+  const value = Number(raw ?? 0);
+
+  return Number.isInteger(value) && Math.abs(value) <= 1_000_000 ? value : 0;
+}
+
+/**
+ * An optional English version of a field — `roleEn`, `titleEn`… Blank is stored
+ * as null, which is what tells the public pages to fall back to the Spanish
+ * text. See `localized()` in `lib/i18n.ts`.
+ */
+function englishText(formData: FormData, name: string) {
+  return String(formData.get(name) ?? "").trim() || null;
+}
+
+/**
+ * For deletes: a row that is already gone — a double click, a second tab — is
+ * what the delete wanted anyway, not an error page. Prisma reports it as P2025;
+ * anything else still throws. The rows with no blob to clean up use
+ * `deleteMany`, which simply deletes nothing in that case.
+ */
+function alreadyGone(error: unknown): null {
+  if ((error as { code?: string } | null)?.code === "P2025") return null;
+
+  throw error;
+}
+
 export async function createProject(_previous: FormState, formData: FormData): Promise<FormState> {
   /**
    * A Server Action is a public endpoint: anyone can post to it once they know
@@ -68,7 +101,15 @@ export async function createProject(_previous: FormState, formData: FormData): P
   }
 
   await prisma.project.create({
-    data: { title, type, description, technologies, imageUrl },
+    data: {
+      title,
+      titleEn: englishText(formData, "titleEn"),
+      type,
+      description,
+      descriptionEn: englishText(formData, "descriptionEn"),
+      technologies,
+      imageUrl,
+    },
   });
 
   revalidateSite();
@@ -82,14 +123,14 @@ export async function deleteProject(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   if (!id) return;
 
-  const project = await prisma.project.delete({ where: { id } });
+  const project = await prisma.project.delete({ where: { id } }).catch(alreadyGone);
 
   /**
    * Best effort, and deliberately after the row is gone: a cover left in the
    * store is a few stray kilobytes, while a delete that fails here should not
    * keep the project itself on the site.
    */
-  if (project.imageUrl) {
+  if (project?.imageUrl) {
     try {
       await del(project.imageUrl);
     } catch {
@@ -112,7 +153,7 @@ export async function createCertificate(
   const credentialId = String(formData.get("credentialId") ?? "").trim() || null;
   const rawCredentialUrl = String(formData.get("credentialUrl") ?? "").trim();
   const rawIssuedAt = String(formData.get("issuedAt") ?? "").trim();
-  const position = Number(formData.get("position") ?? 0);
+  const position = parsePosition(formData.get("position"));
 
   if (!title || !issuer) {
     return {
@@ -173,12 +214,13 @@ export async function createCertificate(
   await prisma.certificate.create({
     data: {
       title,
+      titleEn: englishText(formData, "titleEn"),
       issuer,
       issuedAt,
       credentialId,
       credentialUrl,
       imageUrl,
-      position: Number.isFinite(position) ? position : 0,
+      position,
     },
   });
 
@@ -193,14 +235,14 @@ export async function deleteCertificate(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   if (!id) return;
 
-  const certificate = await prisma.certificate.delete({ where: { id } });
+  const certificate = await prisma.certificate.delete({ where: { id } }).catch(alreadyGone);
 
   /**
    * Best effort, and deliberately after the row is gone: a photo left in the
    * store is a few stray kilobytes, while a delete that fails here should not
    * keep the certificate itself on the site.
    */
-  if (certificate.imageUrl) {
+  if (certificate?.imageUrl) {
     try {
       await del(certificate.imageUrl);
     } catch {
@@ -217,14 +259,20 @@ export async function createSkill(_previous: FormState, formData: FormData): Pro
 
   const name = String(formData.get("name") ?? "").trim();
   const category = String(formData.get("category") ?? "").trim();
-  const position = Number(formData.get("position") ?? 0);
+  const position = parsePosition(formData.get("position"));
 
   if (!name || !category) {
     return { status: "error", message: t.skillRequired };
   }
 
   await prisma.skill.create({
-    data: { name, category, position: Number.isFinite(position) ? position : 0 },
+    data: {
+      name,
+      nameEn: englishText(formData, "nameEn"),
+      category,
+      categoryEn: englishText(formData, "categoryEn"),
+      position,
+    },
   });
 
   revalidateSite();
@@ -238,7 +286,7 @@ export async function deleteSkill(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   if (!id) return;
 
-  await prisma.skill.delete({ where: { id } });
+  await prisma.skill.deleteMany({ where: { id } });
 
   revalidateSite();
 }
@@ -408,7 +456,7 @@ export async function createContactLink(
   const platform = String(formData.get("platform") ?? "other").trim();
   const label = String(formData.get("label") ?? "").trim();
   const url = normaliseUrl(String(formData.get("url") ?? ""), platform);
-  const position = Number(formData.get("position") ?? 0);
+  const position = parsePosition(formData.get("position"));
 
   if (!label) {
     return { status: "error", message: t.labelRequired };
@@ -426,7 +474,7 @@ export async function createContactLink(
       platform,
       label,
       url,
-      position: Number.isFinite(position) ? position : 0,
+      position,
     },
   });
 
@@ -441,7 +489,7 @@ export async function deleteContactLink(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   if (!id) return;
 
-  await prisma.contactLink.delete({ where: { id } });
+  await prisma.contactLink.deleteMany({ where: { id } });
 
   revalidateSite();
 }
@@ -501,7 +549,7 @@ export async function createExperience(
     .split(",")
     .map((technology) => technology.trim())
     .filter(Boolean);
-  const position = Number(formData.get("position") ?? 0);
+  const position = parsePosition(formData.get("position"));
 
   if (!company || !role || !description) {
     return {
@@ -520,12 +568,15 @@ export async function createExperience(
     data: {
       company,
       role,
+      roleEn: englishText(formData, "roleEn"),
       location,
+      locationEn: englishText(formData, "locationEn"),
       startedAt: period.startedAt,
       endedAt: period.endedAt,
       description,
+      descriptionEn: englishText(formData, "descriptionEn"),
       technologies,
-      position: Number.isFinite(position) ? position : 0,
+      position,
     },
   });
 
@@ -540,7 +591,7 @@ export async function deleteExperience(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   if (!id) return;
 
-  await prisma.experience.delete({ where: { id } });
+  await prisma.experience.deleteMany({ where: { id } });
 
   revalidateSite();
 }
@@ -554,7 +605,7 @@ export async function createEducation(
 
   const institution = String(formData.get("institution") ?? "").trim();
   const degree = String(formData.get("degree") ?? "").trim();
-  const position = Number(formData.get("position") ?? 0);
+  const position = parsePosition(formData.get("position"));
 
   if (!institution || !degree) {
     return {
@@ -573,9 +624,10 @@ export async function createEducation(
     data: {
       institution,
       degree,
+      degreeEn: englishText(formData, "degreeEn"),
       startedAt: period.startedAt,
       endedAt: period.endedAt,
-      position: Number.isFinite(position) ? position : 0,
+      position,
     },
   });
 
@@ -590,7 +642,7 @@ export async function deleteEducation(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   if (!id) return;
 
-  await prisma.education.delete({ where: { id } });
+  await prisma.education.deleteMany({ where: { id } });
 
   revalidateSite();
 }

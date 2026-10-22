@@ -43,3 +43,17 @@ export const openGraphLocales: Record<Locale, string> = {
   es: "es_EC",
   en: "en_US",
 };
+
+/**
+ * Picks a stored text for the page's language. Content typed in the admin has
+ * a Spanish field and an optional English one (`roleEn`, `titleEn`…); English
+ * pages use the English text when there is some and fall back to the Spanish,
+ * so a translation not written yet shows the original rather than nothing.
+ */
+export function localized<T extends string | null>(
+  locale: string | undefined,
+  es: T,
+  en: string | null | undefined,
+): T | string {
+  return locale === "en" && en?.trim() ? en : es;
+}

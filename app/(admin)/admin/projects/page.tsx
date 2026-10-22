@@ -47,7 +47,15 @@ export default async function ProjectsPage() {
 
                   <div className="min-w-0">
                     <p className="text-sm text-muted">{project.type}</p>
-                    <h3 className="font-semibold">{project.title}</h3>
+                    <h3 className="font-semibold">
+                      {project.title}
+                      {project.titleEn && (
+                        <span lang="en" className="font-normal text-muted">
+                          {" "}
+                          · EN: {project.titleEn}
+                        </span>
+                      )}
+                    </h3>
                     <p>{project.description}</p>
                     {project.technologies.length > 0 && (
                       <p className="text-sm text-muted">{project.technologies.join(", ")}</p>

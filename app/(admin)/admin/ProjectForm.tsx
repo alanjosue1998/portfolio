@@ -1,13 +1,10 @@
 "use client";
 
-import { useActionState } from "react";
-
 import type { AdminDictionary } from "@/lib/admin-i18n";
 
-import { createProject, type FormState } from "./actions";
-import { FIELD, FormStatus, HINT, SUBMIT } from "./form-ui";
-
-const initialState: FormState = undefined;
+import { createProject } from "./actions";
+import { BilingualField, FIELD, FormStatus, HINT, SUBMIT } from "./form-ui";
+import { useAdminForm } from "./use-admin-form";
 
 type Props = {
   t: AdminDictionary["projectForm"];
@@ -15,14 +12,11 @@ type Props = {
 };
 
 export default function ProjectForm({ t, common }: Props) {
-  const [state, action, pending] = useActionState(createProject, initialState);
+  const { state, pending, formProps } = useAdminForm(createProject);
 
   return (
-    <form action={action} className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1">
-        <label htmlFor="title">{common.title}</label>
-        <input id="title" name="title" required className={FIELD} />
-      </div>
+    <form {...formProps} className="flex flex-col gap-4">
+      <BilingualField name="title" label={common.title} labels={common} required />
 
       <div className="flex flex-col gap-1">
         <label htmlFor="type">{t.type}</label>
@@ -35,10 +29,13 @@ export default function ProjectForm({ t, common }: Props) {
         />
       </div>
 
-      <div className="flex flex-col gap-1">
-        <label htmlFor="description">{common.description}</label>
-        <textarea id="description" name="description" rows={3} required className={FIELD} />
-      </div>
+      <BilingualField
+        name="description"
+        label={common.description}
+        labels={common}
+        required
+        rows={3}
+      />
 
       <div className="flex flex-col gap-1">
         <label htmlFor="technologies">{common.technologies}</label>

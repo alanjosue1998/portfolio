@@ -1,13 +1,10 @@
 "use client";
 
-import { useActionState } from "react";
-
 import type { AdminDictionary } from "@/lib/admin-i18n";
 
-import { saveAbout, type FormState } from "./actions";
+import { saveAbout } from "./actions";
 import { FIELD, FormStatus, HINT, SUBMIT } from "./form-ui";
-
-const initialState: FormState = undefined;
+import { useAdminForm } from "./use-admin-form";
 
 type Props = {
   /** What is stored now, per locale. Null when nothing has been written. */
@@ -20,10 +17,10 @@ type Props = {
 };
 
 export default function AboutForm({ current, fallback, t, saving }: Props) {
-  const [state, action, pending] = useActionState(saveAbout, initialState);
+  const { state, pending, formProps } = useAdminForm(saveAbout, { resetOnSuccess: false });
 
   return (
-    <form action={action} className="flex flex-col gap-4">
+    <form {...formProps} className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
         <label htmlFor="aboutEs">{t.es}</label>
         <textarea

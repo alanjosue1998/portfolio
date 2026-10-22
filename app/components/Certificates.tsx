@@ -1,7 +1,7 @@
 import { lang } from "next/root-params";
 
 import { getDictionary } from "@/lib/dictionaries";
-import { defaultLocale } from "@/lib/i18n";
+import { defaultLocale, localized } from "@/lib/i18n";
 import prisma from "@/lib/prisma";
 
 import CertificateImage from "./CertificateImage";
@@ -50,7 +50,7 @@ export default async function Certificates() {
             {certificate.imageUrl && (
               <CertificateImage
                 src={certificate.imageUrl}
-                title={certificate.title}
+                title={localized(locale, certificate.title, certificate.titleEn)}
                 labels={dict.certificates.image}
               />
             )}
@@ -61,7 +61,9 @@ export default async function Certificates() {
                 {certificate.issuedAt && ` · ${month.format(certificate.issuedAt)}`}
               </p>
 
-              <h3 className="text-lg leading-snug">{certificate.title}</h3>
+              <h3 className="text-lg leading-snug">
+                {localized(locale, certificate.title, certificate.titleEn)}
+              </h3>
 
               {certificate.credentialId && (
                 <p className="text-sm text-muted">

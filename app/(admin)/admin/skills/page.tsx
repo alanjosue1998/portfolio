@@ -57,7 +57,13 @@ export default async function SkillsPage() {
                       className="flex items-center justify-between gap-4 rounded border border-border px-3 py-2"
                     >
                       <span>
-                        {skill.name}{" "}
+                        {skill.name}
+                        {skill.nameEn && (
+                          <span lang="en" className="text-muted">
+                            {" "}
+                            · EN: {skill.nameEn}
+                          </span>
+                        )}{" "}
                         <span className="text-sm text-muted">
                           ({dict.skills.order} {skill.position})
                         </span>
