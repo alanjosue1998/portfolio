@@ -2,49 +2,55 @@
 
 import { useActionState } from "react";
 
-import { createProject, type ProjectState } from "./actions";
+import type { AdminDictionary } from "@/lib/admin-i18n";
 
-const initialState: ProjectState = undefined;
+import { createProject, type FormState } from "./actions";
+import { FIELD, FormStatus, HINT, SUBMIT } from "./form-ui";
 
-const fieldClass = "rounded border border-gray-400 px-3 py-2";
+const initialState: FormState = undefined;
 
-export default function ProjectForm() {
+type Props = {
+  t: AdminDictionary["projectForm"];
+  common: AdminDictionary["common"];
+};
+
+export default function ProjectForm({ t, common }: Props) {
   const [state, action, pending] = useActionState(createProject, initialState);
 
   return (
     <form action={action} className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
-        <label htmlFor="title">Título</label>
-        <input id="title" name="title" required className={fieldClass} />
+        <label htmlFor="title">{common.title}</label>
+        <input id="title" name="title" required className={FIELD} />
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="type">Tipo</label>
+        <label htmlFor="type">{t.type}</label>
         <input
           id="type"
           name="type"
           required
           placeholder="Drupal, WordPress, Next.js…"
-          className={fieldClass}
+          className={FIELD}
         />
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="description">Descripción</label>
-        <textarea id="description" name="description" rows={3} required className={fieldClass} />
+        <label htmlFor="description">{common.description}</label>
+        <textarea id="description" name="description" rows={3} required className={FIELD} />
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="technologies">Tecnologías</label>
+        <label htmlFor="technologies">{common.technologies}</label>
         <input
           id="technologies"
           name="technologies"
           placeholder="Drupal, PHP, Twig"
           aria-describedby="technologies-hint"
-          className={fieldClass}
+          className={FIELD}
         />
-        <p id="technologies-hint" className="text-sm text-gray-500">
-          Separadas por comas.
+        <p id="technologies-hint" className={HINT}>
+          {common.technologiesHint}
         </p>
       </div>
 
@@ -53,7 +59,7 @@ export default function ProjectForm() {
         a card, just without the image on top.
       */}
       <div className="flex flex-col gap-1">
-        <label htmlFor="image">Portada</label>
+        <label htmlFor="image">{t.cover}</label>
         <input
           id="image"
           name="image"
@@ -62,23 +68,15 @@ export default function ProjectForm() {
           aria-describedby="image-hint"
           className="text-sm"
         />
-        <p id="image-hint" className="text-sm text-gray-500">
-          Opcional. JPG, PNG o WebP, máximo 4 MB.
+        <p id="image-hint" className={HINT}>
+          {t.coverHint}
         </p>
       </div>
 
-      {state && (
-        <p role="alert" className={state.status === "error" ? "text-red-600" : "text-green-700"}>
-          {state.message}
-        </p>
-      )}
+      <FormStatus state={state} />
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="self-start rounded bg-foreground px-4 py-2 text-background disabled:opacity-60"
-      >
-        {pending ? "Guardando…" : "Añadir proyecto"}
+      <button type="submit" disabled={pending} className={SUBMIT}>
+        {pending ? common.saving : t.submit}
       </button>
     </form>
   );

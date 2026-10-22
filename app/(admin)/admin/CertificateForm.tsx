@@ -2,37 +2,43 @@
 
 import { useActionState } from "react";
 
+import type { AdminDictionary } from "@/lib/admin-i18n";
+
 import { createCertificate } from "./actions";
 import type { FormState } from "./actions";
+import { FIELD, FormStatus, HINT, SUBMIT } from "./form-ui";
 
 const initialState: FormState = undefined;
 
-const fieldClass = "rounded border border-gray-400 px-3 py-2";
+type Props = {
+  t: AdminDictionary["certificateForm"];
+  common: AdminDictionary["common"];
+};
 
-export default function CertificateForm() {
+export default function CertificateForm({ t, common }: Props) {
   const [state, action, pending] = useActionState(createCertificate, initialState);
 
   return (
     <form action={action} className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
-        <label htmlFor="title">Título</label>
+        <label htmlFor="title">{common.title}</label>
         <input
           id="title"
           name="title"
           required
           placeholder="Acquia Certified Drupal Developer"
-          className={fieldClass}
+          className={FIELD}
         />
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="issuer">Entidad</label>
+        <label htmlFor="issuer">{t.issuer}</label>
         <input
           id="issuer"
           name="issuer"
           required
-          placeholder="Acquia, Platzi, la universidad…"
-          className={fieldClass}
+          placeholder={t.issuerPlaceholder}
+          className={FIELD}
         />
       </div>
 
@@ -41,42 +47,42 @@ export default function CertificateForm() {
         asking for a day invents one. The action pins it to the first.
       */}
       <div className="flex flex-col gap-1">
-        <label htmlFor="issuedAt">Fecha</label>
+        <label htmlFor="issuedAt">{t.date}</label>
         <input
           id="issuedAt"
           name="issuedAt"
           type="month"
           aria-describedby="issuedAt-hint"
-          className={fieldClass}
+          className={FIELD}
         />
-        <p id="issuedAt-hint" className="text-sm text-gray-500">
-          Opcional. Solo mes y año, que es lo que muestra la tarjeta.
+        <p id="issuedAt-hint" className={HINT}>
+          {t.dateHint}
         </p>
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="credentialId">ID de credencial</label>
+        <label htmlFor="credentialId">{t.credentialId}</label>
         <input
           id="credentialId"
           name="credentialId"
           aria-describedby="credentialId-hint"
-          className={fieldClass}
+          className={FIELD}
         />
-        <p id="credentialId-hint" className="text-sm text-gray-500">
-          Opcional. El código impreso en el certificado.
+        <p id="credentialId-hint" className={HINT}>
+          {t.credentialIdHint}
         </p>
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="credentialUrl">Enlace de verificación</label>
+        <label htmlFor="credentialUrl">{t.credentialUrl}</label>
         <input
           id="credentialUrl"
           name="credentialUrl"
           aria-describedby="credentialUrl-hint"
-          className={fieldClass}
+          className={FIELD}
         />
-        <p id="credentialUrl-hint" className="text-sm text-gray-500">
-          Opcional. La página donde la entidad confirma la credencial.
+        <p id="credentialUrl-hint" className={HINT}>
+          {t.credentialUrlHint}
         </p>
       </div>
 
@@ -85,7 +91,7 @@ export default function CertificateForm() {
         renders as a card, just without the image on top.
       */}
       <div className="flex flex-col gap-1">
-        <label htmlFor="image">Foto</label>
+        <label htmlFor="image">{t.photo}</label>
         <input
           id="image"
           name="image"
@@ -94,39 +100,30 @@ export default function CertificateForm() {
           aria-describedby="image-hint"
           className="text-sm"
         />
-        <p id="image-hint" className="text-sm text-gray-500">
-          Opcional. JPG, PNG o WebP, máximo 4 MB. Se puede abrir a pantalla completa desde el sitio,
-          así que vale la pena que se lea.
+        <p id="image-hint" className={HINT}>
+          {t.photoHint}
         </p>
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="position">Posición</label>
+        <label htmlFor="position">{common.position}</label>
         <input
           id="position"
           name="position"
           type="number"
           defaultValue={0}
           aria-describedby="position-hint"
-          className={fieldClass}
+          className={`${FIELD} w-24`}
         />
-        <p id="position-hint" className="text-sm text-gray-500">
-          Menor primero. Los empates se ordenan por fecha de creación.
+        <p id="position-hint" className={HINT}>
+          {common.positionHint}
         </p>
       </div>
 
-      {state && (
-        <p role="alert" className={state.status === "error" ? "text-red-600" : "text-green-700"}>
-          {state.message}
-        </p>
-      )}
+      <FormStatus state={state} />
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="self-start rounded bg-foreground px-4 py-2 text-background disabled:opacity-60"
-      >
-        {pending ? "Guardando…" : "Añadir certificado"}
+      <button type="submit" disabled={pending} className={SUBMIT}>
+        {pending ? common.saving : t.submit}
       </button>
     </form>
   );

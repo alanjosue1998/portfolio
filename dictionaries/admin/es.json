@@ -1,0 +1,170 @@
+{
+  "meta": {
+    "title": "Panel"
+  },
+  "controls": {
+    "label": "Idioma",
+    "switchTo": {
+      "es": "Cambiar a español",
+      "en": "Cambiar a inglés"
+    },
+    "theme": {
+      "toDark": "Cambiar al tema oscuro",
+      "toLight": "Cambiar al tema claro"
+    }
+  },
+  "login": {
+    "title": "Entrar al panel",
+    "email": "Email",
+    "password": "Contraseña",
+    "submit": "Entrar",
+    "submitting": "Entrando…",
+    "invalid": "Email o contraseña incorrectos.",
+    "tooMany": "Demasiados intentos. Espera unos minutos antes de volver a probar."
+  },
+  "layout": {
+    "title": "Administración",
+    "signOut": "Salir",
+    "navLabel": "Secciones",
+    "nav": {
+      "profile": "Información de perfil",
+      "skills": "Skills",
+      "projects": "Proyectos",
+      "certificates": "Certificados",
+      "experience": "Experiencia",
+      "education": "Educación"
+    }
+  },
+  "common": {
+    "delete": "Borrar",
+    "saving": "Guardando…",
+    "optional": "Opcional.",
+    "position": "Orden",
+    "positionHint": "De menor a mayor. Los empates se ordenan por fecha de creación.",
+    "description": "Descripción",
+    "technologies": "Tecnologías",
+    "technologiesHint": "Separadas por comas.",
+    "from": "Desde",
+    "to": "Hasta",
+    "toHint": "Vacío si sigue en curso.",
+    "title": "Título"
+  },
+  "profile": {
+    "photoHeading": "Foto de perfil",
+    "aboutHeading": "Sobre mí",
+    "contactsHeading": "Contactos"
+  },
+  "profileForm": {
+    "currentAlt": "Foto actual",
+    "noPhoto": "Sin foto",
+    "label": "Foto de perfil",
+    "hint": "JPG, PNG o WebP. Máximo 4 MB.",
+    "submit": "Guardar foto",
+    "submitting": "Subiendo…"
+  },
+  "aboutForm": {
+    "es": "Español",
+    "en": "Inglés",
+    "hint": "Uno por idioma: cada visitante lee el que corresponde a la página en la que está. Un campo vacío usa el texto de ejemplo que aparece en gris, que es el que trae el sitio. Las líneas en blanco se respetan como saltos de párrafo.",
+    "submit": "Guardar texto"
+  },
+  "contactForm": {
+    "platform": "Plataforma",
+    "otherPlatform": "Otro enlace",
+    "label": "Etiqueta",
+    "labelHint": "Es lo que se lee en el enlace y lo que anuncia un lector de pantalla.",
+    "url": "Dirección",
+    "urlHint": "Para email basta el correo. Para el resto se añade https:// si falta.",
+    "submit": "Añadir contacto"
+  },
+  "skills": {
+    "add": "Añadir una skill",
+    "published": "Publicadas",
+    "empty": "Todavía no hay ninguna.",
+    "order": "orden"
+  },
+  "skillForm": {
+    "name": "Nombre",
+    "category": "Categoría",
+    "categoryHint": "Agrupa las etiquetas en el sitio. Escribe una nueva o elige una existente.",
+    "submit": "Añadir skill"
+  },
+  "projects": {
+    "add": "Añadir un proyecto",
+    "published": "Publicados",
+    "empty": "Todavía no hay ninguno."
+  },
+  "projectForm": {
+    "type": "Tipo",
+    "cover": "Portada",
+    "coverHint": "Opcional. JPG, PNG o WebP, máximo 4 MB.",
+    "submit": "Añadir proyecto"
+  },
+  "certificates": {
+    "add": "Añadir un certificado",
+    "published": "Publicados",
+    "empty": "Todavía no hay ninguno."
+  },
+  "certificateForm": {
+    "issuer": "Entidad",
+    "issuerPlaceholder": "Acquia, Platzi, la universidad…",
+    "date": "Fecha",
+    "dateHint": "Opcional. Solo mes y año, que es lo que muestra la tarjeta.",
+    "credentialId": "ID de credencial",
+    "credentialIdHint": "Opcional. El código impreso en el certificado.",
+    "credentialUrl": "Enlace de verificación",
+    "credentialUrlHint": "Opcional. La página donde la entidad confirma la credencial.",
+    "photo": "Foto",
+    "photoHint": "Opcional. JPG, PNG o WebP, máximo 4 MB. Se puede abrir a pantalla completa desde el sitio, así que vale la pena que se lea.",
+    "submit": "Añadir certificado"
+  },
+  "experience": {
+    "add": "Añadir experiencia",
+    "published": "Publicadas",
+    "empty": "Todavía no hay ninguna.",
+    "ongoing": "actualidad"
+  },
+  "experienceForm": {
+    "role": "Cargo",
+    "rolePlaceholder": "Desarrollador Drupal",
+    "company": "Empresa",
+    "location": "Ubicación",
+    "locationPlaceholder": "Quito, Ecuador · Remoto",
+    "submit": "Añadir experiencia"
+  },
+  "education": {
+    "add": "Añadir educación",
+    "published": "Publicadas",
+    "empty": "Todavía no hay ninguna.",
+    "ongoing": "en curso"
+  },
+  "educationForm": {
+    "degree": "Título",
+    "degreePlaceholder": "Ingeniería en Sistemas",
+    "institution": "Institución",
+    "submit": "Añadir educación"
+  },
+  "actions": {
+    "added": "Se añadió “{name}”.",
+    "experienceAdded": "Se añadió “{role}” en {company}.",
+    "photoUpdated": "Foto actualizada.",
+    "textUpdated": "Texto actualizado.",
+    "projectRequired": "Título, tipo y descripción son obligatorios.",
+    "certificateRequired": "El título y la entidad son obligatorios.",
+    "skillRequired": "Nombre y categoría son obligatorios.",
+    "labelRequired": "La etiqueta es obligatoria.",
+    "experienceRequired": "La empresa, el cargo y la descripción son obligatorios.",
+    "educationRequired": "La institución y el título son obligatorios.",
+    "invalidDate": "La fecha no es válida.",
+    "startRequired": "La fecha de inicio es obligatoria.",
+    "invalidEnd": "La fecha de fin no es válida.",
+    "endBeforeStart": "La fecha de fin no puede ser anterior a la de inicio.",
+    "invalidEmail": "Escribe un correo válido.",
+    "invalidUrl": "Escribe una dirección https:// válida — http:// no se acepta.",
+    "verificationHttps": "El enlace de verificación tiene que ser https:// — http:// no se acepta.",
+    "chooseImage": "Elige una imagen.",
+    "notImage": "El archivo tiene que ser una imagen.",
+    "imageTooBig": "La imagen no puede pasar de 4 MB.",
+    "uploadFailed": "No se pudo subir la imagen."
+  }
+}

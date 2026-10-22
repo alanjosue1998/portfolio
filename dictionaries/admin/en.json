@@ -1,0 +1,170 @@
+{
+  "meta": {
+    "title": "Admin"
+  },
+  "controls": {
+    "label": "Language",
+    "switchTo": {
+      "es": "Switch to Spanish",
+      "en": "Switch to English"
+    },
+    "theme": {
+      "toDark": "Switch to the dark theme",
+      "toLight": "Switch to the light theme"
+    }
+  },
+  "login": {
+    "title": "Sign in to the admin",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign in",
+    "submitting": "Signing in…",
+    "invalid": "Wrong email or password.",
+    "tooMany": "Too many attempts. Wait a few minutes before trying again."
+  },
+  "layout": {
+    "title": "Administration",
+    "signOut": "Sign out",
+    "navLabel": "Sections",
+    "nav": {
+      "profile": "Profile",
+      "skills": "Skills",
+      "projects": "Projects",
+      "certificates": "Certificates",
+      "experience": "Experience",
+      "education": "Education"
+    }
+  },
+  "common": {
+    "delete": "Delete",
+    "saving": "Saving…",
+    "optional": "Optional.",
+    "position": "Order",
+    "positionHint": "Lowest first. Ties are ordered by creation date.",
+    "description": "Description",
+    "technologies": "Technologies",
+    "technologiesHint": "Comma-separated.",
+    "from": "From",
+    "to": "To",
+    "toHint": "Leave empty if ongoing.",
+    "title": "Title"
+  },
+  "profile": {
+    "photoHeading": "Profile photo",
+    "aboutHeading": "About me",
+    "contactsHeading": "Contacts"
+  },
+  "profileForm": {
+    "currentAlt": "Current photo",
+    "noPhoto": "No photo",
+    "label": "Profile photo",
+    "hint": "JPG, PNG or WebP. 4 MB max.",
+    "submit": "Save photo",
+    "submitting": "Uploading…"
+  },
+  "aboutForm": {
+    "es": "Spanish",
+    "en": "English",
+    "hint": "One per language: each visitor reads the one for the page they are on. An empty field uses the sample text shown in grey, which is the one the site ships with. Blank lines are kept as paragraph breaks.",
+    "submit": "Save text"
+  },
+  "contactForm": {
+    "platform": "Platform",
+    "otherPlatform": "Other link",
+    "label": "Label",
+    "labelHint": "What the link reads, and what a screen reader announces.",
+    "url": "Address",
+    "urlHint": "For email, the address is enough. For the rest, https:// is added if missing.",
+    "submit": "Add contact"
+  },
+  "skills": {
+    "add": "Add a skill",
+    "published": "Published",
+    "empty": "None yet.",
+    "order": "order"
+  },
+  "skillForm": {
+    "name": "Name",
+    "category": "Category",
+    "categoryHint": "Groups the tags on the site. Type a new one or pick an existing one.",
+    "submit": "Add skill"
+  },
+  "projects": {
+    "add": "Add a project",
+    "published": "Published",
+    "empty": "None yet."
+  },
+  "projectForm": {
+    "type": "Type",
+    "cover": "Cover",
+    "coverHint": "Optional. JPG, PNG or WebP, 4 MB max.",
+    "submit": "Add project"
+  },
+  "certificates": {
+    "add": "Add a certificate",
+    "published": "Published",
+    "empty": "None yet."
+  },
+  "certificateForm": {
+    "issuer": "Issuer",
+    "issuerPlaceholder": "Acquia, Platzi, a university…",
+    "date": "Date",
+    "dateHint": "Optional. Month and year only — that is what the card shows.",
+    "credentialId": "Credential ID",
+    "credentialIdHint": "Optional. The code printed on the certificate.",
+    "credentialUrl": "Verification link",
+    "credentialUrlHint": "Optional. The page where the issuer confirms the credential.",
+    "photo": "Photo",
+    "photoHint": "Optional. JPG, PNG or WebP, 4 MB max. It can be opened full screen from the site, so it is worth making it legible.",
+    "submit": "Add certificate"
+  },
+  "experience": {
+    "add": "Add experience",
+    "published": "Published",
+    "empty": "None yet.",
+    "ongoing": "present"
+  },
+  "experienceForm": {
+    "role": "Role",
+    "rolePlaceholder": "Drupal developer",
+    "company": "Company",
+    "location": "Location",
+    "locationPlaceholder": "Quito, Ecuador · Remote",
+    "submit": "Add experience"
+  },
+  "education": {
+    "add": "Add education",
+    "published": "Published",
+    "empty": "None yet.",
+    "ongoing": "ongoing"
+  },
+  "educationForm": {
+    "degree": "Degree",
+    "degreePlaceholder": "Systems Engineering",
+    "institution": "Institution",
+    "submit": "Add education"
+  },
+  "actions": {
+    "added": "Added “{name}”.",
+    "experienceAdded": "Added “{role}” at {company}.",
+    "photoUpdated": "Photo updated.",
+    "textUpdated": "Text updated.",
+    "projectRequired": "Title, type and description are required.",
+    "certificateRequired": "Title and issuer are required.",
+    "skillRequired": "Name and category are required.",
+    "labelRequired": "The label is required.",
+    "experienceRequired": "Company, role and description are required.",
+    "educationRequired": "Institution and degree are required.",
+    "invalidDate": "The date is not valid.",
+    "startRequired": "The start date is required.",
+    "invalidEnd": "The end date is not valid.",
+    "endBeforeStart": "The end date cannot be before the start date.",
+    "invalidEmail": "Enter a valid email address.",
+    "invalidUrl": "Enter a valid https:// address — http:// is not accepted.",
+    "verificationHttps": "The verification link has to be https:// — http:// is not accepted.",
+    "chooseImage": "Choose an image.",
+    "notImage": "The file has to be an image.",
+    "imageTooBig": "The image cannot be larger than 4 MB.",
+    "uploadFailed": "The image could not be uploaded."
+  }
+}

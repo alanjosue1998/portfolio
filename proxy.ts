@@ -1,38 +1,13 @@
 import { getSessionCookie } from "better-auth/cookies";
 import { NextResponse, type NextRequest } from "next/server";
 
-import { defaultLocale, isLocale, locales } from "@/lib/i18n";
+import { locales, matchLocale } from "@/lib/i18n";
 
 /**
- * The admin area is a tool for one person rather than part of the site, so it
- * is not translated and never gets a locale prefix. See `app/(admin)`.
+ * The admin area never gets a locale prefix: its language is a preference kept
+ * in a cookie rather than part of the address. See `lib/admin-i18n.ts`.
  */
 const adminPaths = ["/admin", "/login"];
-
-/**
- * Picks the best supported locale from the `Accept-Language` header, highest
- * quality value first. Region subtags are ignored, so `en-GB` matches `en`.
- */
-function detectLocale(request: NextRequest) {
-  const header = request.headers.get("accept-language");
-
-  if (!header) return defaultLocale;
-
-  const preferences = header
-    .split(",")
-    .map((entry) => {
-      const [tag, quality] = entry.trim().split(";q=");
-      return { tag: tag.toLowerCase(), quality: quality ? Number(quality) : 1 };
-    })
-    .sort((a, b) => b.quality - a.quality);
-
-  for (const { tag } of preferences) {
-    const language = tag.split("-")[0];
-    if (isLocale(language)) return language;
-  }
-
-  return defaultLocale;
-}
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -62,7 +37,7 @@ export function proxy(request: NextRequest) {
 
   if (alreadyLocalized) return;
 
-  request.nextUrl.pathname = `/${detectLocale(request)}${pathname}`;
+  request.nextUrl.pathname = `/${matchLocale(request.headers.get("accept-language"))}${pathname}`;
 
   return NextResponse.redirect(request.nextUrl);
 }

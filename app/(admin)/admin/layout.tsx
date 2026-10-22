@@ -1,3 +1,4 @@
+import { getAdminDictionary } from "@/lib/admin-i18n";
 import { requireSession } from "@/lib/session";
 
 import AdminNav from "./AdminNav";
@@ -14,24 +15,24 @@ import { signOut } from "./actions";
  * boundary — a page must not depend on its parent having checked.
  */
 export default async function AdminSectionLayout({ children }: { children: React.ReactNode }) {
-  const session = await requireSession();
+  const [session, dict] = await Promise.all([requireSession(), getAdminDictionary()]);
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 p-6 sm:p-8">
-      <header className="flex flex-wrap items-baseline justify-between gap-4 border-b border-gray-300 pb-4">
-        <h1 className="text-2xl font-semibold">Administración</h1>
+      <header className="flex flex-wrap items-baseline justify-between gap-4 border-b border-border pb-4">
+        <h1 className="text-2xl font-semibold">{dict.layout.title}</h1>
 
         <form action={signOut}>
-          <span className="mr-3 text-sm text-gray-500">{session.user.email}</span>
+          <span className="mr-3 text-sm text-muted">{session.user.email}</span>
           <button type="submit" className="text-sm underline">
-            Salir
+            {dict.layout.signOut}
           </button>
         </form>
       </header>
 
       {/* Stacks on a phone, where a fixed side column would leave no room. */}
       <div className="flex flex-col gap-8 sm:flex-row sm:gap-10">
-        <AdminNav />
+        <AdminNav label={dict.layout.navLabel} labels={dict.layout.nav} />
         {/* `min-w-0` lets long URLs truncate instead of stretching the column. */}
         <div className="min-w-0 flex-1">{children}</div>
       </div>

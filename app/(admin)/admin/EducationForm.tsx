@@ -2,82 +2,80 @@
 
 import { useActionState } from "react";
 
+import type { AdminDictionary } from "@/lib/admin-i18n";
+
 import { createEducation } from "./actions";
 import type { FormState } from "./actions";
+import { FIELD, FormStatus, HINT, SUBMIT } from "./form-ui";
 
 const initialState: FormState = undefined;
 
-const fieldClass = "rounded border border-gray-400 px-3 py-2";
+type Props = {
+  t: AdminDictionary["educationForm"];
+  common: AdminDictionary["common"];
+};
 
-export default function EducationForm() {
+export default function EducationForm({ t, common }: Props) {
   const [state, action, pending] = useActionState(createEducation, initialState);
 
   return (
     <form action={action} className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
-        <label htmlFor="degree">Título</label>
+        <label htmlFor="degree">{t.degree}</label>
         <input
           id="degree"
           name="degree"
           required
-          placeholder="Ingeniería en Sistemas"
-          className={fieldClass}
+          placeholder={t.degreePlaceholder}
+          className={FIELD}
         />
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="institution">Institución</label>
-        <input id="institution" name="institution" required className={fieldClass} />
+        <label htmlFor="institution">{t.institution}</label>
+        <input id="institution" name="institution" required className={FIELD} />
       </div>
 
       <div className="flex flex-wrap gap-4">
         <div className="flex flex-col gap-1">
-          <label htmlFor="startedAt">Desde</label>
-          <input id="startedAt" name="startedAt" type="month" required className={fieldClass} />
+          <label htmlFor="startedAt">{common.from}</label>
+          <input id="startedAt" name="startedAt" type="month" required className={FIELD} />
         </div>
 
         <div className="flex flex-col gap-1">
-          <label htmlFor="endedAt">Hasta</label>
+          <label htmlFor="endedAt">{common.to}</label>
           <input
             id="endedAt"
             name="endedAt"
             type="month"
             aria-describedby="endedAt-hint"
-            className={fieldClass}
+            className={FIELD}
           />
-          <p id="endedAt-hint" className="text-sm text-gray-500">
-            Vacío si sigue en curso.
+          <p id="endedAt-hint" className={HINT}>
+            {common.toHint}
           </p>
         </div>
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="position">Posición</label>
+        <label htmlFor="position">{common.position}</label>
         <input
           id="position"
           name="position"
           type="number"
           defaultValue={0}
           aria-describedby="position-hint"
-          className={fieldClass}
+          className={`${FIELD} w-24`}
         />
-        <p id="position-hint" className="text-sm text-gray-500">
-          Menor primero. Los empates se ordenan por fecha de creación.
+        <p id="position-hint" className={HINT}>
+          {common.positionHint}
         </p>
       </div>
 
-      {state && (
-        <p role="alert" className={state.status === "error" ? "text-red-600" : "text-green-700"}>
-          {state.message}
-        </p>
-      )}
+      <FormStatus state={state} />
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="self-start rounded bg-foreground px-4 py-2 text-background disabled:opacity-60"
-      >
-        {pending ? "Guardando…" : "Añadir educación"}
+      <button type="submit" disabled={pending} className={SUBMIT}>
+        {pending ? common.saving : t.submit}
       </button>
     </form>
   );

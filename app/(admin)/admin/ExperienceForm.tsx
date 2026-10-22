@@ -2,116 +2,108 @@
 
 import { useActionState } from "react";
 
+import type { AdminDictionary } from "@/lib/admin-i18n";
+
 import { createExperience } from "./actions";
 import type { FormState } from "./actions";
+import { FIELD, FormStatus, HINT, SUBMIT } from "./form-ui";
 
 const initialState: FormState = undefined;
 
-const fieldClass = "rounded border border-gray-400 px-3 py-2";
+type Props = {
+  t: AdminDictionary["experienceForm"];
+  common: AdminDictionary["common"];
+};
 
-export default function ExperienceForm() {
+export default function ExperienceForm({ t, common }: Props) {
   const [state, action, pending] = useActionState(createExperience, initialState);
 
   return (
     <form action={action} className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
-        <label htmlFor="role">Cargo</label>
-        <input
-          id="role"
-          name="role"
-          required
-          placeholder="Desarrollador Drupal"
-          className={fieldClass}
-        />
+        <label htmlFor="role">{t.role}</label>
+        <input id="role" name="role" required placeholder={t.rolePlaceholder} className={FIELD} />
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="company">Empresa</label>
-        <input id="company" name="company" required className={fieldClass} />
+        <label htmlFor="company">{t.company}</label>
+        <input id="company" name="company" required className={FIELD} />
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="location">Ubicación</label>
+        <label htmlFor="location">{t.location}</label>
         <input
           id="location"
           name="location"
-          placeholder="Quito, Ecuador · Remoto"
+          placeholder={t.locationPlaceholder}
           aria-describedby="location-hint"
-          className={fieldClass}
+          className={FIELD}
         />
-        <p id="location-hint" className="text-sm text-gray-500">
-          Opcional.
+        <p id="location-hint" className={HINT}>
+          {common.optional}
         </p>
       </div>
 
       {/* `month`, like the certificate date: a CV dates a job to the month. */}
       <div className="flex flex-wrap gap-4">
         <div className="flex flex-col gap-1">
-          <label htmlFor="startedAt">Desde</label>
-          <input id="startedAt" name="startedAt" type="month" required className={fieldClass} />
+          <label htmlFor="startedAt">{common.from}</label>
+          <input id="startedAt" name="startedAt" type="month" required className={FIELD} />
         </div>
 
         <div className="flex flex-col gap-1">
-          <label htmlFor="endedAt">Hasta</label>
+          <label htmlFor="endedAt">{common.to}</label>
           <input
             id="endedAt"
             name="endedAt"
             type="month"
             aria-describedby="endedAt-hint"
-            className={fieldClass}
+            className={FIELD}
           />
-          <p id="endedAt-hint" className="text-sm text-gray-500">
-            Vacío si sigue en curso.
+          <p id="endedAt-hint" className={HINT}>
+            {common.toHint}
           </p>
         </div>
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="description">Descripción</label>
-        <textarea id="description" name="description" rows={4} required className={fieldClass} />
+        <label htmlFor="description">{common.description}</label>
+        <textarea id="description" name="description" rows={4} required className={FIELD} />
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="technologies">Tecnologías</label>
+        <label htmlFor="technologies">{common.technologies}</label>
         <input
           id="technologies"
           name="technologies"
           placeholder="Drupal, PHP, Twig"
           aria-describedby="technologies-hint"
-          className={fieldClass}
+          className={FIELD}
         />
-        <p id="technologies-hint" className="text-sm text-gray-500">
-          Separadas por comas.
+        <p id="technologies-hint" className={HINT}>
+          {common.technologiesHint}
         </p>
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="position">Posición</label>
+        <label htmlFor="position">{common.position}</label>
         <input
           id="position"
           name="position"
           type="number"
           defaultValue={0}
           aria-describedby="position-hint"
-          className={fieldClass}
+          className={`${FIELD} w-24`}
         />
-        <p id="position-hint" className="text-sm text-gray-500">
-          Menor primero. Los empates se ordenan por fecha de creación.
+        <p id="position-hint" className={HINT}>
+          {common.positionHint}
         </p>
       </div>
 
-      {state && (
-        <p role="alert" className={state.status === "error" ? "text-red-600" : "text-green-700"}>
-          {state.message}
-        </p>
-      )}
+      <FormStatus state={state} />
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="self-start rounded bg-foreground px-4 py-2 text-background disabled:opacity-60"
-      >
-        {pending ? "Guardando…" : "Añadir experiencia"}
+      <button type="submit" disabled={pending} className={SUBMIT}>
+        {pending ? common.saving : t.submit}
       </button>
     </form>
   );
