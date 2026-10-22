@@ -1,13 +1,10 @@
 "use client";
 
-import { useActionState } from "react";
-
 import type { AdminDictionary } from "@/lib/admin-i18n";
 
-import { createProject, type FormState } from "./actions";
+import { createProject } from "./actions";
 import { FIELD, FormStatus, HINT, SUBMIT } from "./form-ui";
-
-const initialState: FormState = undefined;
+import { useAdminForm } from "./use-admin-form";
 
 type Props = {
   t: AdminDictionary["projectForm"];
@@ -15,10 +12,10 @@ type Props = {
 };
 
 export default function ProjectForm({ t, common }: Props) {
-  const [state, action, pending] = useActionState(createProject, initialState);
+  const { state, pending, formProps } = useAdminForm(createProject);
 
   return (
-    <form action={action} className="flex flex-col gap-4">
+    <form {...formProps} className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
         <label htmlFor="title">{common.title}</label>
         <input id="title" name="title" required className={FIELD} />

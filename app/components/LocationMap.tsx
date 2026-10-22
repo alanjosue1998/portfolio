@@ -241,11 +241,21 @@ export default function LocationMap({ city, country, description, unavailable, c
     };
   }, []);
 
+  /**
+   * Without WebGL there is no map, but the greeting and the portrait are not
+   * part of it — they are the page's `<h1>` and its link to About. They used to
+   * go down with it, leaving the page headless for anyone whose browser could
+   * not draw a map. Now they sit on the page under the note instead of over the
+   * map.
+   */
   if (failed) {
     return (
-      <p className="text-muted">
-        {unavailable} {city}, {country}.
-      </p>
+      <div className="flex flex-col gap-6 pt-10">
+        <p className="text-muted">
+          {unavailable} {city}, {country}.
+        </p>
+        <div className="flex items-end justify-between gap-4">{children}</div>
+      </div>
     );
   }
 

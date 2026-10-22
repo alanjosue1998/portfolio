@@ -8,7 +8,7 @@ import ThemeScript from "@/app/components/ThemeScript";
 import { spaceGrotesk } from "@/app/fonts";
 import { getDictionary } from "@/lib/dictionaries";
 import { locales, type Locale } from "@/lib/i18n";
-import { socialMetadata } from "@/lib/metadata";
+import { pageMetadata } from "@/lib/metadata";
 import { siteUrl } from "@/lib/site";
 
 import "../globals.css";
@@ -39,9 +39,9 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(siteUrl),
     title: dict.meta.title,
     description: dict.meta.description,
-    ...socialMetadata({
+    ...pageMetadata({
       locale: locale as Locale,
-      path: `/${locale}`,
+      page: "",
       title: dict.meta.title,
       description: dict.meta.description,
     }),

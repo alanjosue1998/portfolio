@@ -1,14 +1,10 @@
 "use client";
 
-import { useActionState } from "react";
-
 import type { AdminDictionary } from "@/lib/admin-i18n";
 
 import { createEducation } from "./actions";
-import type { FormState } from "./actions";
 import { FIELD, FormStatus, HINT, SUBMIT } from "./form-ui";
-
-const initialState: FormState = undefined;
+import { useAdminForm } from "./use-admin-form";
 
 type Props = {
   t: AdminDictionary["educationForm"];
@@ -16,10 +12,10 @@ type Props = {
 };
 
 export default function EducationForm({ t, common }: Props) {
-  const [state, action, pending] = useActionState(createEducation, initialState);
+  const { state, pending, formProps } = useAdminForm(createEducation);
 
   return (
-    <form action={action} className="flex flex-col gap-4">
+    <form {...formProps} className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
         <label htmlFor="degree">{t.degree}</label>
         <input

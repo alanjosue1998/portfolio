@@ -1,13 +1,10 @@
 "use client";
 
-import { useActionState } from "react";
-
 import type { AdminDictionary } from "@/lib/admin-i18n";
 
-import { createSkill, type FormState } from "./actions";
+import { createSkill } from "./actions";
 import { FIELD, FormStatus, HINT, SUBMIT } from "./form-ui";
-
-const initialState: FormState = undefined;
+import { useAdminForm } from "./use-admin-form";
 
 type Props = {
   categories: string[];
@@ -22,10 +19,10 @@ type Props = {
  * something you type once and then get offered from then on.
  */
 export default function SkillForm({ categories, t, common }: Props) {
-  const [state, action, pending] = useActionState(createSkill, initialState);
+  const { state, pending, formProps } = useAdminForm(createSkill);
 
   return (
-    <form action={action} className="flex flex-col gap-4">
+    <form {...formProps} className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
         <label htmlFor="name">{t.name}</label>
         <input id="name" name="name" required placeholder="Drupal" className={FIELD} />

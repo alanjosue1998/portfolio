@@ -1,14 +1,11 @@
 "use client";
 
-import { useActionState } from "react";
-
 import type { AdminDictionary } from "@/lib/admin-i18n";
 import { contactPlatforms } from "@/lib/contact-platforms";
 
-import { createContactLink, type FormState } from "./actions";
+import { createContactLink } from "./actions";
 import { FIELD, FormStatus, HINT, SUBMIT } from "./form-ui";
-
-const initialState: FormState = undefined;
+import { useAdminForm } from "./use-admin-form";
 
 type Props = {
   t: AdminDictionary["contactForm"];
@@ -16,10 +13,10 @@ type Props = {
 };
 
 export default function ContactLinkForm({ t, common }: Props) {
-  const [state, action, pending] = useActionState(createContactLink, initialState);
+  const { state, pending, formProps } = useAdminForm(createContactLink);
 
   return (
-    <form action={action} className="flex flex-col gap-4">
+    <form {...formProps} className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
         <label htmlFor="platform">{t.platform}</label>
         <select id="platform" name="platform" defaultValue="github" className={FIELD}>

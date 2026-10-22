@@ -4,6 +4,7 @@ import { getDictionary } from "@/lib/dictionaries";
 import { locales } from "@/lib/i18n";
 
 import { CONTROL } from "./control";
+import LanguageLink from "./LanguageLink";
 import ThemeToggle from "./ThemeToggle";
 
 /**
@@ -42,16 +43,14 @@ export default async function CornerControls() {
                * and switching language is a once-a-visit act.
                *
                * It also means no JavaScript is needed to change language, and a
-               * crawler follows it like any other link.
+               * crawler follows it like any other link. `LanguageLink` keeps the
+               * page: from `/es/cv` it goes to `/en/cv`.
                */}
-              <a
-                href={`/${locale}`}
-                hrefLang={locale}
-                aria-label={dict.languages.switchTo[locale]}
+              <LanguageLink
+                locale={locale}
+                label={dict.languages.switchTo[locale]}
                 className={`${CONTROL} text-[13px] font-semibold tracking-wide uppercase`}
-              >
-                {locale}
-              </a>
+              />
             </li>
           ))}
         </ul>

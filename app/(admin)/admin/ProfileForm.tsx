@@ -1,14 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useActionState } from "react";
-
 import type { AdminDictionary } from "@/lib/admin-i18n";
 
-import { saveProfileImage, type FormState } from "./actions";
+import { saveProfileImage } from "./actions";
 import { FormStatus, HINT, SUBMIT } from "./form-ui";
-
-const initialState: FormState = undefined;
+import { useAdminForm } from "./use-admin-form";
 
 type Props = {
   imageUrl: string | null;
@@ -16,10 +13,10 @@ type Props = {
 };
 
 export default function ProfileForm({ imageUrl, t }: Props) {
-  const [state, action, pending] = useActionState(saveProfileImage, initialState);
+  const { state, pending, formProps } = useAdminForm(saveProfileImage);
 
   return (
-    <form action={action} className="flex flex-col gap-4">
+    <form {...formProps} className="flex flex-col gap-4">
       <div className="flex items-center gap-4">
         {imageUrl ? (
           <Image

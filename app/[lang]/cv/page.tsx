@@ -6,7 +6,7 @@ import CvPrintButton from "@/app/components/CvPrintButton";
 import { ArrowLeftIcon } from "@/app/components/icons";
 import { getDictionary } from "@/lib/dictionaries";
 import { defaultLocale, type Locale } from "@/lib/i18n";
-import { socialMetadata } from "@/lib/metadata";
+import { pageMetadata } from "@/lib/metadata";
 import prisma from "@/lib/prisma";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -19,9 +19,9 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: dict.cv.title,
     description: dict.cv.description,
-    ...socialMetadata({
+    ...pageMetadata({
       locale: locale as Locale,
-      path: `/${locale}/cv`,
+      page: "/cv",
       title: dict.cv.title,
       description: dict.cv.description,
     }),
