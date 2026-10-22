@@ -3,6 +3,8 @@ import { lang } from "next/root-params";
 import { getDictionary } from "@/lib/dictionaries";
 import prisma from "@/lib/prisma";
 
+import SectionHeading from "./SectionHeading";
+
 export default async function About() {
   const [dict, locale, profile] = await Promise.all([
     getDictionary(),
@@ -26,11 +28,13 @@ export default async function About() {
      * The portrait on the map links here. `scroll-mt-8` keeps the heading from
      * landing flush against the top of the viewport once the scroll finishes.
      */
-    <section id="about" className="scroll-mt-8">
-      <h2>{dict.about.heading}</h2>
+    <section id="about" className="flex scroll-mt-8 flex-col gap-5">
+      <SectionHeading>{dict.about.heading}</SectionHeading>
       {/* `whitespace-pre-line` so the blank lines typed into the admin's
           textarea survive as paragraph breaks instead of collapsing. */}
-      <p className="whitespace-pre-line">{written || dict.about.body}</p>
+      <p className="max-w-[62ch] text-[17px] leading-relaxed whitespace-pre-line">
+        {written || dict.about.body}
+      </p>
     </section>
   );
 }

@@ -3,6 +3,7 @@ import Image from "next/image";
 import { getDictionary } from "@/lib/dictionaries";
 import prisma from "@/lib/prisma";
 
+import { ArrowDownIcon, UserIcon } from "./icons";
 import LocationMap from "./LocationMap";
 
 /**
@@ -26,7 +27,7 @@ export default async function Location() {
     >
       <div>
         <p className="text-sm text-muted sm:text-base">{dict.hero.greeting}</p>
-        <h1 className="text-2xl sm:text-3xl">{dict.hero.name}</h1>
+        <h1 className="text-3xl leading-tight tracking-tight sm:text-4xl">{dict.hero.name}</h1>
       </div>
 
       {/*
@@ -57,7 +58,7 @@ export default async function Location() {
         <a
           href="#about"
           aria-label={dict.about.heading}
-          className="group pointer-events-auto relative mr-4 block shrink-0 overflow-hidden rounded-2xl border-2 border-surface shadow focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent motion-safe:transition-transform motion-safe:duration-300 motion-safe:hover:-translate-y-0.5 sm:mr-8"
+          className="group pointer-events-auto relative mr-4 block shrink-0 overflow-hidden rounded-2xl border-[3px] border-surface shadow-[0_10px_30px_-12px_rgb(0_0_0/0.35)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent motion-safe:transition-transform motion-safe:duration-300 motion-safe:hover:-translate-y-0.5 sm:mr-8"
         >
           <Image
             src={profile.imageUrl}
@@ -85,38 +86,15 @@ export default async function Location() {
             className="absolute inset-x-0 bottom-0 flex translate-y-full items-center justify-center gap-1 bg-surface/95 py-1.5 text-xs font-medium text-foreground group-hover:translate-y-0 group-focus-visible:translate-y-0 motion-safe:transition-transform motion-safe:duration-300"
           >
             {dict.about.heading}
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 16 16"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.75"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M8 3.5v9M4 8.5l4 4 4-4" />
-            </svg>
+            <ArrowDownIcon size={12} />
           </span>
         </a>
       ) : (
         <div
           aria-hidden="true"
-          className="mr-4 flex size-28 shrink-0 items-center justify-center rounded-2xl border-2 border-dashed border-muted bg-surface/70 text-muted sm:mr-8 sm:size-36"
+          className="mr-4 flex size-28 shrink-0 items-center justify-center rounded-2xl border-[3px] border-surface bg-accent-soft text-accent-strong shadow-[0_10px_30px_-12px_rgb(0_0_0/0.35)] sm:mr-8 sm:size-36"
         >
-          <svg
-            width="28"
-            height="28"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          >
-            <circle cx="12" cy="8.5" r="3.5" />
-            <path d="M4.5 20a7.5 7.5 0 0 1 15 0" />
-          </svg>
+          <UserIcon size={36} />
         </div>
       )}
     </LocationMap>

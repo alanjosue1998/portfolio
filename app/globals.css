@@ -16,7 +16,14 @@
   --background: #faf7f2;
   --foreground: #1c1917;
   --accent: #b45309;
-  --muted: #78716c;
+  /* Hover on accent fills, and accent text laid over `--accent-soft`. */
+  --accent-strong: #92400e;
+  /* A wash of the accent: badges, skill chips, the empty portrait. */
+  --accent-soft: #fbeedd;
+  /* Text on an accent fill — the primary button. */
+  --on-accent: #ffffff;
+  /* Was #78716c, which reaches only 4.4:1 on the background and misses AA. */
+  --muted: #6b645e;
   /* Sits on top of the background: cards, the label over the map. */
   --surface: #ffffff;
   --border: #e7e5e4;
@@ -28,6 +35,9 @@
     --foreground: #faf7f2;
     /* Lifted from #b45309, which only reaches 1.7:1 against the dark ground. */
     --accent: #f59e0b;
+    --accent-strong: #fbbf24;
+    --accent-soft: #3b2a14;
+    --on-accent: #1c1917;
     --muted: #a8a29e;
     --surface: #292524;
     --border: #44403c;
@@ -39,6 +49,9 @@
   --background: #1c1917;
   --foreground: #faf7f2;
   --accent: #f59e0b;
+  --accent-strong: #fbbf24;
+  --accent-soft: #3b2a14;
+  --on-accent: #1c1917;
   --muted: #a8a29e;
   --surface: #292524;
   --border: #44403c;
@@ -79,6 +92,9 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
   --color-muted: var(--muted);
   --color-surface: var(--surface);
   --color-border: var(--border);
@@ -139,21 +155,44 @@ body {
    * layout rather than to the document.
    */
   h2 {
-    font-size: 1.25rem;
-    line-height: 1.75rem;
+    font-size: 1.375rem;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
   }
 
   /*
    * sm: — one step up, and no further. The greeting over the map is the `h1`
-   * and carries 1.5rem/1.875rem from `Location.tsx`; a section title that
-   * matched it would leave the page with no first heading.
+   * and runs larger from `Location.tsx`; a section title that matched it would
+   * leave the page with no first heading.
    */
   @media (width >= 40rem) {
     h2 {
-      font-size: 1.5rem;
-      line-height: 2rem;
+      font-size: 1.625rem;
     }
   }
+
+  /*
+   * One ring for everything a keyboard can reach, in the accent, so focus looks
+   * the same on a button, a card link and the corner controls.
+   */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+
+/*
+ * The "01", "02"… in front of each section title. A CSS counter rather than a
+ * number passed in from `page.tsx`: every section renders nothing until the
+ * admin has something to show, and only the sections actually on the page
+ * should be counted. `<main>` resets it; `SectionHeading` draws it.
+ */
+.section-count {
+  counter-increment: section;
+}
+
+.section-count::before {
+  content: counter(section, decimal-leading-zero);
 }
 
 /*

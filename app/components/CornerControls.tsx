@@ -11,7 +11,7 @@ import ThemeToggle from "./ThemeToggle";
  * them would read as a mistake.
  */
 const CONTROL =
-  "flex h-12 w-12 items-center justify-center rounded-full border border-border bg-surface text-foreground shadow-lg hover:border-accent hover:text-accent";
+  "flex h-11 w-11 items-center justify-center rounded-full border border-border bg-surface text-foreground shadow-[0_6px_18px_-8px_rgb(0_0_0/0.35)] transition-colors hover:border-accent hover:text-accent";
 
 /**
  * The two controls that follow the page: the language, and the theme.
@@ -55,7 +55,7 @@ export default async function CornerControls() {
                 href={`/${locale}`}
                 hrefLang={locale}
                 aria-label={dict.languages.switchTo[locale]}
-                className={`${CONTROL} text-sm font-medium uppercase`}
+                className={`${CONTROL} text-[13px] font-semibold tracking-wide uppercase`}
               >
                 {locale}
               </a>

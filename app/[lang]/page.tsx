@@ -2,6 +2,7 @@ import About from "@/app/components/About";
 import Certificates from "@/app/components/Certificates";
 import Contact from "@/app/components/Contact";
 import ContactCta from "@/app/components/ContactCta";
+import Footer from "@/app/components/Footer";
 import Location from "@/app/components/Location";
 import Projects from "@/app/components/Projects";
 import Skills from "@/app/components/Skills";
@@ -24,25 +25,38 @@ export default async function Home() {
    * width for the whole page keeps the map, the cards and the text on the same
    * edges, and two would not.
    *
-   * Padded at the bottom only. The map is the first thing here and it is meant
-   * to meet the top of the window: a strip of page above it made it look like a
+   * Not padded at the top. The map is the first thing here and it is meant to
+   * meet the top of the window: a strip of page above it made it look like a
    * card that had been placed on the page rather than the thing the page opens
    * with.
+   *
+   * `gap-16` between sections, up from 10: at 40px a section title sat almost
+   * as close to the cards above it as to its own, and the page read as one
+   * long list. The opening block keeps its own tighter rhythm inside.
+   *
+   * `[counter-reset:section]` starts the numbers `SectionHeading` draws.
    */
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-4 pb-10 sm:px-6">
-      {/* The map opens the page, and carries the greeting and the portrait. */}
-      <Location />
-      <p>{dict.hero.tagline}</p>
-      {/* The one call to action above the fold. Renders nothing until an
-          email link exists in the admin. */}
-      <ContactCta />
-      <About />
-      {/* Each of these renders nothing until the admin has something to show. */}
-      <Skills />
-      <Projects />
-      <Certificates />
-      <Contact />
-    </main>
+    <>
+      <main className="mx-auto flex w-full max-w-3xl flex-col gap-12 px-4 [counter-reset:section] sm:gap-16 sm:px-6">
+        <div className="flex flex-col gap-6">
+          {/* The map opens the page, and carries the greeting and the portrait. */}
+          <Location />
+          <p className="max-w-[34ch] text-lg leading-snug text-balance sm:text-xl">
+            {dict.hero.role} · <span className="font-medium text-accent">{dict.hero.tagline}</span>
+          </p>
+          {/* The calls to action above the fold. Renders nothing until an
+              email link exists in the admin. */}
+          <ContactCta />
+        </div>
+        <About />
+        {/* Each of these renders nothing until the admin has something to show. */}
+        <Skills />
+        <Projects />
+        <Certificates />
+        <Contact />
+      </main>
+      <Footer />
+    </>
   );
 }
