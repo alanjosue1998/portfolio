@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { lang } from "next/root-params";
 
-import { isLocale } from "@/lib/i18n";
+import { isLocale, type Locale } from "@/lib/i18n";
 
 const loaders = {
   es: () => import("@/dictionaries/es.json").then((m) => m.default),
@@ -25,5 +25,13 @@ export async function getDictionary(): Promise<Dictionary> {
 
   if (!locale || !isLocale(locale)) notFound();
 
+  return loadDictionary(locale);
+}
+
+/**
+ * For the places `next/root-params` does not reach — the generated Open Graph
+ * image is one — which read the locale from `params` instead.
+ */
+export function loadDictionary(locale: Locale): Promise<Dictionary> {
   return loaders[locale]();
 }

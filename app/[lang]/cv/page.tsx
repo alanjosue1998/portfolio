@@ -5,11 +5,12 @@ import BottomBar, { BAR_ITEM } from "@/app/components/BottomBar";
 import CvPrintButton from "@/app/components/CvPrintButton";
 import { ArrowLeftIcon } from "@/app/components/icons";
 import { getDictionary } from "@/lib/dictionaries";
-import { defaultLocale } from "@/lib/i18n";
+import { defaultLocale, type Locale } from "@/lib/i18n";
+import { socialMetadata } from "@/lib/metadata";
 import prisma from "@/lib/prisma";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const dict = await getDictionary();
+  const [dict, locale] = await Promise.all([getDictionary(), lang()]);
 
   /**
    * The title doubles as the PDF's file name: "Save as PDF" proposes the
@@ -18,6 +19,12 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: dict.cv.title,
     description: dict.cv.description,
+    ...socialMetadata({
+      locale: locale as Locale,
+      path: `/${locale}/cv`,
+      title: dict.cv.title,
+      description: dict.cv.description,
+    }),
   };
 }
 
