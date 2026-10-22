@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
+import ThemeScript from "@/app/components/ThemeScript";
+import { getAdminDictionary, getAdminLocale } from "@/lib/admin-i18n";
+
+import AdminControls from "./AdminControls";
+
 import "../globals.css";
 
 const geistSans = Geist({
@@ -13,35 +18,43 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Panel",
-  // Private tooling: keep it out of search results.
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const dict = await getAdminDictionary();
+
+  return {
+    title: dict.meta.title,
+    // Private tooling: keep it out of search results.
+    robots: { index: false, follow: false },
+  };
+}
 
 /**
- * A second root layout, alongside `app/[lang]/layout.tsx`. The panel is a tool
- * for one person, so it stays outside the `[lang]` segment and out of the
- * translation files — which is also why this file, not `lang()`, decides the
- * language of the document.
+ * A second root layout, alongside `app/[lang]/layout.tsx`. The panel stays
+ * outside the `[lang]` segment so its addresses do not change with the
+ * language; which one it speaks comes from a cookie — see `lib/admin-i18n.ts` —
+ * and that is what sets `lang` here.
  *
- * It also decides the theme, by pinning `data-theme` to `light` rather than
- * leaving the attribute off and letting `prefers-color-scheme` answer. The
- * panel renders no `ThemeToggle`, so the system setting would be the whole say;
- * forms read better on a light ground, and an uploaded photo should be judged
- * against the one the public card paints it on. `app/globals.css` guards its
- * dark rules as `:root:not([data-theme="light"])`, so this wins on its own —
- * and deliberately without `ThemeScript`, which restores a choice from storage
- * that the panel never offers.
+ * The theme works as it does on the public site: `ThemeScript` restores a saved
+ * choice before the first paint, and with none the system setting decides. The
+ * panel's colours all come from the tokens in `app/globals.css`, so both themes
+ * hold up.
+ *
+ * `pb-28` keeps the last thing on a page clear of `AdminControls`, which float
+ * over the bottom-right corner.
  */
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
-      lang="es"
-      data-theme="light"
+      lang={await getAdminLocale()}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">{children}</body>
+      <head>
+        <ThemeScript />
+      </head>
+      <body className="flex min-h-full flex-col pb-28">
+        {children}
+        <AdminControls />
+      </body>
     </html>
   );
 }

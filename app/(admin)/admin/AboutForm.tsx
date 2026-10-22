@@ -2,11 +2,12 @@
 
 import { useActionState } from "react";
 
+import type { AdminDictionary } from "@/lib/admin-i18n";
+
 import { saveAbout, type FormState } from "./actions";
+import { FIELD, FormStatus, HINT, SUBMIT } from "./form-ui";
 
 const initialState: FormState = undefined;
-
-const fieldClass = "rounded border border-gray-400 px-3 py-2";
 
 type Props = {
   /** What is stored now, per locale. Null when nothing has been written. */
@@ -14,55 +15,47 @@ type Props = {
   /** The paragraphs in `dictionaries/*.json`, shown as what a blank field
       falls back to. */
   fallback: { es: string; en: string };
+  t: AdminDictionary["aboutForm"];
+  saving: string;
 };
 
-export default function AboutForm({ current, fallback }: Props) {
+export default function AboutForm({ current, fallback, t, saving }: Props) {
   const [state, action, pending] = useActionState(saveAbout, initialState);
 
   return (
     <form action={action} className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
-        <label htmlFor="aboutEs">Español</label>
+        <label htmlFor="aboutEs">{t.es}</label>
         <textarea
           id="aboutEs"
           name="aboutEs"
+          lang="es"
           rows={5}
           defaultValue={current.es ?? ""}
           placeholder={fallback.es}
-          className={fieldClass}
+          className={FIELD}
         />
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="aboutEn">Inglés</label>
+        <label htmlFor="aboutEn">{t.en}</label>
         <textarea
           id="aboutEn"
           name="aboutEn"
+          lang="en"
           rows={5}
           defaultValue={current.en ?? ""}
           placeholder={fallback.en}
-          className={fieldClass}
+          className={FIELD}
         />
       </div>
 
-      <p className="text-sm text-gray-500">
-        Uno por idioma: cada visitante lee el que corresponde a la página en la que está. Un campo
-        vacío usa el texto de ejemplo que aparece en gris, que es el que trae el sitio. Las líneas
-        en blanco se respetan como saltos de párrafo.
-      </p>
+      <p className={HINT}>{t.hint}</p>
 
-      {state && (
-        <p role="alert" className={state.status === "error" ? "text-red-600" : "text-green-700"}>
-          {state.message}
-        </p>
-      )}
+      <FormStatus state={state} />
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="self-start rounded bg-foreground px-4 py-2 text-background disabled:opacity-60"
-      >
-        {pending ? "Guardando…" : "Guardar texto"}
+      <button type="submit" disabled={pending} className={SUBMIT}>
+        {pending ? saving : t.submit}
       </button>
     </form>
   );

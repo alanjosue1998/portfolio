@@ -5,11 +5,10 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { fill, getAdminDictionary, type AdminDictionary } from "@/lib/admin-i18n";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
-
-export type ProjectState = { status: "error" | "ok"; message: string } | undefined;
 
 /** Every form on the admin page reports back the same way. */
 export type FormState = { status: "error" | "ok"; message: string } | undefined;
@@ -26,15 +25,13 @@ function revalidateSite() {
   revalidatePath("/[lang]", "layout");
 }
 
-export async function createProject(
-  _previous: ProjectState,
-  formData: FormData,
-): Promise<ProjectState> {
+export async function createProject(_previous: FormState, formData: FormData): Promise<FormState> {
   /**
    * A Server Action is a public endpoint: anyone can post to it once they know
    * it exists. The check in `proxy.ts` does not cover it, so it happens here.
    */
   await requireSession();
+  const t = (await getAdminDictionary()).actions;
 
   const title = String(formData.get("title") ?? "").trim();
   const type = String(formData.get("type") ?? "").trim();
@@ -47,7 +44,7 @@ export async function createProject(
   if (!title || !type || !description) {
     return {
       status: "error",
-      message: "Título, tipo y descripción son obligatorios.",
+      message: t.projectRequired,
     };
   }
 
@@ -61,7 +58,7 @@ export async function createProject(
   let imageUrl: string | null = null;
 
   if (hasCover) {
-    const uploaded = await uploadImage(chosen, "projects");
+    const uploaded = await uploadImage(chosen, "projects", t);
 
     if (!uploaded.ok) {
       return { status: "error", message: uploaded.message };
@@ -76,7 +73,7 @@ export async function createProject(
 
   revalidateSite();
 
-  return { status: "ok", message: `Se añadió “${title}”.` };
+  return { status: "ok", message: fill(t.added, { name: title }) };
 }
 
 export async function deleteProject(formData: FormData) {
@@ -108,6 +105,7 @@ export async function createCertificate(
   formData: FormData,
 ): Promise<FormState> {
   await requireSession();
+  const t = (await getAdminDictionary()).actions;
 
   const title = String(formData.get("title") ?? "").trim();
   const issuer = String(formData.get("issuer") ?? "").trim();
@@ -119,7 +117,7 @@ export async function createCertificate(
   if (!title || !issuer) {
     return {
       status: "error",
-      message: "El título y la entidad son obligatorios.",
+      message: t.certificateRequired,
     };
   }
 
@@ -135,7 +133,7 @@ export async function createCertificate(
     const parsed = new Date(`${rawIssuedAt}-01T00:00:00Z`);
 
     if (Number.isNaN(parsed.getTime())) {
-      return { status: "error", message: "La fecha no es válida." };
+      return { status: "error", message: t.invalidDate };
     }
 
     issuedAt = parsed;
@@ -151,7 +149,7 @@ export async function createCertificate(
   if (rawCredentialUrl && !credentialUrl) {
     return {
       status: "error",
-      message: "El enlace de verificación tiene que ser https:// — http:// no se acepta.",
+      message: t.verificationHttps,
     };
   }
 
@@ -163,7 +161,7 @@ export async function createCertificate(
   let imageUrl: string | null = null;
 
   if (chosen instanceof File && chosen.size > 0) {
-    const uploaded = await uploadImage(chosen, "certificates");
+    const uploaded = await uploadImage(chosen, "certificates", t);
 
     if (!uploaded.ok) {
       return { status: "error", message: uploaded.message };
@@ -186,7 +184,7 @@ export async function createCertificate(
 
   revalidateSite();
 
-  return { status: "ok", message: `Se añadió “${title}”.` };
+  return { status: "ok", message: fill(t.added, { name: title }) };
 }
 
 export async function deleteCertificate(formData: FormData) {
@@ -215,13 +213,14 @@ export async function deleteCertificate(formData: FormData) {
 
 export async function createSkill(_previous: FormState, formData: FormData): Promise<FormState> {
   await requireSession();
+  const t = (await getAdminDictionary()).actions;
 
   const name = String(formData.get("name") ?? "").trim();
   const category = String(formData.get("category") ?? "").trim();
   const position = Number(formData.get("position") ?? 0);
 
   if (!name || !category) {
-    return { status: "error", message: "Nombre y categoría son obligatorios." };
+    return { status: "error", message: t.skillRequired };
   }
 
   await prisma.skill.create({
@@ -230,7 +229,7 @@ export async function createSkill(_previous: FormState, formData: FormData): Pro
 
   revalidateSite();
 
-  return { status: "ok", message: `Se añadió “${name}”.` };
+  return { status: "ok", message: fill(t.added, { name }) };
 }
 
 export async function deleteSkill(formData: FormData) {
@@ -261,17 +260,18 @@ const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
 async function uploadImage(
   file: FormDataEntryValue | null,
   folder: string,
+  t: AdminDictionary["actions"],
 ): Promise<{ ok: true; url: string } | { ok: false; message: string }> {
   if (!(file instanceof File) || file.size === 0) {
-    return { ok: false, message: "Elige una imagen." };
+    return { ok: false, message: t.chooseImage };
   }
 
   if (!file.type.startsWith("image/")) {
-    return { ok: false, message: "El archivo tiene que ser una imagen." };
+    return { ok: false, message: t.notImage };
   }
 
   if (file.size > MAX_IMAGE_BYTES) {
-    return { ok: false, message: "La imagen no puede pasar de 4 MB." };
+    return { ok: false, message: t.imageTooBig };
   }
 
   try {
@@ -302,7 +302,7 @@ async function uploadImage(
 
     return {
       ok: false,
-      message: `No se pudo subir la imagen. ${error instanceof Error ? error.message : String(error)}`,
+      message: `${t.uploadFailed} ${error instanceof Error ? error.message : String(error)}`,
     };
   }
 }
@@ -312,8 +312,9 @@ export async function saveProfileImage(
   formData: FormData,
 ): Promise<FormState> {
   await requireSession();
+  const t = (await getAdminDictionary()).actions;
 
-  const uploaded = await uploadImage(formData.get("image"), "profile");
+  const uploaded = await uploadImage(formData.get("image"), "profile", t);
 
   if (!uploaded.ok) {
     return { status: "error", message: uploaded.message };
@@ -342,11 +343,12 @@ export async function saveProfileImage(
 
   revalidateSite();
 
-  return { status: "ok", message: "Foto actualizada." };
+  return { status: "ok", message: t.photoUpdated };
 }
 
 export async function saveAbout(_previous: FormState, formData: FormData): Promise<FormState> {
   await requireSession();
+  const t = (await getAdminDictionary()).actions;
 
   /**
    * Stored as null rather than as an empty string: `app/components/About.tsx`
@@ -364,7 +366,7 @@ export async function saveAbout(_previous: FormState, formData: FormData): Promi
 
   revalidateSite();
 
-  return { status: "ok", message: "Texto actualizado." };
+  return { status: "ok", message: t.textUpdated };
 }
 
 /**
@@ -401,6 +403,7 @@ export async function createContactLink(
   formData: FormData,
 ): Promise<FormState> {
   await requireSession();
+  const t = (await getAdminDictionary()).actions;
 
   const platform = String(formData.get("platform") ?? "other").trim();
   const label = String(formData.get("label") ?? "").trim();
@@ -408,16 +411,13 @@ export async function createContactLink(
   const position = Number(formData.get("position") ?? 0);
 
   if (!label) {
-    return { status: "error", message: "La etiqueta es obligatoria." };
+    return { status: "error", message: t.labelRequired };
   }
 
   if (!url) {
     return {
       status: "error",
-      message:
-        platform === "email"
-          ? "Escribe un correo válido."
-          : "Escribe una dirección https:// válida — http:// no se acepta.",
+      message: platform === "email" ? t.invalidEmail : t.invalidUrl,
     };
   }
 
@@ -432,7 +432,7 @@ export async function createContactLink(
 
   revalidateSite();
 
-  return { status: "ok", message: `Se añadió “${label}”.` };
+  return { status: "ok", message: fill(t.added, { name: label }) };
 }
 
 export async function deleteContactLink(formData: FormData) {
@@ -466,20 +466,21 @@ function parseMonth(raw: FormDataEntryValue | null): Date | null | undefined {
  */
 function parsePeriod(
   formData: FormData,
+  t: AdminDictionary["actions"],
 ): { ok: true; startedAt: Date; endedAt: Date | null } | { ok: false; message: string } {
   const startedAt = parseMonth(formData.get("startedAt"));
   const endedAt = parseMonth(formData.get("endedAt"));
 
   if (!startedAt) {
-    return { ok: false, message: "La fecha de inicio es obligatoria." };
+    return { ok: false, message: t.startRequired };
   }
 
   if (endedAt === undefined) {
-    return { ok: false, message: "La fecha de fin no es válida." };
+    return { ok: false, message: t.invalidEnd };
   }
 
   if (endedAt && endedAt < startedAt) {
-    return { ok: false, message: "La fecha de fin no puede ser anterior a la de inicio." };
+    return { ok: false, message: t.endBeforeStart };
   }
 
   return { ok: true, startedAt, endedAt };
@@ -490,6 +491,7 @@ export async function createExperience(
   formData: FormData,
 ): Promise<FormState> {
   await requireSession();
+  const t = (await getAdminDictionary()).actions;
 
   const company = String(formData.get("company") ?? "").trim();
   const role = String(formData.get("role") ?? "").trim();
@@ -504,11 +506,11 @@ export async function createExperience(
   if (!company || !role || !description) {
     return {
       status: "error",
-      message: "La empresa, el cargo y la descripción son obligatorios.",
+      message: t.experienceRequired,
     };
   }
 
-  const period = parsePeriod(formData);
+  const period = parsePeriod(formData, t);
 
   if (!period.ok) {
     return { status: "error", message: period.message };
@@ -529,7 +531,7 @@ export async function createExperience(
 
   revalidateSite();
 
-  return { status: "ok", message: `Se añadió “${role}” en ${company}.` };
+  return { status: "ok", message: fill(t.experienceAdded, { role, company }) };
 }
 
 export async function deleteExperience(formData: FormData) {
@@ -548,6 +550,7 @@ export async function createEducation(
   formData: FormData,
 ): Promise<FormState> {
   await requireSession();
+  const t = (await getAdminDictionary()).actions;
 
   const institution = String(formData.get("institution") ?? "").trim();
   const degree = String(formData.get("degree") ?? "").trim();
@@ -556,11 +559,11 @@ export async function createEducation(
   if (!institution || !degree) {
     return {
       status: "error",
-      message: "La institución y el título son obligatorios.",
+      message: t.educationRequired,
     };
   }
 
-  const period = parsePeriod(formData);
+  const period = parsePeriod(formData, t);
 
   if (!period.ok) {
     return { status: "error", message: period.message };
@@ -578,7 +581,7 @@ export async function createEducation(
 
   revalidateSite();
 
-  return { status: "ok", message: `Se añadió “${degree}”.` };
+  return { status: "ok", message: fill(t.added, { name: degree }) };
 }
 
 export async function deleteEducation(formData: FormData) {

@@ -3,11 +3,19 @@
 import Image from "next/image";
 import { useActionState } from "react";
 
+import type { AdminDictionary } from "@/lib/admin-i18n";
+
 import { saveProfileImage, type FormState } from "./actions";
+import { FormStatus, HINT, SUBMIT } from "./form-ui";
 
 const initialState: FormState = undefined;
 
-export default function ProfileForm({ imageUrl }: { imageUrl: string | null }) {
+type Props = {
+  imageUrl: string | null;
+  t: AdminDictionary["profileForm"];
+};
+
+export default function ProfileForm({ imageUrl, t }: Props) {
   const [state, action, pending] = useActionState(saveProfileImage, initialState);
 
   return (
@@ -16,19 +24,19 @@ export default function ProfileForm({ imageUrl }: { imageUrl: string | null }) {
         {imageUrl ? (
           <Image
             src={imageUrl}
-            alt="Foto actual"
+            alt={t.currentAlt}
             width={80}
             height={80}
-            className="size-20 rounded-full border border-gray-300 object-cover"
+            className="size-20 shrink-0 rounded-full border border-border object-cover"
           />
         ) : (
-          <div className="flex size-20 items-center justify-center rounded-full border-2 border-dashed border-gray-400 text-xs text-gray-500">
-            Sin foto
+          <div className="flex size-20 shrink-0 items-center justify-center rounded-full border-2 border-dashed border-foreground/25 text-xs text-muted">
+            {t.noPhoto}
           </div>
         )}
 
         <div className="flex flex-col gap-1">
-          <label htmlFor="image">Foto de perfil</label>
+          <label htmlFor="image">{t.label}</label>
           <input
             id="image"
             name="image"
@@ -38,24 +46,16 @@ export default function ProfileForm({ imageUrl }: { imageUrl: string | null }) {
             aria-describedby="image-hint"
             className="text-sm"
           />
-          <p id="image-hint" className="text-sm text-gray-500">
-            JPG, PNG o WebP. Máximo 4 MB.
+          <p id="image-hint" className={HINT}>
+            {t.hint}
           </p>
         </div>
       </div>
 
-      {state && (
-        <p role="alert" className={state.status === "error" ? "text-red-600" : "text-green-700"}>
-          {state.message}
-        </p>
-      )}
+      <FormStatus state={state} />
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="self-start rounded bg-foreground px-4 py-2 text-background disabled:opacity-60"
-      >
-        {pending ? "Subiendo…" : "Guardar foto"}
+      <button type="submit" disabled={pending} className={SUBMIT}>
+        {pending ? t.submitting : t.submit}
       </button>
     </form>
   );

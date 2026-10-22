@@ -3,9 +3,12 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import type { AdminDictionary } from "@/lib/admin-i18n";
 import { authClient } from "@/lib/auth-client";
 
-export default function LoginForm() {
+import { FIELD } from "../admin/form-ui";
+
+export default function LoginForm({ t }: { t: AdminDictionary["login"] }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -31,13 +34,13 @@ export default function LoginForm() {
       setPending(false);
       setError(
         error.status === 429
-          ? "Demasiados intentos. Espera unos minutos antes de volver a probar."
+          ? t.tooMany
           : /**
              * One message for a wrong password and for an email that has no
              * account. Telling them apart would let anyone check which emails
              * are registered.
              */
-            "Email o contraseña incorrectos.",
+            t.invalid,
       );
       return;
     }
@@ -50,32 +53,32 @@ export default function LoginForm() {
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
-        <label htmlFor="email">Email</label>
+        <label htmlFor="email">{t.email}</label>
         <input
           id="email"
           name="email"
           type="email"
           autoComplete="username"
           required
-          className="rounded border border-gray-400 px-3 py-2"
+          className={FIELD}
         />
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="password">Contraseña</label>
+        <label htmlFor="password">{t.password}</label>
         <input
           id="password"
           name="password"
           type="password"
           autoComplete="current-password"
           required
-          className="rounded border border-gray-400 px-3 py-2"
+          className={FIELD}
         />
       </div>
 
       {/* `role="alert"` makes a screen reader announce the failure. */}
       {error && (
-        <p role="alert" className="text-red-600">
+        <p role="alert" className="text-danger">
           {error}
         </p>
       )}
@@ -85,7 +88,7 @@ export default function LoginForm() {
         disabled={pending}
         className="rounded bg-foreground px-4 py-2 text-background disabled:opacity-60"
       >
-        {pending ? "Entrando…" : "Entrar"}
+        {pending ? t.submitting : t.submit}
       </button>
     </form>
   );

@@ -3,15 +3,8 @@ import { lang } from "next/root-params";
 import { getDictionary } from "@/lib/dictionaries";
 import { locales } from "@/lib/i18n";
 
+import { CONTROL } from "./control";
 import ThemeToggle from "./ThemeToggle";
-
-/**
- * The shape both controls share. One string rather than two copies of it: they
- * are the same object in two states, and a border that only matched on one of
- * them would read as a mistake.
- */
-const CONTROL =
-  "flex h-11 w-11 items-center justify-center rounded-full border border-border bg-surface text-foreground shadow-[0_6px_18px_-8px_rgb(0_0_0/0.35)] transition-colors hover:border-accent hover:text-accent";
 
 /**
  * The two controls that follow the page: the language, and the theme.

@@ -1,54 +1,59 @@
+import { getAdminDictionary, getAdminLocale } from "@/lib/admin-i18n";
 import prisma from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 
 import EducationForm from "../EducationForm";
 import { deleteEducation } from "../actions";
-
-/** Month and year, in the language the admin itself is written in. */
-const month = new Intl.DateTimeFormat("es", {
-  month: "long",
-  year: "numeric",
-  timeZone: "UTC",
-});
+import { DELETE, ITEM } from "../form-ui";
 
 export default async function EducationPage() {
   await requireSession();
 
-  const studies = await prisma.education.findMany({
-    orderBy: [{ position: "asc" }, { createdAt: "asc" }],
+  const [dict, locale, studies] = await Promise.all([
+    getAdminDictionary(),
+    getAdminLocale(),
+    prisma.education.findMany({
+      orderBy: [{ position: "asc" }, { createdAt: "asc" }],
+    }),
+  ]);
+
+  /** Month and year, in the panel's language. */
+  const month = new Intl.DateTimeFormat(locale, {
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
   });
 
   return (
     <div className="flex flex-col gap-10">
       <section className="flex flex-col gap-4">
-        <h2 className="text-lg font-semibold">Añadir educación</h2>
-        <EducationForm />
+        <h2 className="text-lg font-semibold">{dict.education.add}</h2>
+        <EducationForm t={dict.educationForm} common={dict.common} />
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-lg font-semibold">Publicadas ({studies.length})</h2>
+        <h2 className="text-lg font-semibold">
+          {dict.education.published} ({studies.length})
+        </h2>
 
         {studies.length === 0 ? (
-          <p className="text-gray-500">Todavía no hay ninguna.</p>
+          <p className="text-muted">{dict.education.empty}</p>
         ) : (
           <ul className="flex flex-col gap-4">
             {studies.map((study) => (
-              <li
-                key={study.id}
-                className="flex items-start justify-between gap-4 rounded border border-gray-300 p-4"
-              >
+              <li key={study.id} className={ITEM}>
                 <div className="min-w-0">
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-muted">
                     {study.institution} · {month.format(study.startedAt)} –{" "}
-                    {study.endedAt ? month.format(study.endedAt) : "en curso"}
+                    {study.endedAt ? month.format(study.endedAt) : dict.education.ongoing}
                   </p>
                   <h3 className="font-semibold">{study.degree}</h3>
                 </div>
 
                 <form action={deleteEducation}>
                   <input type="hidden" name="id" value={study.id} />
-                  <button type="submit" className="text-sm text-red-600 underline">
-                    Borrar
+                  <button type="submit" className={DELETE}>
+                    {dict.common.delete}
                   </button>
                 </form>
               </li>
