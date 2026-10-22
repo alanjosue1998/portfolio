@@ -1,15 +1,19 @@
+import { lang } from "next/root-params";
+
 import About from "@/app/components/About";
+import BottomBar, { BAR_ITEM_PRIMARY } from "@/app/components/BottomBar";
 import Certificates from "@/app/components/Certificates";
 import Contact from "@/app/components/Contact";
 import ContactCta from "@/app/components/ContactCta";
 import Footer from "@/app/components/Footer";
+import { FileIcon } from "@/app/components/icons";
 import Location from "@/app/components/Location";
 import Projects from "@/app/components/Projects";
 import Skills from "@/app/components/Skills";
 import { getDictionary } from "@/lib/dictionaries";
 
 export default async function Home() {
-  const dict = await getDictionary();
+  const [dict, locale] = await Promise.all([getDictionary(), lang()]);
 
   /**
    * `max-w-3xl` — 768px — rather than the 1280px this used to run to. At the
@@ -57,6 +61,15 @@ export default async function Home() {
         <Contact />
       </main>
       <Footer />
+
+      <BottomBar label={dict.cv.bar}>
+        {/* A plain anchor, like the language switch in `CornerControls`, so
+            the chosen theme survives the trip. */}
+        <a href={`/${locale}/cv`} className={BAR_ITEM_PRIMARY}>
+          <FileIcon size={18} />
+          {dict.cv.link}
+        </a>
+      </BottomBar>
     </>
   );
 }

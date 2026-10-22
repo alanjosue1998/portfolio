@@ -30,7 +30,7 @@ export default async function CornerControls() {
   const others = locales.filter((locale) => locale !== current);
 
   return (
-    <div className="fixed right-4 bottom-4 z-20 flex flex-col items-center gap-2 sm:right-6 sm:bottom-6">
+    <div className="no-print fixed right-4 bottom-4 z-20 flex flex-col items-center gap-2 sm:right-6 sm:bottom-6">
       <nav aria-label={dict.languages.label}>
         <ul className="flex flex-col items-center gap-2">
           {others.map((locale) => (

@@ -110,6 +110,14 @@ export function ArrowDownIcon(props: IconProps) {
   );
 }
 
+export function ArrowLeftIcon(props: IconProps) {
+  return (
+    <Stroke {...props}>
+      <path d="M19 12H5M11 6l-6 6 6 6" />
+    </Stroke>
+  );
+}
+
 export function CloseIcon(props: IconProps) {
   return (
     <Stroke {...props}>
