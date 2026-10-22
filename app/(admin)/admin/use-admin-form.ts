@@ -1,6 +1,7 @@
 import { startTransition, useActionState, useEffect, useRef } from "react";
 
 import type { FormState } from "./actions";
+import { useCloseDialog } from "./EditDialog";
 
 /**
  * Submits a panel form through its Server Action and clears it only once the
@@ -25,10 +26,19 @@ export function useAdminForm(
 ) {
   const [state, dispatch, pending] = useActionState(action, undefined);
   const form = useRef<HTMLFormElement>(null);
+  const closeDialog = useCloseDialog();
 
+  /**
+   * Inside an `EditDialog`, success closes it — the list behind already shows
+   * the saved row, and the form unmounts with the dialog, so there is nothing
+   * to reset. Elsewhere the form stays and is cleared for the next entry.
+   */
   useEffect(() => {
-    if (resetOnSuccess && state?.status === "ok") form.current?.reset();
-  }, [state, resetOnSuccess]);
+    if (state?.status !== "ok") return;
+
+    if (closeDialog) closeDialog();
+    else if (resetOnSuccess) form.current?.reset();
+  }, [state, resetOnSuccess, closeDialog]);
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();

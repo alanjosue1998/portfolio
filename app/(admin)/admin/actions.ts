@@ -47,6 +47,19 @@ function englishText(formData: FormData, name: string) {
 }
 
 /**
+ * Deletes a file from Vercel Blob on a best-effort basis: a file left behind
+ * is a few stray kilobytes, which is not worth failing a save that otherwise
+ * worked.
+ */
+async function removeBlob(url: string) {
+  try {
+    await del(url);
+  } catch {
+    // Left behind in the store; harmless.
+  }
+}
+
+/**
  * For deletes: a row that is already gone — a double click, a second tab — is
  * what the delete wanted anyway, not an error page. Prisma reports it as P2025;
  * anything else still throws. The rows with no blob to clean up use
@@ -58,7 +71,7 @@ function alreadyGone(error: unknown): null {
   throw error;
 }
 
-export async function createProject(_previous: FormState, formData: FormData): Promise<FormState> {
+async function saveProject(formData: FormData, id: string | null): Promise<FormState> {
   /**
    * A Server Action is a public endpoint: anyone can post to it once they know
    * it exists. The check in `proxy.ts` does not cover it, so it happens here.
@@ -100,21 +113,48 @@ export async function createProject(_previous: FormState, formData: FormData): P
     imageUrl = uploaded.url;
   }
 
-  await prisma.project.create({
-    data: {
-      title,
-      titleEn: englishText(formData, "titleEn"),
-      type,
-      description,
-      descriptionEn: englishText(formData, "descriptionEn"),
-      technologies,
-      imageUrl,
-    },
-  });
+  const data = {
+    title,
+    titleEn: englishText(formData, "titleEn"),
+    type,
+    description,
+    descriptionEn: englishText(formData, "descriptionEn"),
+    technologies,
+    // Left out when no new file was chosen, so an edit keeps the current one.
+    ...(imageUrl && { imageUrl }),
+  };
+
+  // Read before the update, to clean up the file a new one replaces.
+  const previous =
+    id !== null && imageUrl
+      ? await prisma.project.findUnique({ where: { id }, select: { imageUrl: true } })
+      : null;
+
+  const saved =
+    id === null
+      ? await prisma.project.create({ data })
+      : await prisma.project.update({ where: { id }, data }).catch(alreadyGone);
+
+  if (!saved) {
+    // The row went while the file was uploading: nothing points at it now.
+    if (imageUrl) await removeBlob(imageUrl);
+
+    return { status: "error", message: t.gone };
+  }
+
+  if (previous?.imageUrl) await removeBlob(previous.imageUrl);
 
   revalidateSite();
 
-  return { status: "ok", message: fill(t.added, { name: title }) };
+  return { status: "ok", message: fill(id === null ? t.added : t.updated, { name: title }) };
+}
+
+export async function createProject(_previous: FormState, formData: FormData) {
+  return saveProject(formData, null);
+}
+
+export async function updateProject(_previous: FormState, formData: FormData) {
+  return saveProject(formData, String(formData.get("id") ?? ""));
 }
 
 export async function deleteProject(formData: FormData) {
@@ -141,10 +181,7 @@ export async function deleteProject(formData: FormData) {
   revalidateSite();
 }
 
-export async function createCertificate(
-  _previous: FormState,
-  formData: FormData,
-): Promise<FormState> {
+async function saveCertificate(formData: FormData, id: string | null): Promise<FormState> {
   await requireSession();
   const t = (await getAdminDictionary()).actions;
 
@@ -211,22 +248,49 @@ export async function createCertificate(
     imageUrl = uploaded.url;
   }
 
-  await prisma.certificate.create({
-    data: {
-      title,
-      titleEn: englishText(formData, "titleEn"),
-      issuer,
-      issuedAt,
-      credentialId,
-      credentialUrl,
-      imageUrl,
-      position,
-    },
-  });
+  const data = {
+    title,
+    titleEn: englishText(formData, "titleEn"),
+    issuer,
+    issuedAt,
+    credentialId,
+    credentialUrl,
+    // Left out when no new file was chosen, so an edit keeps the current one.
+    ...(imageUrl && { imageUrl }),
+    position,
+  };
+
+  // Read before the update, to clean up the file a new one replaces.
+  const previous =
+    id !== null && imageUrl
+      ? await prisma.certificate.findUnique({ where: { id }, select: { imageUrl: true } })
+      : null;
+
+  const saved =
+    id === null
+      ? await prisma.certificate.create({ data })
+      : await prisma.certificate.update({ where: { id }, data }).catch(alreadyGone);
+
+  if (!saved) {
+    // The row went while the file was uploading: nothing points at it now.
+    if (imageUrl) await removeBlob(imageUrl);
+
+    return { status: "error", message: t.gone };
+  }
+
+  if (previous?.imageUrl) await removeBlob(previous.imageUrl);
 
   revalidateSite();
 
-  return { status: "ok", message: fill(t.added, { name: title }) };
+  return { status: "ok", message: fill(id === null ? t.added : t.updated, { name: title }) };
+}
+
+export async function createCertificate(_previous: FormState, formData: FormData) {
+  return saveCertificate(formData, null);
+}
+
+export async function updateCertificate(_previous: FormState, formData: FormData) {
+  return saveCertificate(formData, String(formData.get("id") ?? ""));
 }
 
 export async function deleteCertificate(formData: FormData) {
@@ -253,7 +317,7 @@ export async function deleteCertificate(formData: FormData) {
   revalidateSite();
 }
 
-export async function createSkill(_previous: FormState, formData: FormData): Promise<FormState> {
+async function saveSkill(formData: FormData, id: string | null): Promise<FormState> {
   await requireSession();
   const t = (await getAdminDictionary()).actions;
 
@@ -265,19 +329,32 @@ export async function createSkill(_previous: FormState, formData: FormData): Pro
     return { status: "error", message: t.skillRequired };
   }
 
-  await prisma.skill.create({
-    data: {
-      name,
-      nameEn: englishText(formData, "nameEn"),
-      category,
-      categoryEn: englishText(formData, "categoryEn"),
-      position,
-    },
-  });
+  const data = {
+    name,
+    nameEn: englishText(formData, "nameEn"),
+    category,
+    categoryEn: englishText(formData, "categoryEn"),
+    position,
+  };
+
+  const saved =
+    id === null
+      ? await prisma.skill.create({ data })
+      : await prisma.skill.update({ where: { id }, data }).catch(alreadyGone);
+
+  if (!saved) return { status: "error", message: t.gone };
 
   revalidateSite();
 
-  return { status: "ok", message: fill(t.added, { name }) };
+  return { status: "ok", message: fill(id === null ? t.added : t.updated, { name }) };
+}
+
+export async function createSkill(_previous: FormState, formData: FormData) {
+  return saveSkill(formData, null);
+}
+
+export async function updateSkill(_previous: FormState, formData: FormData) {
+  return saveSkill(formData, String(formData.get("id") ?? ""));
 }
 
 export async function deleteSkill(formData: FormData) {
@@ -446,10 +523,7 @@ function normaliseUrl(raw: string, platform: string): string | null {
   }
 }
 
-export async function createContactLink(
-  _previous: FormState,
-  formData: FormData,
-): Promise<FormState> {
+async function saveContactLink(formData: FormData, id: string | null): Promise<FormState> {
   await requireSession();
   const t = (await getAdminDictionary()).actions;
 
@@ -469,18 +543,31 @@ export async function createContactLink(
     };
   }
 
-  await prisma.contactLink.create({
-    data: {
-      platform,
-      label,
-      url,
-      position,
-    },
-  });
+  const data = {
+    platform,
+    label,
+    url,
+    position,
+  };
+
+  const saved =
+    id === null
+      ? await prisma.contactLink.create({ data })
+      : await prisma.contactLink.update({ where: { id }, data }).catch(alreadyGone);
+
+  if (!saved) return { status: "error", message: t.gone };
 
   revalidateSite();
 
-  return { status: "ok", message: fill(t.added, { name: label }) };
+  return { status: "ok", message: fill(id === null ? t.added : t.updated, { name: label }) };
+}
+
+export async function createContactLink(_previous: FormState, formData: FormData) {
+  return saveContactLink(formData, null);
+}
+
+export async function updateContactLink(_previous: FormState, formData: FormData) {
+  return saveContactLink(formData, String(formData.get("id") ?? ""));
 }
 
 export async function deleteContactLink(formData: FormData) {
@@ -534,10 +621,7 @@ function parsePeriod(
   return { ok: true, startedAt, endedAt };
 }
 
-export async function createExperience(
-  _previous: FormState,
-  formData: FormData,
-): Promise<FormState> {
+async function saveExperience(formData: FormData, id: string | null): Promise<FormState> {
   await requireSession();
   const t = (await getAdminDictionary()).actions;
 
@@ -564,25 +648,42 @@ export async function createExperience(
     return { status: "error", message: period.message };
   }
 
-  await prisma.experience.create({
-    data: {
-      company,
-      role,
-      roleEn: englishText(formData, "roleEn"),
-      location,
-      locationEn: englishText(formData, "locationEn"),
-      startedAt: period.startedAt,
-      endedAt: period.endedAt,
-      description,
-      descriptionEn: englishText(formData, "descriptionEn"),
-      technologies,
-      position,
-    },
-  });
+  const data = {
+    company,
+    role,
+    roleEn: englishText(formData, "roleEn"),
+    location,
+    locationEn: englishText(formData, "locationEn"),
+    startedAt: period.startedAt,
+    endedAt: period.endedAt,
+    description,
+    descriptionEn: englishText(formData, "descriptionEn"),
+    technologies,
+    position,
+  };
+
+  const saved =
+    id === null
+      ? await prisma.experience.create({ data })
+      : await prisma.experience.update({ where: { id }, data }).catch(alreadyGone);
+
+  if (!saved) return { status: "error", message: t.gone };
 
   revalidateSite();
 
-  return { status: "ok", message: fill(t.experienceAdded, { role, company }) };
+  return {
+    status: "ok",
+    message:
+      id === null ? fill(t.experienceAdded, { role, company }) : fill(t.updated, { name: role }),
+  };
+}
+
+export async function createExperience(_previous: FormState, formData: FormData) {
+  return saveExperience(formData, null);
+}
+
+export async function updateExperience(_previous: FormState, formData: FormData) {
+  return saveExperience(formData, String(formData.get("id") ?? ""));
 }
 
 export async function deleteExperience(formData: FormData) {
@@ -596,10 +697,7 @@ export async function deleteExperience(formData: FormData) {
   revalidateSite();
 }
 
-export async function createEducation(
-  _previous: FormState,
-  formData: FormData,
-): Promise<FormState> {
+async function saveEducation(formData: FormData, id: string | null): Promise<FormState> {
   await requireSession();
   const t = (await getAdminDictionary()).actions;
 
@@ -620,20 +718,33 @@ export async function createEducation(
     return { status: "error", message: period.message };
   }
 
-  await prisma.education.create({
-    data: {
-      institution,
-      degree,
-      degreeEn: englishText(formData, "degreeEn"),
-      startedAt: period.startedAt,
-      endedAt: period.endedAt,
-      position,
-    },
-  });
+  const data = {
+    institution,
+    degree,
+    degreeEn: englishText(formData, "degreeEn"),
+    startedAt: period.startedAt,
+    endedAt: period.endedAt,
+    position,
+  };
+
+  const saved =
+    id === null
+      ? await prisma.education.create({ data })
+      : await prisma.education.update({ where: { id }, data }).catch(alreadyGone);
+
+  if (!saved) return { status: "error", message: t.gone };
 
   revalidateSite();
 
-  return { status: "ok", message: fill(t.added, { name: degree }) };
+  return { status: "ok", message: fill(id === null ? t.added : t.updated, { name: degree }) };
+}
+
+export async function createEducation(_previous: FormState, formData: FormData) {
+  return saveEducation(formData, null);
+}
+
+export async function updateEducation(_previous: FormState, formData: FormData) {
+  return saveEducation(formData, String(formData.get("id") ?? ""));
 }
 
 export async function deleteEducation(formData: FormData) {

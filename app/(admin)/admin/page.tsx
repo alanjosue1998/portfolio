@@ -6,13 +6,14 @@
  */
 import en from "@/dictionaries/en.json";
 import es from "@/dictionaries/es.json";
-import { getAdminDictionary } from "@/lib/admin-i18n";
+import { fill, getAdminDictionary } from "@/lib/admin-i18n";
 import prisma from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 
 import AboutForm from "./AboutForm";
 import ContactLinkForm from "./ContactLinkForm";
-import { DELETE } from "./form-ui";
+import DeleteButton from "./DeleteButton";
+import EditDialog from "./EditDialog";
 import ProfileForm from "./ProfileForm";
 import { deleteContactLink } from "./actions";
 
@@ -65,12 +66,21 @@ export default async function ProfilePage() {
                   <p className="truncate text-sm text-muted">{link.url}</p>
                 </div>
 
-                <form action={deleteContactLink}>
-                  <input type="hidden" name="id" value={link.id} />
-                  <button type="submit" className={DELETE}>
-                    {dict.common.delete}
-                  </button>
-                </form>
+                <div className="flex shrink-0 items-center gap-4">
+                  <EditDialog
+                    trigger={dict.common.edit}
+                    title={fill(dict.common.editTitle, { name: link.label })}
+                    cancel={dict.common.cancel}
+                  >
+                    <ContactLinkForm t={dict.contactForm} common={dict.common} initial={link} />
+                  </EditDialog>
+                  <DeleteButton
+                    action={deleteContactLink}
+                    id={link.id}
+                    label={dict.common.delete}
+                    confirmation={fill(dict.common.confirmDelete, { name: link.label })}
+                  />
+                </div>
               </li>
             ))}
           </ul>

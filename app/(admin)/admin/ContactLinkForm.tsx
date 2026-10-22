@@ -1,25 +1,40 @@
 "use client";
 
+import type { ContactLink } from "@/generated/prisma/browser";
 import type { AdminDictionary } from "@/lib/admin-i18n";
 import { contactPlatforms } from "@/lib/contact-platforms";
 
-import { createContactLink } from "./actions";
+import { createContactLink, updateContactLink } from "./actions";
 import { FIELD, FormStatus, HINT, SUBMIT } from "./form-ui";
 import { useAdminForm } from "./use-admin-form";
 
 type Props = {
   t: AdminDictionary["contactForm"];
   common: AdminDictionary["common"];
+  /** The row to edit. Without it the form creates a new one. */
+  initial?: ContactLink;
 };
 
-export default function ContactLinkForm({ t, common }: Props) {
-  const { state, pending, formProps } = useAdminForm(createContactLink);
+export default function ContactLinkForm({ t, common, initial }: Props) {
+  const editing = initial !== undefined;
+  const { state, pending, formProps } = useAdminForm(
+    editing ? updateContactLink : createContactLink,
+  );
+  // Inside the edit dialog the create form is still on the page behind it.
+  const p = editing ? "edit-" : "";
 
   return (
     <form {...formProps} className="flex flex-col gap-4">
+      {editing && <input type="hidden" name="id" value={initial.id} />}
+
       <div className="flex flex-col gap-1">
-        <label htmlFor="platform">{t.platform}</label>
-        <select id="platform" name="platform" defaultValue="github" className={FIELD}>
+        <label htmlFor={`${p}platform`}>{t.platform}</label>
+        <select
+          id={`${p}platform`}
+          name="platform"
+          defaultValue={initial?.platform ?? "github"}
+          className={FIELD}
+        >
           {contactPlatforms.map((platform) => (
             <option key={platform.value} value={platform.value}>
               {/* The rest are names, the same in any language. */}
@@ -30,46 +45,49 @@ export default function ContactLinkForm({ t, common }: Props) {
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="label">{t.label}</label>
+        <label htmlFor={`${p}label`}>{t.label}</label>
         <input
-          id="label"
+          id={`${p}label`}
           name="label"
           required
+          defaultValue={initial?.label}
           placeholder="GitHub"
-          aria-describedby="label-hint"
+          aria-describedby={`${p}label-hint`}
           className={FIELD}
         />
-        <p id="label-hint" className={HINT}>
+        <p id={`${p}label-hint`} className={HINT}>
           {t.labelHint}
         </p>
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="url">{t.url}</label>
+        <label htmlFor={`${p}url`}>{t.url}</label>
         <input
-          id="url"
+          id={`${p}url`}
           name="url"
           required
+          // An email is shown as the address, the way it was typed.
+          defaultValue={initial?.url.replace(/^mailto:/, "")}
           placeholder="github.com/alanjosue1998"
-          aria-describedby="url-hint"
+          aria-describedby={`${p}url-hint`}
           className={FIELD}
         />
-        <p id="url-hint" className={HINT}>
+        <p id={`${p}url-hint`} className={HINT}>
           {t.urlHint}
         </p>
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="position">{common.position}</label>
+        <label htmlFor={`${p}position`}>{common.position}</label>
         <input
-          id="position"
+          id={`${p}position`}
           name="position"
           type="number"
-          defaultValue={0}
-          aria-describedby="position-hint"
+          defaultValue={initial?.position ?? 0}
+          aria-describedby={`${p}position-hint`}
           className={`${FIELD} w-24`}
         />
-        <p id="position-hint" className={HINT}>
+        <p id={`${p}position-hint`} className={HINT}>
           {common.positionHint}
         </p>
       </div>
@@ -77,7 +95,7 @@ export default function ContactLinkForm({ t, common }: Props) {
       <FormStatus state={state} />
 
       <button type="submit" disabled={pending} className={SUBMIT}>
-        {pending ? common.saving : t.submit}
+        {pending ? common.saving : editing ? common.saveChanges : t.submit}
       </button>
     </form>
   );

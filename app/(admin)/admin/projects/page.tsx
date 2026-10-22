@@ -1,12 +1,14 @@
 import Image from "next/image";
 
-import { getAdminDictionary } from "@/lib/admin-i18n";
+import { fill, getAdminDictionary } from "@/lib/admin-i18n";
 import prisma from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 
 import ProjectForm from "../ProjectForm";
+import DeleteButton from "../DeleteButton";
+import EditDialog from "../EditDialog";
 import { deleteProject } from "../actions";
-import { DELETE, ITEM } from "../form-ui";
+import { ITEM } from "../form-ui";
 
 export default async function ProjectsPage() {
   await requireSession();
@@ -63,12 +65,21 @@ export default async function ProjectsPage() {
                   </div>
                 </div>
 
-                <form action={deleteProject}>
-                  <input type="hidden" name="id" value={project.id} />
-                  <button type="submit" className={DELETE}>
-                    {dict.common.delete}
-                  </button>
-                </form>
+                <div className="flex shrink-0 items-center gap-4">
+                  <EditDialog
+                    trigger={dict.common.edit}
+                    title={fill(dict.common.editTitle, { name: project.title })}
+                    cancel={dict.common.cancel}
+                  >
+                    <ProjectForm t={dict.projectForm} common={dict.common} initial={project} />
+                  </EditDialog>
+                  <DeleteButton
+                    action={deleteProject}
+                    id={project.id}
+                    label={dict.common.delete}
+                    confirmation={fill(dict.common.confirmDelete, { name: project.title })}
+                  />
+                </div>
               </li>
             ))}
           </ul>

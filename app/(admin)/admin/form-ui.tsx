@@ -36,6 +36,12 @@ export function FormStatus({ state }: { state: FormState }) {
 type BilingualFieldProps = {
   /** The Spanish field's name; the English one is the same with `En` added. */
   name: string;
+  /** Prepended to the ids, so a form open in an `EditDialog` does not reuse the
+      ids of the create form on the page behind it. */
+  idPrefix?: string;
+  /** The stored values, when editing. */
+  defaultValue?: string | null;
+  defaultValueEn?: string | null;
   label: string;
   labels: Pick<AdminDictionary["common"], "spanish" | "english" | "englishHint">;
   /** Applies to the Spanish field only: the English one is always optional. */
@@ -56,6 +62,9 @@ type BilingualFieldProps = {
  */
 export function BilingualField({
   name,
+  idPrefix = "",
+  defaultValue,
+  defaultValueEn,
   label,
   labels,
   required,
@@ -65,6 +74,8 @@ export function BilingualField({
   hint,
 }: BilingualFieldProps) {
   const english = `${name}En`;
+  const spanishId = `${idPrefix}${name}`;
+  const englishId = `${idPrefix}${english}`;
   const Control = rows ? "textarea" : "input";
 
   return (
@@ -73,13 +84,14 @@ export function BilingualField({
 
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="flex flex-col gap-1">
-          <label htmlFor={name} className={HINT}>
+          <label htmlFor={spanishId} className={HINT}>
             {labels.spanish}
           </label>
           <Control
-            id={name}
+            id={spanishId}
             name={name}
             lang="es"
+            defaultValue={defaultValue ?? undefined}
             rows={rows}
             required={required}
             placeholder={placeholder}
@@ -89,18 +101,19 @@ export function BilingualField({
         </div>
 
         <div className="flex flex-col gap-1">
-          <label htmlFor={english} className={HINT}>
+          <label htmlFor={englishId} className={HINT}>
             {labels.english}
           </label>
           <Control
-            id={english}
+            id={englishId}
             name={english}
             lang="en"
             rows={rows}
-            aria-describedby={`${english}-hint`}
+            defaultValue={defaultValueEn ?? undefined}
+            aria-describedby={`${englishId}-hint`}
             className={FIELD}
           />
-          <p id={`${english}-hint`} className={HINT}>
+          <p id={`${englishId}-hint`} className={HINT}>
             {labels.englishHint}
           </p>
         </div>
@@ -109,4 +122,9 @@ export function BilingualField({
       {hint && <p className={HINT}>{hint}</p>}
     </fieldset>
   );
+}
+
+/** A stored first-of-the-month date as `<input type="month">` wants it, in UTC. */
+export function monthValue(date: Date | null | undefined) {
+  return date ? date.toISOString().slice(0, 7) : undefined;
 }
