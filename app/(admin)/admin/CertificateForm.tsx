@@ -3,7 +3,7 @@
 import type { AdminDictionary } from "@/lib/admin-i18n";
 
 import { createCertificate } from "./actions";
-import { FIELD, FormStatus, HINT, SUBMIT } from "./form-ui";
+import { BilingualField, FIELD, FormStatus, HINT, SUBMIT } from "./form-ui";
 import { useAdminForm } from "./use-admin-form";
 
 type Props = {
@@ -16,16 +16,13 @@ export default function CertificateForm({ t, common }: Props) {
 
   return (
     <form {...formProps} className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1">
-        <label htmlFor="title">{common.title}</label>
-        <input
-          id="title"
-          name="title"
-          required
-          placeholder="Acquia Certified Drupal Developer"
-          className={FIELD}
-        />
-      </div>
+      <BilingualField
+        name="title"
+        label={common.title}
+        labels={common}
+        required
+        placeholder="Acquia Certified Drupal Developer"
+      />
 
       <div className="flex flex-col gap-1">
         <label htmlFor="issuer">{t.issuer}</label>

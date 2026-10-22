@@ -47,7 +47,10 @@
     "from": "From",
     "to": "To",
     "toHint": "Leave empty if ongoing.",
-    "title": "Title"
+    "title": "Title",
+    "spanish": "Spanish",
+    "english": "English",
+    "englishHint": "Optional. Left empty, the English site shows the Spanish text."
   },
   "profile": {
     "photoHeading": "Profile photo",

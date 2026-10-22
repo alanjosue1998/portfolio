@@ -47,7 +47,15 @@ export default async function EducationPage() {
                     {study.institution} · {month.format(study.startedAt)} –{" "}
                     {study.endedAt ? month.format(study.endedAt) : dict.education.ongoing}
                   </p>
-                  <h3 className="font-semibold">{study.degree}</h3>
+                  <h3 className="font-semibold">
+                    {study.degree}
+                    {study.degreeEn && (
+                      <span lang="en" className="font-normal text-muted">
+                        {" "}
+                        · EN: {study.degreeEn}
+                      </span>
+                    )}
+                  </h3>
                 </div>
 
                 <form action={deleteEducation}>

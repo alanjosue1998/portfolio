@@ -60,7 +60,15 @@ export default async function CertificatesPage() {
                       {certificate.issuer}
                       {certificate.issuedAt && ` · ${month.format(certificate.issuedAt)}`}
                     </p>
-                    <h3 className="font-semibold">{certificate.title}</h3>
+                    <h3 className="font-semibold">
+                      {certificate.title}
+                      {certificate.titleEn && (
+                        <span lang="en" className="font-normal text-muted">
+                          {" "}
+                          · EN: {certificate.titleEn}
+                        </span>
+                      )}
+                    </h3>
 
                     {certificate.credentialId && (
                       <p className="text-sm text-muted">{certificate.credentialId}</p>

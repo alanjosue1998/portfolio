@@ -1,13 +1,17 @@
 import Image from "next/image";
 
+import { lang } from "next/root-params";
+
 import { getDictionary } from "@/lib/dictionaries";
+import { localized } from "@/lib/i18n";
 import prisma from "@/lib/prisma";
 
 import SectionHeading from "./SectionHeading";
 
 export default async function Projects() {
-  const [dict, projects] = await Promise.all([
+  const [dict, locale, projects] = await Promise.all([
     getDictionary(),
+    lang(),
     prisma.project.findMany({ orderBy: { createdAt: "desc" } }),
   ]);
 
@@ -58,8 +62,12 @@ export default async function Projects() {
                 <span className="sr-only">{dict.projects.typeLabel}: </span>
                 {project.type}
               </p>
-              <h3 className="text-xl leading-snug">{project.title}</h3>
-              <p className="text-[15px] text-muted">{project.description}</p>
+              <h3 className="text-xl leading-snug">
+                {localized(locale, project.title, project.titleEn)}
+              </h3>
+              <p className="text-[15px] text-muted">
+                {localized(locale, project.description, project.descriptionEn)}
+              </p>
 
               {project.technologies.length > 0 && (
                 <ul className="mt-auto flex flex-wrap gap-1.5 pt-2">

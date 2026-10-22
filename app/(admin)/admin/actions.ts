@@ -38,6 +38,15 @@ function parsePosition(raw: FormDataEntryValue | null) {
 }
 
 /**
+ * An optional English version of a field — `roleEn`, `titleEn`… Blank is stored
+ * as null, which is what tells the public pages to fall back to the Spanish
+ * text. See `localized()` in `lib/i18n.ts`.
+ */
+function englishText(formData: FormData, name: string) {
+  return String(formData.get(name) ?? "").trim() || null;
+}
+
+/**
  * For deletes: a row that is already gone — a double click, a second tab — is
  * what the delete wanted anyway, not an error page. Prisma reports it as P2025;
  * anything else still throws. The rows with no blob to clean up use
@@ -92,7 +101,15 @@ export async function createProject(_previous: FormState, formData: FormData): P
   }
 
   await prisma.project.create({
-    data: { title, type, description, technologies, imageUrl },
+    data: {
+      title,
+      titleEn: englishText(formData, "titleEn"),
+      type,
+      description,
+      descriptionEn: englishText(formData, "descriptionEn"),
+      technologies,
+      imageUrl,
+    },
   });
 
   revalidateSite();
@@ -197,6 +214,7 @@ export async function createCertificate(
   await prisma.certificate.create({
     data: {
       title,
+      titleEn: englishText(formData, "titleEn"),
       issuer,
       issuedAt,
       credentialId,
@@ -248,7 +266,13 @@ export async function createSkill(_previous: FormState, formData: FormData): Pro
   }
 
   await prisma.skill.create({
-    data: { name, category, position },
+    data: {
+      name,
+      nameEn: englishText(formData, "nameEn"),
+      category,
+      categoryEn: englishText(formData, "categoryEn"),
+      position,
+    },
   });
 
   revalidateSite();
@@ -544,10 +568,13 @@ export async function createExperience(
     data: {
       company,
       role,
+      roleEn: englishText(formData, "roleEn"),
       location,
+      locationEn: englishText(formData, "locationEn"),
       startedAt: period.startedAt,
       endedAt: period.endedAt,
       description,
+      descriptionEn: englishText(formData, "descriptionEn"),
       technologies,
       position,
     },
@@ -597,6 +624,7 @@ export async function createEducation(
     data: {
       institution,
       degree,
+      degreeEn: englishText(formData, "degreeEn"),
       startedAt: period.startedAt,
       endedAt: period.endedAt,
       position,
