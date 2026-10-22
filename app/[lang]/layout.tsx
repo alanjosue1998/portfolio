@@ -7,7 +7,9 @@ import CornerControls from "@/app/components/CornerControls";
 import ThemeScript from "@/app/components/ThemeScript";
 import { spaceGrotesk } from "@/app/fonts";
 import { getDictionary } from "@/lib/dictionaries";
-import { locales } from "@/lib/i18n";
+import { locales, type Locale } from "@/lib/i18n";
+import { socialMetadata } from "@/lib/metadata";
+import { siteUrl } from "@/lib/site";
 
 import "../globals.css";
 
@@ -26,11 +28,23 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const dict = await getDictionary();
+  const [dict, locale] = await Promise.all([getDictionary(), lang()]);
 
   return {
+    /**
+     * The origin every relative URL in the metadata resolves against — the
+     * Open Graph image and `og:url` above all, which a crawler needs absolute.
+     * Same source as the sitemap's, so the two never disagree.
+     */
+    metadataBase: new URL(siteUrl),
     title: dict.meta.title,
     description: dict.meta.description,
+    ...socialMetadata({
+      locale: locale as Locale,
+      path: `/${locale}`,
+      title: dict.meta.title,
+      description: dict.meta.description,
+    }),
   };
 }
 
