@@ -140,6 +140,37 @@
   }
 }
 
+/*
+ * Each section on the home page settles into place as it scrolls into view: a
+ * fade and 12px of rise, over the first stretch of its entry, and done.
+ *
+ * Driven by the scroll itself (`animation-timeline: view()`), not by script, so
+ * there is nothing to load and nothing to fail. Behind `@supports` because the
+ * hidden starting frame must never apply where the timeline does not exist —
+ * there the section would simply stay invisible. A browser without it shows
+ * the page as it always has. And nothing at all moves for anyone who asked
+ * their system for less motion.
+ *
+ * A section already on screen when the page opens is past its entry, so it is
+ * drawn finished: nothing above the fold waits to appear.
+ */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal-sections > section {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 35%;
+    }
+  }
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

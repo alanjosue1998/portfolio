@@ -5,6 +5,7 @@ import BottomBar, { BAR_ITEM, BAR_ITEM_PRIMARY } from "@/app/components/BottomBa
 import Certificates from "@/app/components/Certificates";
 import Contact from "@/app/components/Contact";
 import ContactCta from "@/app/components/ContactCta";
+import Experience from "@/app/components/Experience";
 import Footer from "@/app/components/Footer";
 import { FileIcon, UserIcon } from "@/app/components/icons";
 import Location from "@/app/components/Location";
@@ -39,10 +40,13 @@ export default async function Home() {
    * long list. The opening block keeps its own tighter rhythm inside.
    *
    * `[counter-reset:section]` starts the numbers `SectionHeading` draws.
+   *
+   * `reveal-sections` lets each section settle in as it scrolls into view — see
+   * `app/globals.css`.
    */
   return (
     <>
-      <main className="mx-auto flex w-full max-w-3xl flex-col gap-12 px-4 [counter-reset:section] sm:gap-16 sm:px-6">
+      <main className="reveal-sections mx-auto flex w-full max-w-3xl flex-col gap-12 px-4 [counter-reset:section] sm:gap-16 sm:px-6">
         <div className="flex flex-col gap-6">
           {/* The map opens the page, and carries the greeting and the portrait. */}
           <Location />
@@ -55,6 +59,7 @@ export default async function Home() {
         </div>
         <About />
         {/* Each of these renders nothing until the admin has something to show. */}
+        <Experience />
         <Skills />
         <Projects />
         <Certificates />
