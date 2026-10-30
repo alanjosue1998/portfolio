@@ -1,27 +1,37 @@
 /**
  * The theme lives in one place: the `data-theme` attribute on <html>. The inline
- * script in `ThemeScript` puts it there before the first paint, `app/globals.css`
- * reads it, and everything that has to follow it reads it from there rather than
- * keeping a copy in React state — so there is no second source to drift.
+ * script in `ThemeScript` puts it there before the first paint, the stylesheet
+ * generated from `themes.ts` reads it, and everything that has to follow it
+ * reads it from there rather than keeping a copy in React state — so there is
+ * no second source to drift.
+ *
+ * No attribute means nothing has been chosen, and the system setting picks
+ * between Andes and Páramo.
  *
  * Browser only. Every function here touches `document` or `window`.
  */
 
-/** What the page is painted as once the system setting has had its say. */
+import { findTheme } from "./themes";
+
+/** Whether what is painted is a light or a dark palette. */
 export type ResolvedTheme = "light" | "dark";
 
 const DARK_SETTING = "(prefers-color-scheme: dark)";
+const STORAGE_KEY = "theme";
+
+/** The theme chosen in the picker, or null while the system decides. */
+export function chosenTheme(): string | null {
+  return findTheme(document.documentElement.dataset.theme)?.id ?? null;
+}
 
 /**
- * The same three-state rule the colours follow: an explicit choice wins, and
- * nothing chosen hands the decision to the system. Only two values come out of
- * it, because "follow the system" is a way of picking one of these, not a third
- * thing the page can look like.
+ * Light or dark, whichever palette is on: the chosen theme's own scheme, or the
+ * system setting when nothing is chosen. The map picks its street style by this.
  */
 export function resolvedTheme(): ResolvedTheme {
-  const chosen = document.documentElement.dataset.theme;
+  const chosen = findTheme(document.documentElement.dataset.theme);
 
-  if (chosen === "light" || chosen === "dark") return chosen;
+  if (chosen) return chosen.scheme;
 
   return window.matchMedia(DARK_SETTING).matches ? "dark" : "light";
 }
@@ -49,12 +59,13 @@ export function subscribeToTheme(onChange: () => void) {
    * re-read this tab's own, unchanged attribute.
    */
   function fromAnotherTab(event: StorageEvent) {
-    if (event.key !== "theme") return;
+    if (event.key !== STORAGE_KEY) return;
 
     const html = document.documentElement;
+    const theme = findTheme(event.newValue);
 
-    if (event.newValue === "light" || event.newValue === "dark") {
-      html.dataset.theme = event.newValue;
+    if (theme) {
+      html.dataset.theme = theme.id;
     } else {
       delete html.dataset.theme;
     }
@@ -69,13 +80,40 @@ export function subscribeToTheme(onChange: () => void) {
   };
 }
 
-/** Records the choice, for this page and for the next visit. */
-export function applyTheme(next: ResolvedTheme) {
-  document.documentElement.dataset.theme = next;
+/**
+ * Records the choice, for this page and for the next visit. Null goes back to
+ * following the system.
+ *
+ * Wrapped in a view transition where the browser has one, so the page fades
+ * from one palette to the next instead of snapping — unless the visitor asked
+ * for less motion, or the browser cannot, in which case it simply switches.
+ */
+export function applyTheme(id: string | null) {
+  const change = () => {
+    const html = document.documentElement;
 
-  try {
-    localStorage.setItem("theme", next);
-  } catch {
-    // Storage blocked: the colours still change, only the memory of it is lost.
+    if (id) {
+      html.dataset.theme = id;
+    } else {
+      delete html.dataset.theme;
+    }
+
+    try {
+      if (id) {
+        localStorage.setItem(STORAGE_KEY, id);
+      } else {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    } catch {
+      // Storage blocked: the colours still change, only the memory of it is lost.
+    }
+  };
+
+  const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (calm || !document.startViewTransition) {
+    change();
+  } else {
+    document.startViewTransition(change);
   }
 }

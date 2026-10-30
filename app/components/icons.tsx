@@ -177,6 +177,18 @@ export function GridIcon(props: IconProps) {
   );
 }
 
+/** A painter's palette: the theme picker. */
+export function PaletteIcon(props: IconProps) {
+  return (
+    <Stroke {...props}>
+      <path d="M12 3.5a8.5 8.5 0 1 0 0 17c1.1 0 1.75-.8 1.75-1.7 0-.45-.17-.83-.43-1.13-.26-.3-.42-.68-.42-1.12 0-.94.76-1.7 1.7-1.7h2.05a3.85 3.85 0 0 0 3.85-3.85C20.5 6.9 16.7 3.5 12 3.5Z" />
+      <circle cx="7.75" cy="11" r="1" />
+      <circle cx="10.5" cy="7.25" r="1" />
+      <circle cx="15" cy="7.75" r="1" />
+    </Stroke>
+  );
+}
+
 export function SunIcon(props: IconProps) {
   return (
     <Stroke {...props}>

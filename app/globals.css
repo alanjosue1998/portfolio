@@ -1,115 +1,12 @@
 @import "tailwindcss";
 
 /*
- * "Andes" palette, taken from Imbabura: the green of the volcano is the
- * accent, over a cool mist-white ground (or a páramo-night one in the dark).
- * Every text colour clears WCAG AA against both `--background` and
- * `--surface`, and `--field` clears the 3:1 that a control's outline needs.
- *
- * The theme has three states. A visitor who has never chosen gets no
- * `data-theme` attribute, so `prefers-color-scheme` decides and light is the
- * fallback when the system asks for nothing. Choosing from the menu stamps
- * `data-theme` on <html>, and those rules win in both directions.
- *
- * Every colour is defined here on bare `:root` first. A colour whose only
- * definition lived inside a media query would simply be missing for anyone
- * whose system does not match it.
+ * The colours are not written here. Every palette — Andes, Páramo and the rest
+ * — lives in `app/components/themes.ts`, which `ThemeScript` turns into a
+ * stylesheet in the head: one source for the CSS, the picker's swatches and the
+ * contrast test that holds each one to WCAG AA. This file only maps the
+ * variables they define onto Tailwind's colour names, below.
  */
-:root {
-  --background: #f4f5f0;
-  --foreground: #13201a;
-  /* 5.9:1 on the background, 6.4:1 on white. */
-  --accent: #1d6b4e;
-  /* Hover on accent fills, and accent text laid over `--accent-soft`. */
-  --accent-strong: #134a36;
-  /* A wash of the accent: badges, skill chips, the empty portrait. */
-  --accent-soft: #e2eee7;
-  /* Text on an accent fill — the primary button. */
-  --on-accent: #ffffff;
-  /* 5.8:1 on the background. */
-  --muted: #56625b;
-  /* Sits on top of the background: cards, the label over the map. */
-  --surface: #ffffff;
-  /* A hairline for cards. Decorative, so it is allowed to be faint. */
-  --border: #d9ded7;
-  /*
-   * The outline of a text field. Unlike `--border` it has to be found, so it
-   * clears 3:1 on both grounds a field can sit on.
-   */
-  --field: #7a8680;
-  /* Form feedback in the panel. Both clear AA on the background. */
-  --danger: #b42318;
-  --success: #15803d;
-  /* Native controls — selects, date pickers, scrollbars — follow the theme. */
-  color-scheme: light;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --background: #0e1512;
-    --foreground: #eaf0eb;
-    /* Lifted from #1d6b4e, which is too dark to read against this ground. */
-    --accent: #6ccb9e;
-    --accent-strong: #9be0be;
-    --accent-soft: #183a2c;
-    --on-accent: #0e1512;
-    --muted: #9daba3;
-    --surface: #17211d;
-    --border: #2a3731;
-    --field: #6e7e76;
-    --danger: #f48678;
-    --success: #4ade80;
-    color-scheme: dark;
-  }
-}
-
-/* An explicit choice beats the system setting, whichever way it points. */
-:root[data-theme="dark"] {
-  --background: #0e1512;
-  --foreground: #eaf0eb;
-  --accent: #6ccb9e;
-  --accent-strong: #9be0be;
-  --accent-soft: #183a2c;
-  --on-accent: #0e1512;
-  --muted: #9daba3;
-  --surface: #17211d;
-  --border: #2a3731;
-  --field: #6e7e76;
-  --danger: #f48678;
-  --success: #4ade80;
-  color-scheme: dark;
-}
-
-/*
- * Which of the two icons in `ThemeToggle` is on screen.
- *
- * It is decided here rather than in React because the pages are prerendered:
- * their HTML cannot know which theme is in play, so an icon chosen in JavaScript
- * would paint the wrong one and visibly flip once React hydrated. These are the
- * same three rules as the palette above, in the same order and for the same
- * reason — the explicit choice comes last, so it wins in both directions.
- */
-:root .theme-icon-moon {
-  display: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .theme-icon-sun {
-    display: none;
-  }
-
-  :root:not([data-theme="light"]) .theme-icon-moon {
-    display: block;
-  }
-}
-
-:root[data-theme="dark"] .theme-icon-sun {
-  display: none;
-}
-
-:root[data-theme="dark"] .theme-icon-moon {
-  display: block;
-}
 
 @theme inline {
   --color-background: var(--background);
@@ -141,33 +38,30 @@
 }
 
 /*
- * Each section on the home page settles into place as it scrolls into view: a
- * fade and 12px of rise, over the first stretch of its entry, and done.
+ * Each section on the home page rises into place the first time it scrolls into
+ * view: a fade and 32px, over 700ms. `ScrollReveal` marks the sections below
+ * the fold `out` once it runs and flips each to `in` as it arrives.
  *
- * Driven by the scroll itself (`animation-timeline: view()`), not by script, so
- * there is nothing to load and nothing to fail. Behind `@supports` because the
- * hidden starting frame must never apply where the timeline does not exist —
- * there the section would simply stay invisible. A browser without it shows
- * the page as it always has. And nothing at all moves for anyone who asked
- * their system for less motion.
- *
- * A section already on screen when the page opens is past its entry, so it is
- * drawn finished: nothing above the fold waits to appear.
+ * Only the `out` state hides anything, and only script sets it — so without
+ * JavaScript, or before it loads, every section is simply there. Nothing is
+ * marked for a visitor who asked for less motion, and nothing above the fold
+ * ever waits to appear.
  */
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .reveal-sections > section {
-      animation: reveal linear both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 35%;
-    }
-  }
+.reveal-sections > section {
+  transition:
+    opacity 700ms ease-out,
+    translate 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
-@keyframes reveal {
-  from {
-    opacity: 0;
-    translate: 0 12px;
+.reveal-sections > section[data-reveal="out"] {
+  opacity: 0;
+  translate: 0 32px;
+}
+
+@media print {
+  .reveal-sections > section[data-reveal="out"] {
+    opacity: 1;
+    translate: none;
   }
 }
 
@@ -273,6 +167,17 @@ body {
 }
 
 /*
+ * The pin, in the accent of whichever theme is on — maplibre-gl's stock blue
+ * belonged to nothing else on the page. It sets the colour as a `fill`
+ * attribute on the second group of its SVG, and a CSS `fill` beats a
+ * presentation attribute, so this follows every theme change with no script.
+ */
+.maplibregl-marker > svg > g > g:nth-child(2) {
+  fill: var(--accent);
+  transition: fill 200ms;
+}
+
+/*
  * The CV page as a PDF. The browser's "Save as PDF" is the whole pipeline, so
  * these rules are its entire design. See `app/[lang]/cv/page.tsx`.
  */
@@ -283,30 +188,9 @@ body {
 
 @media print {
   /*
-   * Paper is always the light theme. All three selectors the dark palette can
-   * arrive through are named here: `:root` alone would lose to
-   * `:root:not([data-theme="light"])` on specificity, and a visitor whose
-   * system is dark would print near-white text that browsers then lay on white
-   * paper, since they leave backgrounds out by default. Last in the file, so it
-   * also wins the tie with `:root[data-theme="dark"]`.
+   * Paper is always the light palette on white — that rule is generated with
+   * the rest in `themes.ts`, so it comes after every theme's and wins.
    */
-  :root,
-  :root:not([data-theme="light"]),
-  :root[data-theme="dark"] {
-    --background: #ffffff;
-    --foreground: #13201a;
-    --accent: #1d6b4e;
-    --accent-strong: #134a36;
-    --accent-soft: #e2eee7;
-    --on-accent: #ffffff;
-    --muted: #56625b;
-    --surface: #ffffff;
-    --border: #d6dbd4;
-    --field: #7a8680;
-    --danger: #b42318;
-    --success: #15803d;
-    color-scheme: light;
-  }
 
   /* Small enough that a CV fits its pages; still comfortable on A4. */
   html {

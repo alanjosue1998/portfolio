@@ -176,15 +176,11 @@ export default function LocationMap({ city, country, description, unavailable, c
                * anyone can see yet.
                */
               /**
-               * In the page's accent rather than maplibre-gl's stock red, which
-               * was the one colour on the page that belonged to nothing else.
-               * Read from the stylesheet so it follows `globals.css`; it keeps
-               * the colour of the theme it landed in, which a later toggle does
-               * not repaint — a pin is too small for that to matter.
+               * Painted in the page's accent by `app/globals.css`, not here: a
+               * colour passed in would be the theme it landed in, and with six
+               * themes a pin left green on Cacao's orange was easy to see.
                */
-              const accent = getComputedStyle(element).getPropertyValue("--accent").trim();
-
-              new Marker({ color: accent || undefined }).setLngLat(IBARRA).addTo(map);
+              new Marker().setLngLat(IBARRA).addTo(map);
               foldCredit(map);
               setArrived(true);
             });

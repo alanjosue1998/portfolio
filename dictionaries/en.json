@@ -51,8 +51,9 @@
     "place": "Made in Ibarra, Ecuador"
   },
   "theme": {
-    "toDark": "Switch to the dark theme",
-    "toLight": "Switch to the light theme"
+    "label": "Theme",
+    "auto": "Automatic",
+    "autoHint": "follows your system"
   },
   "languages": {
     "label": "Language",
