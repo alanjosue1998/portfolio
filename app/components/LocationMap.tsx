@@ -304,8 +304,13 @@ export default function LocationMap({ city, country, description, unavailable, c
         </p>
       )}
 
-      {/* The greeting and the portrait, over the bottom of the map. */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 py-5 sm:py-6">
+      {/*
+        The greeting and the portrait, over the bottom of the map. The left
+        padding matches the place label's inset in the top corner, so the
+        greeting sits in the map rather than on its edge and the two line up;
+        the portrait keeps its own margin on the right.
+      */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 py-5 pl-5 sm:py-6 sm:pl-6">
         {children}
       </div>
     </div>
