@@ -15,7 +15,8 @@
     "db:seed": "prisma db seed",
     "user:create": "tsx scripts/create-user.ts",
     "postinstall": "prisma generate && node scripts/copy-map-worker.mjs",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test": "vitest run"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx,mjs}": [
@@ -54,6 +55,7 @@
     "prisma": "^7.10.1",
     "tailwindcss": "^4",
     "tsx": "^4.23.5",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.5"
   }
 }

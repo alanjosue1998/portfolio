@@ -79,4 +79,9 @@ jobs:
       - name: Type-check
         run: npx tsc --noEmit
 
+      # Unit tests for the pure functions — URL normalisation, locale matching,
+      # dictionary parity. No database or browser involved, so they run in
+      # seconds and go before the build for the same reason the type check does.
+      - run: npm test
+
       - run: npm run build
