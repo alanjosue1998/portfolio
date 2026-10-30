@@ -7,6 +7,8 @@ import { skillIcon } from "@/lib/skill-icons";
 
 import MarqueeToggle from "./MarqueeToggle";
 import SectionHeading from "./SectionHeading";
+import SkillChip from "./SkillChip";
+import SkillLane from "./SkillLane";
 
 export default async function Skills() {
   const [dict, locale, skills] = await Promise.all([
@@ -38,6 +40,17 @@ export default async function Skills() {
     byCategory.set(skill.category, group);
   }
 
+  // Names and logos settled here, on the server, so only the paths in use
+  // travel to the browser for the moving lane.
+  const groups = [...byCategory].map(([category, group]) => ({
+    key: category,
+    label: group.label,
+    skills: group.skills.map((skill) => {
+      const name = localized(locale, skill.name, skill.nameEn);
+      return { id: skill.id, name, icon: skillIcon(name) };
+    }),
+  }));
+
   return (
     <section id="skills" className="flex scroll-mt-8 flex-col gap-6">
       <div className="flex items-center gap-3">
@@ -48,14 +61,14 @@ export default async function Skills() {
       </div>
 
       {/*
-        A row per category: its name, and its skills running past underneath,
-        left to right, in a loop. No cards — the rows are the structure, and a
-        box around a strip that moves only fenced it in. Each row runs at its
-        own pace so they never move in step.
+        Every category with its skills, as a plain list: what a screen reader
+        reads, and what is on screen when the visitor asked for less motion —
+        `app/globals.css` keeps it out of sight otherwise, while the lane below
+        plays the same content one category at a time.
       */}
-      <div className="flex flex-col gap-6">
-        {[...byCategory].map(([category, group], row) => (
-          <div key={category} className="flex flex-col gap-3">
+      <div className="skill-list flex flex-col gap-5">
+        {groups.map((group) => (
+          <div key={group.key} className="flex flex-col gap-3">
             {/*
               A heading rather than a styled paragraph: this is a real level in
               the outline, and a screen reader listing headings should find the
@@ -64,94 +77,18 @@ export default async function Skills() {
             <h3 className="font-sans text-xs font-semibold tracking-[0.08em] text-muted uppercase">
               {group.label}
             </h3>
-
-            <Marquee
-              names={group.skills.map((skill) => localized(locale, skill.name, skill.nameEn))}
-              pace={1 + row * 0.15}
-            />
+            <ul className="flex flex-wrap gap-2">
+              {group.skills.map((skill) => (
+                <li key={skill.id}>
+                  <SkillChip name={skill.name} icon={skill.icon} />
+                </li>
+              ))}
+            </ul>
           </div>
         ))}
       </div>
+
+      <SkillLane groups={groups} />
     </section>
-  );
-}
-
-/**
- * Enough chips in each half of the strip to outrun the widest column, so the
- * loop never shows a gap — a category with one skill still fills its row.
- */
-const MIN_PER_HALF = 8;
-
-/** Seconds a chip takes to travel its own width and gap, near enough. */
-const SECONDS_PER_CHIP = 2.6;
-
-/**
- * One category's skills on a loop. The strip holds the same run twice, and
- * `app/globals.css` slides it by exactly half its width, so the second run
- * lands where the first began and the seam never shows.
- *
- * Only the first run of names is read out — every repeat is `aria-hidden`.
- * Under reduced motion the repeats are not drawn and the first run simply
- * wraps, as the chips did before.
- */
-function Marquee({ names, pace }: { names: string[]; pace: number }) {
-  const times = Math.ceil(MIN_PER_HALF / names.length);
-  const run = Array.from({ length: times }, () => names).flat();
-
-  return (
-    <div className="marquee">
-      <div
-        className="marquee-track"
-        style={
-          {
-            "--marquee-duration": `${(run.length * SECONDS_PER_CHIP * pace).toFixed(1)}s`,
-          } as React.CSSProperties
-        }
-      >
-        {[0, 1].map((half) => (
-          <ul key={half} aria-hidden={half === 1 || undefined} className="marquee-run">
-            {run.map((name, index) => (
-              <li key={index} aria-hidden={(half === 0 && index >= names.length) || undefined}>
-                <SkillChip name={name} />
-              </li>
-            ))}
-          </ul>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/**
- * A skill and its logo, drawn in the chip's own colour so every brand sits in
- * the theme rather than in its own palette. A skill Simple Icons does not know
- * gets its initial in a disc of the same size, so no chip is missing a mark.
- */
-function SkillChip({ name }: { name: string }) {
-  const path = skillIcon(name);
-
-  return (
-    <span className="flex items-center gap-2 rounded-full bg-accent-soft py-2 pr-4 pl-3 text-sm font-medium whitespace-nowrap text-accent-strong">
-      {path ? (
-        <svg
-          viewBox="0 0 24 24"
-          width={18}
-          height={18}
-          fill="currentColor"
-          aria-hidden="true"
-          className="shrink-0"
-        >
-          <path d={path} />
-        </svg>
-      ) : (
-        <span
-          aria-hidden="true"
-          className="grid size-[18px] shrink-0 place-items-center rounded-full bg-accent-strong text-[10px] font-bold text-accent-soft"
-        >
-          {name.charAt(0).toUpperCase()}
-        </span>
-      )}
-      {name}
-    </span>
   );
 }

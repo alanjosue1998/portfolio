@@ -150,72 +150,86 @@
 }
 
 /*
- * The skills strips — see `Marquee` in `app/components/Skills.tsx`. The track
- * holds the same run twice and slides from minus half its width to nothing,
- * so it moves left to right and the second run lands where the first began.
- * The edges fade into the page rather than cutting chips in half.
+ * Skills — see `SkillLane` and `Skills`. Two renderings of the same content:
  *
- * It stops under a pointer, under keyboard focus, and when the section's
- * pause button sets `data-paused`. Under reduced motion nothing moves: the
- * repeats are not drawn and the first run wraps onto as many lines as it needs.
+ * - `.skill-list`, every category with its chips, still. What a screen reader
+ *   reads, always, and what is on screen under reduced motion.
+ * - `.skill-lane`, one category at a time crossing a single lane, for
+ *   everyone else. `aria-hidden`, and not drawn under reduced motion.
+ *
+ * So with motion allowed the list is kept for assistive tech but taken out of
+ * sight, the way `sr-only` does it.
  */
-.marquee {
-  overflow: hidden;
-  mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
-}
-
-.marquee-track {
-  display: flex;
-  width: max-content;
-}
-
-.marquee-run {
-  display: flex;
-  flex-shrink: 0;
-  gap: 0.5rem;
-  /* The gap after the last chip, so both runs are the same width. */
-  padding-right: 0.5rem;
-}
-
-@keyframes marquee {
-  from {
-    translate: -50% 0;
-  }
-
-  to {
-    translate: 0 0;
-  }
-}
-
 @media (prefers-reduced-motion: no-preference) {
-  .marquee-track {
-    animation: marquee var(--marquee-duration, 30s) linear infinite;
-  }
-
-  .marquee:hover .marquee-track,
-  .marquee:focus-within .marquee-track,
-  [data-paused] .marquee-track {
-    animation-play-state: paused;
+  .skill-list {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .marquee {
-    mask-image: none;
-  }
-
-  .marquee-track {
-    width: auto;
-  }
-
-  .marquee-run {
-    flex-wrap: wrap;
-    padding-right: 0;
-  }
-
-  .marquee-run:not(:first-child),
-  .marquee-run > li[aria-hidden] {
+  .skill-lane {
     display: none;
+  }
+}
+
+/*
+ * The lane is as tall as a chip, and the chips are positioned in it, so the
+ * page below never moves as categories come and go. Its edges fade into the
+ * page. `container-type` gives the pass its width in `cqw`.
+ */
+.skill-lane-stage {
+  position: relative;
+  height: 2.5rem;
+  overflow: hidden;
+  container-type: inline-size;
+  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+
+.skill-lane-track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  gap: 0.5rem;
+  width: max-content;
+  /* Waiting just out of sight on the left until its length is measured. */
+  translate: -100% 0;
+}
+
+.skill-lane-track[data-running] {
+  animation: skill-pass linear both;
+}
+
+/* From fully out on the left to fully out on the right. */
+@keyframes skill-pass {
+  from {
+    translate: -100% 0;
+  }
+
+  to {
+    translate: 100cqw 0;
+  }
+}
+
+.skill-lane:hover .skill-lane-track,
+[data-paused] .skill-lane-track {
+  animation-play-state: paused;
+}
+
+/* Each new category's name fades up into place. */
+.skill-lane-label {
+  animation: skill-label-in 400ms ease-out both;
+}
+
+@keyframes skill-label-in {
+  from {
+    opacity: 0;
+    translate: 0 4px;
   }
 }
 
