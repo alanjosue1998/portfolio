@@ -1,3 +1,5 @@
+import { THEME_IDS, themeCss } from "./themes";
+
 /**
  * Applies a saved theme before the browser paints.
  *
@@ -7,16 +9,26 @@
  * the head happens before the first paint, so there is nothing to see.
  *
  * `localStorage` throws rather than returns null when a browser blocks storage,
- * hence the try. Missing or unrecognised values are left alone, which leaves
- * `prefers-color-scheme` in charge — see `app/globals.css`.
+ * hence the try. Only a known theme id is applied — a stale or tampered value is
+ * left alone, which leaves `prefers-color-scheme` in charge.
  */
 const script = `
 try {
   var t = localStorage.getItem("theme");
-  if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+  if (${JSON.stringify(THEME_IDS)}.indexOf(t) > -1) document.documentElement.dataset.theme = t;
 } catch (e) {}
 `;
 
+/**
+ * Both halves of the theme, in the head of each root layout: the palettes —
+ * generated from `themes.ts`, the one place their colours are written — and
+ * the script that picks one before the first paint.
+ */
 export default function ThemeScript() {
-  return <script dangerouslySetInnerHTML={{ __html: script }} />;
+  return (
+    <>
+      <style dangerouslySetInnerHTML={{ __html: themeCss() }} />
+      <script dangerouslySetInnerHTML={{ __html: script }} />
+    </>
+  );
 }

@@ -51,8 +51,9 @@
     "place": "Hecho en Ibarra, Ecuador"
   },
   "theme": {
-    "toDark": "Cambiar al tema oscuro",
-    "toLight": "Cambiar al tema claro"
+    "label": "Tema",
+    "auto": "Automático",
+    "autoHint": "sigue al sistema"
   },
   "languages": {
     "label": "Idioma",

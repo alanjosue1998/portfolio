@@ -1,5 +1,5 @@
 import { CONTROL } from "@/app/components/control";
-import ThemeToggle from "@/app/components/ThemeToggle";
+import ThemePicker from "@/app/components/ThemePicker";
 import { getAdminDictionary, getAdminLocale } from "@/lib/admin-i18n";
 import { locales } from "@/lib/i18n";
 
@@ -11,7 +11,7 @@ import { setAdminLocale } from "./locale-actions";
  *
  * The language is a form rather than a link: the panel's addresses carry no
  * locale, so switching means setting a cookie, and a Server Action does that
- * with or without JavaScript. The theme is the public site's own toggle; it
+ * with or without JavaScript. The theme is the public site's own picker; it
  * writes the same `localStorage` key, so a choice made on one side holds on
  * the other.
  */
@@ -37,7 +37,7 @@ export default async function AdminControls() {
         ))}
       </div>
 
-      <ThemeToggle labels={dict.controls.theme} className={CONTROL} />
+      <ThemePicker labels={dict.controls.theme} className={CONTROL} />
     </div>
   );
 }

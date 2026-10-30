@@ -5,7 +5,7 @@ import { locales } from "@/lib/i18n";
 
 import { CONTROL } from "./control";
 import LanguageLink from "./LanguageLink";
-import ThemeToggle from "./ThemeToggle";
+import ThemePicker from "./ThemePicker";
 
 /**
  * The two controls that follow the page: the language, and the theme.
@@ -56,7 +56,7 @@ export default async function CornerControls() {
         </ul>
       </nav>
 
-      <ThemeToggle labels={dict.theme} className={CONTROL} />
+      <ThemePicker labels={dict.theme} className={CONTROL} />
     </div>
   );
 }

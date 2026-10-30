@@ -9,6 +9,7 @@ import Experience from "@/app/components/Experience";
 import Footer from "@/app/components/Footer";
 import Location from "@/app/components/Location";
 import Projects from "@/app/components/Projects";
+import ScrollReveal from "@/app/components/ScrollReveal";
 import SectionNav, { type SectionId } from "@/app/components/SectionNav";
 import Skills from "@/app/components/Skills";
 import { getDictionary } from "@/lib/dictionaries";
@@ -57,18 +58,19 @@ export default async function Home() {
    * card that had been placed on the page rather than the thing the page opens
    * with.
    *
-   * `gap-16` between sections, up from 10: at 40px a section title sat almost
-   * as close to the cards above it as to its own, and the page read as one
-   * long list. The opening block keeps its own tighter rhythm inside.
+   * `gap-28` between sections — 112px, 80px on a phone. It was 64px, and
+   * before that 40px, where a section title sat almost as close to the cards
+   * above it as to its own; even at 64px the page still read as one long
+   * list. The opening block keeps its own tighter rhythm inside.
    *
    * `[counter-reset:section]` starts the numbers `SectionHeading` draws.
    *
-   * `reveal-sections` lets each section settle in as it scrolls into view — see
-   * `app/globals.css`.
+   * `reveal-sections` marks the sections `ScrollReveal` lets rise into view —
+   * see `app/globals.css`.
    */
   return (
     <>
-      <main className="reveal-sections mx-auto flex w-full max-w-3xl flex-col gap-12 px-4 [counter-reset:section] sm:gap-16 sm:px-6">
+      <main className="reveal-sections mx-auto flex w-full max-w-3xl flex-col gap-20 px-4 [counter-reset:section] sm:gap-28 sm:px-6">
         <div className="flex flex-col gap-6">
           {/* The map opens the page, and carries the greeting and the portrait. */}
           <Location />
@@ -88,6 +90,7 @@ export default async function Home() {
         <Contact />
       </main>
       <Footer />
+      <ScrollReveal />
 
       <BottomBar label={dict.nav.label}>
         <SectionNav
