@@ -1,27 +1,16 @@
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { lang } from "next/root-params";
 
 import CornerControls from "@/app/components/CornerControls";
 import ThemeScript from "@/app/components/ThemeScript";
-import { spaceGrotesk } from "@/app/fonts";
+import { geistMono, geistSans, spaceGrotesk } from "@/app/fonts";
 import { getDictionary } from "@/lib/dictionaries";
 import { locales, type Locale } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/metadata";
 import { siteUrl } from "@/lib/site";
 
 import "../globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ lang: locale }));
