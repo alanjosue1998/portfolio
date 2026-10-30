@@ -66,15 +66,20 @@
 }
 
 /*
- * Behind the top of the home page: contour lines, as on a topographic map of
- * the Andes the palettes are named after — the map of Ibarra sits on them like
- * a sheet laid over a survey chart. They fade out before the first paragraph,
- * so text always sits on plain ground.
+ * Behind the whole home page: contour lines, as on a topographic map of the
+ * Andes the palettes are named after. Fixed to the window, so the page scrolls
+ * over them like a sheet laid on a survey chart, and the map of Ibarra is one
+ * more sheet on top.
  *
  * The lines are a mask, not an image: `public/backdrop/topography.svg` only
  * says where they are, and the colour is painted through it from `--accent`,
- * so they follow every theme. The second mask fades them out downwards;
- * `intersect` keeps only what both allow.
+ * so they follow every theme. `cover` keeps the terrain filling any window
+ * without a seam or a repeat.
+ *
+ * The second mask keeps them full strength in the margins and drops them to a
+ * third behind the 48rem content column, so paragraphs sit on calm ground. On
+ * a phone the column is the whole width and the stops cross, which leaves the
+ * faint third everywhere — the right amount behind text that fills the screen.
  *
  * A glow of the accent was tried with them and dropped: the map's own fade to
  * `--background` then drew a visible box against the tinted ground around it.
@@ -82,11 +87,18 @@
 .backdrop {
   background: color-mix(in srgb, var(--accent) 22%, transparent);
   mask-image:
-    url("/backdrop/topography.svg"), linear-gradient(to bottom, black 30%, transparent 70%);
+    url("/backdrop/topography.svg"),
+    linear-gradient(
+      to right,
+      black,
+      rgb(0 0 0 / 0.33) calc(50% - 24rem),
+      rgb(0 0 0 / 0.33) calc(50% + 24rem),
+      black
+    );
   mask-size:
-    max(100%, 1440px) auto,
+    cover,
     100% 100%;
-  mask-position: top center;
+  mask-position: center;
   mask-repeat: no-repeat;
   mask-composite: intersect;
 }
