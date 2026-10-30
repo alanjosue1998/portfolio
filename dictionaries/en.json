@@ -57,6 +57,10 @@
   },
   "languages": {
     "label": "Language",
+    "names": {
+      "es": "Español",
+      "en": "English"
+    },
     "switchTo": {
       "es": "Switch to Spanish",
       "en": "Switch to English"

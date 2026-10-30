@@ -3,6 +3,8 @@
 import { useEffect, useId, useRef, useState } from "react";
 
 import { BriefcaseIcon, CodeIcon, FileIcon, GridIcon, MenuIcon, TextIcon, UserIcon } from "./icons";
+import LanguageLink from "./LanguageLink";
+import { ThemeSwatches, type ThemeLabels } from "./ThemePicker";
 
 /** The sections the bar can point at, by the `id` each one carries. */
 export type SectionId = "about" | "experience" | "skills" | "projects";
@@ -21,6 +23,17 @@ type Props = {
   cv: { href: string; label: string };
   /** The phone's menu button: what it says outside any section, and what it does. */
   menu: { label: string; open: string };
+  /**
+   * What the corner controls offer, for the phone's menu, where they move:
+   * below `md` the corner is emptied — see `.corner-controls` in
+   * `app/globals.css`.
+   */
+  settings: {
+    theme: ThemeLabels;
+    language: string;
+    /** The languages the page is not in, each named in itself. */
+    languages: { locale: string; name: string; label: string }[];
+  };
 };
 
 /**
@@ -71,7 +84,7 @@ function current(tracked: SectionId[]): SectionId | "top" | null {
  * component's script; the script only adds the highlight. It starts on "top",
  * which is where a fresh load lands, so the server's HTML is already right.
  */
-export default function SectionNav({ sections, top, cv, menu }: Props) {
+export default function SectionNav({ sections, top, cv, menu, settings }: Props) {
   const [active, setActive] = useState<SectionId | "top" | null>("top");
   const menuId = useId();
   const panel = useRef<HTMLDivElement>(null);
@@ -111,18 +124,21 @@ export default function SectionNav({ sections, top, cv, menu }: Props) {
   return (
     <>
       {/*
-        Below `md`: one button that names the section on screen and opens the
-        rest as a menu. Six icons in a row were a puzzle at 40px each; a word
-        says where you are, and the menu says where else you can go.
+        Below `md`: one button that names the section on screen and opens
+        everything else as a menu — the sections, the CV, and the theme and
+        language that otherwise sit in the corner. Six icons in a row were a
+        puzzle at 40px each; a word says where you are, and the menu says
+        where else you can go.
 
         A native popover, like the theme picker's: Escape, a tap outside and
         the top layer come from the browser. Its name starts with the visible
-        text, so voice control finds it by what it shows.
+        text, so voice control finds it by what it shows. `section-menu` is
+        what `app/globals.css` looks for to empty the corner on a phone.
       */}
       <button
         type="button"
         popoverTarget={menuId}
-        className={`${ITEM} gap-2 px-3 md:hidden ${here ? ACTIVE : IDLE}`}
+        className={`section-menu ${ITEM} gap-2 px-4 md:hidden ${here ? ACTIVE : IDLE}`}
       >
         <MenuIcon size={18} />
         {here?.label ?? menu.label}
@@ -135,12 +151,12 @@ export default function SectionNav({ sections, top, cv, menu }: Props) {
         popover="auto"
         aria-label={menu.label}
         /*
-         * Above the bar, from its left edge, where the button that opened it
-         * sits: the bar is 48px tall at `bottom-4`, `bottom-6` from `sm`. It
-         * rises and fades in, and out again, unless less motion is asked for.
-         * `md:hidden` also closes it for good if the window grows past phones.
+         * A sheet across the screen, just above the bar: it is 48px tall at
+         * `bottom-4`, `bottom-6` from `sm`. It rises and fades in, and out
+         * again, unless less motion is asked for. `md:hidden` also closes it
+         * for good if the window grows past phones.
          */
-        className="fixed inset-auto bottom-18 left-4 m-0 w-60 translate-y-2 rounded-2xl border border-border bg-surface p-1.5 text-foreground opacity-0 shadow-[0_12px_32px_-12px_rgb(0_0_0/0.4)] transition-[opacity,translate,display,overlay] transition-discrete duration-200 open:translate-y-0 open:opacity-100 motion-reduce:transition-none sm:bottom-20 md:hidden starting:open:translate-y-2 starting:open:opacity-0"
+        className="fixed inset-x-4 top-auto bottom-18 m-0 w-auto translate-y-2 rounded-2xl border border-border bg-surface p-1.5 text-foreground opacity-0 shadow-[0_12px_32px_-12px_rgb(0_0_0/0.4)] transition-[opacity,translate,display,overlay] transition-discrete duration-200 open:translate-y-0 open:opacity-100 motion-reduce:transition-none sm:bottom-20 md:hidden starting:open:translate-y-2 starting:open:opacity-0"
       >
         <ul className="flex flex-col gap-0.5">
           {entries.map(({ id, href, label, Icon }) => (
@@ -159,6 +175,46 @@ export default function SectionNav({ sections, top, cv, menu }: Props) {
             </li>
           ))}
         </ul>
+
+        {/*
+          The CV, filled like the bar's own link, so it stays the one thing on
+          the menu that reads as the call to action rather than one more row.
+          A plain anchor for the same reason as there.
+        */}
+        <a
+          href={cv.href}
+          className="mt-1.5 flex h-11 items-center justify-center gap-2 rounded-xl bg-accent text-sm font-semibold text-on-accent transition-colors hover:bg-accent-strong"
+        >
+          <FileIcon size={18} />
+          {cv.label}
+        </a>
+
+        {/* The corner's two controls, as rows under a hairline. */}
+        <div className="mt-1.5 flex flex-col gap-3 border-t border-border px-3 pt-3 pb-2">
+          <div className="flex flex-col gap-2">
+            <p className="text-xs font-semibold tracking-[0.08em] text-muted uppercase">
+              {settings.theme.label}
+            </p>
+            <ThemeSwatches labels={settings.theme} />
+          </div>
+
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs font-semibold tracking-[0.08em] text-muted uppercase">
+              {settings.language}
+            </p>
+            <div className="flex gap-2">
+              {settings.languages.map(({ locale, name, label }) => (
+                <LanguageLink
+                  key={locale}
+                  locale={locale}
+                  name={name}
+                  label={label}
+                  className="inline-flex h-9 items-center rounded-full border border-border px-4 text-sm font-semibold transition-colors hover:border-accent hover:text-accent"
+                />
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* From `md`: every destination in the bar itself. */}
@@ -186,17 +242,16 @@ export default function SectionNav({ sections, top, cv, menu }: Props) {
       {/*
         A plain anchor, like the language switch in `CornerControls`, so the
         chosen theme survives the trip. Still the one filled item: the CV is
-        the bar's call to action, the sections are only a way around. Its
-        label shows wherever there is room for it: on a phone, beside the
-        menu, and from `lg`.
+        the bar's call to action, the sections are only a way around. On a
+        phone it lives in the menu instead; its label shows from `lg`.
       */}
       <a
         href={cv.href}
         aria-label={cv.label}
-        className={`${ITEM} bg-accent px-3 text-on-accent hover:bg-accent-strong md:px-0 lg:ml-1 lg:px-4`}
+        className={`${ITEM} bg-accent text-on-accent hover:bg-accent-strong max-md:hidden lg:ml-1`}
       >
         <FileIcon size={18} />
-        <span className="md:max-lg:hidden">{cv.label}</span>
+        <span className="hidden lg:inline">{cv.label}</span>
       </a>
     </>
   );

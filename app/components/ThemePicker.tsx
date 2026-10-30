@@ -133,3 +133,43 @@ export default function ThemePicker({ labels, className }: Props) {
     </>
   );
 }
+
+/**
+ * The same choice as the picker, folded into a row of discs for the phone's
+ * section menu, where the corner controls give way to it. Each disc is half the
+ * theme's ground and half its accent, which is what tells the palettes apart
+ * at this size; the automatic one is half Andes, half Páramo.
+ */
+export function ThemeSwatches({ labels }: { labels: ThemeLabels }) {
+  const chosen = useSyncExternalStore(subscribeToTheme, chosenTheme, readServerTheme);
+
+  const light = findTheme(SYSTEM_THEMES.light)!.palette;
+  const dark = findTheme(SYSTEM_THEMES.dark)!.palette;
+
+  const options = [
+    { id: null, name: labels.auto, a: light.background, b: dark.background },
+    ...THEMES.map((theme) => ({
+      id: theme.id,
+      name: theme.name,
+      a: theme.palette.background,
+      b: theme.palette.accent,
+    })),
+  ];
+
+  return (
+    <div role="group" aria-label={labels.label} className="flex flex-wrap gap-2">
+      {options.map(({ id, name, a, b }) => (
+        <button
+          key={id ?? "auto"}
+          type="button"
+          onClick={() => applyTheme(id)}
+          aria-pressed={chosen === id}
+          aria-label={name}
+          title={name}
+          className="size-8 rounded-full ring-1 ring-black/15 outline-2 outline-offset-2 outline-transparent transition-[outline-color] aria-pressed:outline-accent"
+          style={{ background: `linear-gradient(135deg, ${a} 50%, ${b} 50%)` }}
+        />
+      ))}
+    </div>
+  );
+}
