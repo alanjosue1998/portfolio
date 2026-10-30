@@ -7,7 +7,11 @@
     "greeting": "Hello",
     "name": "I'm Alan Guamán",
     "role": "Systems engineer focused on CMS",
-    "tagline": "Drupal & WordPress"
+    "tagline": "Drupal & WordPress",
+    "typed": {
+      "prefix": "I'm",
+      "phrases": ["Alan Guamán", "a systems engineer", "a Drupal dev", "a WordPress dev"]
+    }
   },
   "about": {
     "heading": "About me",
@@ -32,7 +36,9 @@
     "more": "See the details in the CV"
   },
   "skills": {
-    "heading": "Skills"
+    "heading": "Skills",
+    "pause": "Pause",
+    "play": "Play"
   },
   "contact": {
     "heading": "Contact",

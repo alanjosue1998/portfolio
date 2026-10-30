@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 
 import { ArrowDownIcon, UserIcon } from "./icons";
 import LocationMap from "./LocationMap";
+import TypedName from "./TypedName";
 
 /**
  * Reads the translations on the server and hands them to the map, which has to
@@ -27,7 +28,11 @@ export default async function Location() {
     >
       <div>
         <p className="text-sm text-muted sm:text-base">{dict.hero.greeting}</p>
-        <h1 className="text-3xl leading-tight tracking-tight sm:text-4xl">{dict.hero.name}</h1>
+        <TypedName
+          full={dict.hero.name}
+          prefix={dict.hero.typed.prefix}
+          phrases={dict.hero.typed.phrases}
+        />
       </div>
 
       {/*
