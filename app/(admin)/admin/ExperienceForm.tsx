@@ -46,6 +46,26 @@ export default function ExperienceForm({ t, common, initial }: Props) {
         />
       </div>
 
+      <div className="flex flex-col gap-1">
+        <label htmlFor={`${p}companyUrl`}>{t.companyUrl}</label>
+        {/*
+          Plain text rather than `type="url"`, which would refuse `empresa.com`
+          for want of a scheme — the action adds the `https://` itself.
+        */}
+        <input
+          id={`${p}companyUrl`}
+          name="companyUrl"
+          inputMode="url"
+          defaultValue={initial?.companyUrl ?? ""}
+          placeholder="empresa.com"
+          aria-describedby={`${p}companyUrl-hint`}
+          className={FIELD}
+        />
+        <p id={`${p}companyUrl-hint`} className={HINT}>
+          {common.optional}
+        </p>
+      </div>
+
       <BilingualField
         name="location"
         idPrefix={p}

@@ -607,6 +607,7 @@ async function saveExperience(formData: FormData, id: string | null): Promise<Fo
   const t = (await getAdminDictionary()).actions;
 
   const company = String(formData.get("company") ?? "").trim();
+  const rawCompanyUrl = String(formData.get("companyUrl") ?? "").trim();
   const role = String(formData.get("role") ?? "").trim();
   const location = String(formData.get("location") ?? "").trim() || null;
   const description = String(formData.get("description") ?? "").trim();
@@ -623,6 +624,17 @@ async function saveExperience(formData: FormData, id: string | null): Promise<Fo
     };
   }
 
+  /**
+   * Optional, like the certificate's verification link: blank is fine, only
+   * something that cannot be a link is an error. `company` is not `email`, so
+   * `normaliseUrl` treats it as a web address.
+   */
+  const companyUrl = rawCompanyUrl ? normaliseUrl(rawCompanyUrl, "company") : null;
+
+  if (rawCompanyUrl && !companyUrl) {
+    return { status: "error", message: t.invalidUrl };
+  }
+
   const period = parsePeriod(formData, t);
 
   if (!period.ok) {
@@ -631,6 +643,7 @@ async function saveExperience(formData: FormData, id: string | null): Promise<Fo
 
   const data = {
     company,
+    companyUrl,
     role,
     roleEn: englishText(formData, "roleEn"),
     location,

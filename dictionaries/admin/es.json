@@ -137,6 +137,7 @@
     "role": "Cargo",
     "rolePlaceholder": "Desarrollador Drupal",
     "company": "Empresa",
+    "companyUrl": "Sitio web de la empresa",
     "location": "Ubicación",
     "locationPlaceholder": "Quito, Ecuador · Remoto",
     "submit": "Añadir experiencia"

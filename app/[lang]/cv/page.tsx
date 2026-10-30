@@ -153,7 +153,24 @@ export default async function CvPage() {
                 <li key={job.id} className="cv-entry flex flex-col gap-1">
                   <div className="flex flex-wrap items-baseline justify-between gap-x-4">
                     <h3 className="font-semibold">
-                      {localized(locale, job.role, job.roleEn)} · {job.company}
+                      {localized(locale, job.role, job.roleEn)} ·{" "}
+                      {/*
+                        Underlined like any link in running text, not in the
+                        accent: on paper the colour may be gone, and the line
+                        is what still says it leads somewhere in the PDF.
+                      */}
+                      {job.companyUrl ? (
+                        <a
+                          href={job.companyUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline decoration-border underline-offset-4 transition-colors hover:text-accent hover:decoration-accent"
+                        >
+                          {job.company}
+                        </a>
+                      ) : (
+                        job.company
+                      )}
                     </h3>
                     <p className="text-sm text-muted">{period(job.startedAt, job.endedAt)}</p>
                   </div>
