@@ -135,6 +135,48 @@ export function UserIcon(props: IconProps) {
   );
 }
 
+/** Lines of text: the About section, which is a paragraph about me. */
+export function TextIcon(props: IconProps) {
+  return (
+    <Stroke {...props}>
+      <path d="M4.5 6.5h15" />
+      <path d="M4.5 11h15" />
+      <path d="M4.5 15.5h10" />
+    </Stroke>
+  );
+}
+
+export function BriefcaseIcon(props: IconProps) {
+  return (
+    <Stroke {...props}>
+      <rect x="3.5" y="7" width="17" height="12.5" rx="2" />
+      <path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7" />
+      <path d="M3.5 12.5h17" />
+    </Stroke>
+  );
+}
+
+export function CodeIcon(props: IconProps) {
+  return (
+    <Stroke {...props}>
+      <path d="m8 7-5 5 5 5" />
+      <path d="m16 7 5 5-5 5" />
+      <path d="m13.5 4.5-3 15" />
+    </Stroke>
+  );
+}
+
+export function GridIcon(props: IconProps) {
+  return (
+    <Stroke {...props}>
+      <rect x="4" y="4" width="6.5" height="6.5" rx="1.5" />
+      <rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5" />
+      <rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5" />
+      <rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5" />
+    </Stroke>
+  );
+}
+
 export function SunIcon(props: IconProps) {
   return (
     <Stroke {...props}>

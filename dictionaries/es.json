@@ -61,6 +61,9 @@
       "en": "Cambiar a inglés"
     }
   },
+  "nav": {
+    "label": "Secciones"
+  },
   "cv": {
     "bar": "Acciones",
     "link": "Ver CV",
