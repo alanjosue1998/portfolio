@@ -70,6 +70,15 @@ export default async function Home() {
    */
   return (
     <>
+      {/*
+        Contour lines behind the top of the page — see `.backdrop` in
+        `app/globals.css`. Behind everything, and faded out before the first
+        paragraph.
+      */}
+      <div
+        aria-hidden="true"
+        className="backdrop pointer-events-none absolute inset-x-0 top-0 -z-10 h-[56rem]"
+      />
       <main className="reveal-sections mx-auto flex w-full max-w-3xl flex-col gap-20 px-4 [counter-reset:section] sm:gap-28 sm:px-6">
         <div className="flex flex-col gap-6">
           {/* The map opens the page, and carries the greeting and the portrait. */}

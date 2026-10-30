@@ -65,6 +65,38 @@
   }
 }
 
+/*
+ * Behind the top of the home page: contour lines, as on a topographic map of
+ * the Andes the palettes are named after — the map of Ibarra sits on them like
+ * a sheet laid over a survey chart. They fade out before the first paragraph,
+ * so text always sits on plain ground.
+ *
+ * The lines are a mask, not an image: `public/backdrop/topography.svg` only
+ * says where they are, and the colour is painted through it from `--accent`,
+ * so they follow every theme. The second mask fades them out downwards;
+ * `intersect` keeps only what both allow.
+ *
+ * A glow of the accent was tried with them and dropped: the map's own fade to
+ * `--background` then drew a visible box against the tinted ground around it.
+ */
+.backdrop {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  mask-image:
+    url("/backdrop/topography.svg"), linear-gradient(to bottom, black 30%, transparent 70%);
+  mask-size:
+    max(100%, 1440px) auto,
+    100% 100%;
+  mask-position: top center;
+  mask-repeat: no-repeat;
+  mask-composite: intersect;
+}
+
+@media print {
+  .backdrop {
+    display: none;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
