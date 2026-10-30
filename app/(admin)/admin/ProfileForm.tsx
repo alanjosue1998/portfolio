@@ -27,7 +27,7 @@ export default function ProfileForm({ imageUrl, t }: Props) {
             className="size-20 shrink-0 rounded-full border border-border object-cover"
           />
         ) : (
-          <div className="flex size-20 shrink-0 items-center justify-center rounded-full border-2 border-dashed border-foreground/25 text-xs text-muted">
+          <div className="flex size-20 shrink-0 items-center justify-center rounded-full border-2 border-dashed border-field text-xs text-muted">
             {t.noPhoto}
           </div>
         )}

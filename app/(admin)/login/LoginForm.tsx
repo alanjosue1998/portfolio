@@ -86,7 +86,7 @@ export default function LoginForm({ t }: { t: AdminDictionary["login"] }) {
       <button
         type="submit"
         disabled={pending}
-        className="rounded bg-foreground px-4 py-2 text-background disabled:opacity-60"
+        className="min-h-11 rounded-lg bg-accent px-5 font-medium text-on-accent hover:bg-accent-strong disabled:opacity-60"
       >
         {pending ? t.submitting : t.submit}
       </button>

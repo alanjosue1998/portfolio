@@ -44,7 +44,7 @@ export default function AdminNav({ label, labels }: Props) {
                 // Announces the current section rather than leaving colour to
                 // carry it alone.
                 aria-current={current ? "page" : undefined}
-                className={`block rounded px-3 py-2 text-sm whitespace-nowrap ${
+                className={`flex min-h-11 items-center rounded-lg px-3 text-sm whitespace-nowrap ${
                   current
                     ? "bg-foreground text-background"
                     : "text-muted hover:bg-foreground/5 hover:text-foreground"
