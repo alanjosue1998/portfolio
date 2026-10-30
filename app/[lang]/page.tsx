@@ -1,20 +1,42 @@
 import { lang } from "next/root-params";
 
 import About from "@/app/components/About";
-import BottomBar, { BAR_ITEM, BAR_ITEM_PRIMARY } from "@/app/components/BottomBar";
+import BottomBar from "@/app/components/BottomBar";
 import Certificates from "@/app/components/Certificates";
 import Contact from "@/app/components/Contact";
 import ContactCta from "@/app/components/ContactCta";
 import Experience from "@/app/components/Experience";
 import Footer from "@/app/components/Footer";
-import { FileIcon, UserIcon } from "@/app/components/icons";
 import Location from "@/app/components/Location";
 import Projects from "@/app/components/Projects";
+import SectionNav, { type SectionId } from "@/app/components/SectionNav";
 import Skills from "@/app/components/Skills";
 import { getDictionary } from "@/lib/dictionaries";
+import prisma from "@/lib/prisma";
 
 export default async function Home() {
-  const [dict, locale] = await Promise.all([getDictionary(), lang()]);
+  const [dict, locale, jobs, skills, projects] = await Promise.all([
+    getDictionary(),
+    lang(),
+    /**
+     * Which of the sections have anything in them. Each one renders nothing
+     * when it is empty, and the bar should not offer a way to a heading that
+     * is not there. Counted here rather than reported back by the sections,
+     * which are Server Components with no way to tell a sibling anything.
+     */
+    prisma.experience.count(),
+    prisma.skill.count(),
+    prisma.project.count(),
+  ]);
+
+  // In the order they appear on the page. About always renders: with nothing
+  // saved in the admin it falls back to the dictionary's text.
+  const sections: { id: SectionId; label: string }[] = [
+    { id: "about", label: dict.about.heading },
+    ...(jobs > 0 ? [{ id: "experience" as const, label: dict.experience.heading }] : []),
+    ...(skills > 0 ? [{ id: "skills" as const, label: dict.skills.heading }] : []),
+    ...(projects > 0 ? [{ id: "projects" as const, label: dict.projects.heading }] : []),
+  ];
 
   /**
    * `max-w-3xl` — 768px — rather than the 1280px this used to run to. At the
@@ -67,26 +89,12 @@ export default async function Home() {
       </main>
       <Footer />
 
-      <BottomBar label={dict.cv.bar}>
-        {/*
-          Back to the top, where the greeting and the portrait are. `#top` is
-          the one fragment the browser scrolls to without an element of that
-          id; `globals.css` makes the trip smooth unless reduced motion is
-          asked for.
-
-          Icon only, at every width: the CV is what the bar is for, and the
-          word next to it only competed with that. The name stays for screen
-          readers, and `title` gives it to a mouse hovering over the icon.
-        */}
-        <a href="#top" className={BAR_ITEM} aria-label={dict.cv.top} title={dict.cv.top}>
-          <UserIcon size={18} />
-        </a>
-        {/* A plain anchor, like the language switch in `CornerControls`, so
-            the chosen theme survives the trip. */}
-        <a href={`/${locale}/cv`} className={BAR_ITEM_PRIMARY}>
-          <FileIcon size={18} />
-          {dict.cv.link}
-        </a>
+      <BottomBar label={dict.nav.label}>
+        <SectionNav
+          sections={sections}
+          top={dict.cv.top}
+          cv={{ href: `/${locale}/cv`, label: dict.cv.link }}
+        />
       </BottomBar>
     </>
   );

@@ -37,7 +37,7 @@ export default async function Skills() {
   }
 
   return (
-    <section className="flex flex-col gap-5">
+    <section id="skills" className="flex scroll-mt-8 flex-col gap-5">
       <SectionHeading>{dict.skills.heading}</SectionHeading>
 
       {/* A card per category, as many to a row as fit at 220px each. */}

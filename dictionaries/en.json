@@ -61,6 +61,9 @@
       "en": "Switch to English"
     }
   },
+  "nav": {
+    "label": "Sections"
+  },
   "cv": {
     "bar": "Actions",
     "link": "View CV",

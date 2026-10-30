@@ -35,7 +35,7 @@ export default async function Experience() {
   });
 
   return (
-    <section className="flex flex-col gap-5">
+    <section id="experience" className="flex scroll-mt-8 flex-col gap-5">
       <SectionHeading>{dict.experience.heading}</SectionHeading>
 
       {/*

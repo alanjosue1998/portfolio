@@ -19,7 +19,7 @@ export default async function Projects() {
   if (projects.length === 0) return null;
 
   return (
-    <section className="flex flex-col gap-5">
+    <section id="projects" className="flex scroll-mt-8 flex-col gap-5">
       <SectionHeading>{dict.projects.heading}</SectionHeading>
 
       {/* One column on a phone, two from `sm` up. */}
