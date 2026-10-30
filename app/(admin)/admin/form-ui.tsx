@@ -7,15 +7,20 @@ import type { FormState } from "./actions";
  * follow the theme from one place. All colours are tokens from
  * `app/globals.css`; a fixed grey here would vanish against the dark ground.
  *
- * `border-foreground/25` rather than the `border` token for inputs: that one is
- * a hairline meant for cards, too faint to find a text field by.
+ * `border-field` rather than the `border` token for inputs: that one is a
+ * hairline meant for cards, too faint to find a text field by. `field` clears
+ * the 3:1 a control's outline needs in both themes.
+ *
+ * `min-h-11` — 44px — on everything a finger has to hit, the panel included:
+ * it is edited from a phone as often as from a desk.
  */
-export const FIELD = "rounded border border-foreground/25 bg-surface px-3 py-2";
+export const FIELD = "min-h-11 rounded-lg border border-field bg-surface px-3 py-2";
 
 export const HINT = "text-sm text-muted";
 
+/** The accent fill, so the one action that saves reads as the main one. */
 export const SUBMIT =
-  "self-start rounded bg-foreground px-4 py-2 text-background disabled:opacity-60";
+  "min-h-11 self-start rounded-lg bg-accent px-5 font-medium text-on-accent hover:bg-accent-strong disabled:opacity-60";
 
 /** A row in one of the lists under each form. */
 export const ITEM = "flex items-start justify-between gap-4 rounded border border-border p-4";

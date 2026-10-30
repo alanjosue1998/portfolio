@@ -1,7 +1,10 @@
 @import "tailwindcss";
 
 /*
- * Warm editorial palette.
+ * "Andes" palette, taken from Imbabura: the green of the volcano is the
+ * accent, over a cool mist-white ground (or a páramo-night one in the dark).
+ * Every text colour clears WCAG AA against both `--background` and
+ * `--surface`, and `--field` clears the 3:1 that a control's outline needs.
  *
  * The theme has three states. A visitor who has never chosen gets no
  * `data-theme` attribute, so `prefers-color-scheme` decides and light is the
@@ -13,22 +16,29 @@
  * whose system does not match it.
  */
 :root {
-  --background: #faf7f2;
-  --foreground: #1c1917;
-  --accent: #b45309;
+  --background: #f4f5f0;
+  --foreground: #13201a;
+  /* 5.9:1 on the background, 6.4:1 on white. */
+  --accent: #1d6b4e;
   /* Hover on accent fills, and accent text laid over `--accent-soft`. */
-  --accent-strong: #92400e;
+  --accent-strong: #134a36;
   /* A wash of the accent: badges, skill chips, the empty portrait. */
-  --accent-soft: #fbeedd;
+  --accent-soft: #e2eee7;
   /* Text on an accent fill — the primary button. */
   --on-accent: #ffffff;
-  /* Was #78716c, which reaches only 4.4:1 on the background and misses AA. */
-  --muted: #6b645e;
+  /* 5.8:1 on the background. */
+  --muted: #56625b;
   /* Sits on top of the background: cards, the label over the map. */
   --surface: #ffffff;
-  --border: #e7e5e4;
+  /* A hairline for cards. Decorative, so it is allowed to be faint. */
+  --border: #d9ded7;
+  /*
+   * The outline of a text field. Unlike `--border` it has to be found, so it
+   * clears 3:1 on both grounds a field can sit on.
+   */
+  --field: #7a8680;
   /* Form feedback in the panel. Both clear AA on the background. */
-  --danger: #b91c1c;
+  --danger: #b42318;
   --success: #15803d;
   /* Native controls — selects, date pickers, scrollbars — follow the theme. */
   color-scheme: light;
@@ -36,17 +46,18 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --background: #1c1917;
-    --foreground: #faf7f2;
-    /* Lifted from #b45309, which only reaches 1.7:1 against the dark ground. */
-    --accent: #f59e0b;
-    --accent-strong: #fbbf24;
-    --accent-soft: #3b2a14;
-    --on-accent: #1c1917;
-    --muted: #a8a29e;
-    --surface: #292524;
-    --border: #44403c;
-    --danger: #f87171;
+    --background: #0e1512;
+    --foreground: #eaf0eb;
+    /* Lifted from #1d6b4e, which is too dark to read against this ground. */
+    --accent: #6ccb9e;
+    --accent-strong: #9be0be;
+    --accent-soft: #183a2c;
+    --on-accent: #0e1512;
+    --muted: #9daba3;
+    --surface: #17211d;
+    --border: #2a3731;
+    --field: #6e7e76;
+    --danger: #f48678;
     --success: #4ade80;
     color-scheme: dark;
   }
@@ -54,16 +65,17 @@
 
 /* An explicit choice beats the system setting, whichever way it points. */
 :root[data-theme="dark"] {
-  --background: #1c1917;
-  --foreground: #faf7f2;
-  --accent: #f59e0b;
-  --accent-strong: #fbbf24;
-  --accent-soft: #3b2a14;
-  --on-accent: #1c1917;
-  --muted: #a8a29e;
-  --surface: #292524;
-  --border: #44403c;
-  --danger: #f87171;
+  --background: #0e1512;
+  --foreground: #eaf0eb;
+  --accent: #6ccb9e;
+  --accent-strong: #9be0be;
+  --accent-soft: #183a2c;
+  --on-accent: #0e1512;
+  --muted: #9daba3;
+  --surface: #17211d;
+  --border: #2a3731;
+  --field: #6e7e76;
+  --danger: #f48678;
   --success: #4ade80;
   color-scheme: dark;
 }
@@ -109,6 +121,7 @@
   --color-muted: var(--muted);
   --color-surface: var(--surface);
   --color-border: var(--border);
+  --color-field: var(--field);
   --color-danger: var(--danger);
   --color-success: var(--success);
   --font-sans: var(--font-geist-sans);
@@ -250,15 +263,16 @@ body {
   :root:not([data-theme="light"]),
   :root[data-theme="dark"] {
     --background: #ffffff;
-    --foreground: #1c1917;
-    --accent: #b45309;
-    --accent-strong: #92400e;
-    --accent-soft: #fbeedd;
+    --foreground: #13201a;
+    --accent: #1d6b4e;
+    --accent-strong: #134a36;
+    --accent-soft: #e2eee7;
     --on-accent: #ffffff;
-    --muted: #57534e;
+    --muted: #56625b;
     --surface: #ffffff;
-    --border: #d6d3d1;
-    --danger: #b91c1c;
+    --border: #d6dbd4;
+    --field: #7a8680;
+    --danger: #b42318;
     --success: #15803d;
     color-scheme: light;
   }

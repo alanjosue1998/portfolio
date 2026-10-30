@@ -26,11 +26,11 @@ export const contentType = "image/png";
  * custom properties.
  */
 const palette = {
-  background: "#faf7f2",
-  foreground: "#1c1917",
-  accent: "#b45309",
-  muted: "#6b645e",
-  border: "#e7e5e4",
+  background: "#f4f5f0",
+  foreground: "#13201a",
+  accent: "#1d6b4e",
+  muted: "#56625b",
+  border: "#d9ded7",
 };
 
 /**

@@ -27,7 +27,7 @@ export default async function Projects() {
         {projects.map((project) => (
           <li
             key={project.id}
-            className="flex flex-col overflow-hidden rounded-2xl border border-border bg-surface transition-[border-color,box-shadow,translate] duration-200 hover:border-accent hover:shadow-[0_8px_24px_-12px_rgb(28_25_23/0.25)] motion-safe:hover:-translate-y-0.5"
+            className="flex flex-col overflow-hidden rounded-2xl border border-border bg-surface transition-[border-color,box-shadow,translate] duration-200 hover:border-accent hover:shadow-[0_8px_24px_-12px_rgb(19_32_26/0.25)] motion-safe:hover:-translate-y-0.5"
           >
             {/*
               The cover is optional, and a card without one has to hold its own
