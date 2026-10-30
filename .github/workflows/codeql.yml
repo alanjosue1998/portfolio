@@ -12,6 +12,11 @@ on:
   schedule:
     - cron: "0 12 * * 1"
 
+# Same as CI: a newer push to a pull request supersedes the scan in progress.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   analyze:
     runs-on: ubuntu-latest
