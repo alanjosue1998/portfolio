@@ -1,4 +1,20 @@
+import { Geist, Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
+
+/**
+ * Geist and Geist Mono, shared by both root layouts — `app/[lang]/layout.tsx`
+ * and `app/(admin)/layout.tsx` — so the two cannot drift apart on subsets or
+ * `display`. Each layout still picks which variables go on its `<html>`.
+ */
+export const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+export const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
 
 /**
  * Space Grotesk, self-hosted from `app/fonts` rather than fetched from Google.
