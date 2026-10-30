@@ -26,6 +26,11 @@
       "close": "Close"
     }
   },
+  "experience": {
+    "heading": "Experience",
+    "present": "present",
+    "more": "See the details in the CV"
+  },
   "skills": {
     "heading": "Skills"
   },

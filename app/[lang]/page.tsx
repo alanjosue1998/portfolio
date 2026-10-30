@@ -5,6 +5,7 @@ import BottomBar, { BAR_ITEM, BAR_ITEM_PRIMARY } from "@/app/components/BottomBa
 import Certificates from "@/app/components/Certificates";
 import Contact from "@/app/components/Contact";
 import ContactCta from "@/app/components/ContactCta";
+import Experience from "@/app/components/Experience";
 import Footer from "@/app/components/Footer";
 import { FileIcon, UserIcon } from "@/app/components/icons";
 import Location from "@/app/components/Location";
@@ -39,10 +40,13 @@ export default async function Home() {
    * long list. The opening block keeps its own tighter rhythm inside.
    *
    * `[counter-reset:section]` starts the numbers `SectionHeading` draws.
+   *
+   * `reveal-sections` lets each section settle in as it scrolls into view — see
+   * `app/globals.css`.
    */
   return (
     <>
-      <main className="mx-auto flex w-full max-w-3xl flex-col gap-12 px-4 [counter-reset:section] sm:gap-16 sm:px-6">
+      <main className="reveal-sections mx-auto flex w-full max-w-3xl flex-col gap-12 px-4 [counter-reset:section] sm:gap-16 sm:px-6">
         <div className="flex flex-col gap-6">
           {/* The map opens the page, and carries the greeting and the portrait. */}
           <Location />
@@ -55,6 +59,7 @@ export default async function Home() {
         </div>
         <About />
         {/* Each of these renders nothing until the admin has something to show. */}
+        <Experience />
         <Skills />
         <Projects />
         <Certificates />
@@ -67,12 +72,14 @@ export default async function Home() {
           Back to the top, where the greeting and the portrait are. `#top` is
           the one fragment the browser scrolls to without an element of that
           id; `globals.css` makes the trip smooth unless reduced motion is
-          asked for. Icon-only below `sm`, like the way back on the CV, so the
-          bar still clears the corner controls on a phone.
+          asked for.
+
+          Icon only, at every width: the CV is what the bar is for, and the
+          word next to it only competed with that. The name stays for screen
+          readers, and `title` gives it to a mouse hovering over the icon.
         */}
-        <a href="#top" className={BAR_ITEM} aria-label={dict.cv.top}>
+        <a href="#top" className={BAR_ITEM} aria-label={dict.cv.top} title={dict.cv.top}>
           <UserIcon size={18} />
-          <span className="hidden sm:inline">{dict.cv.top}</span>
         </a>
         {/* A plain anchor, like the language switch in `CornerControls`, so
             the chosen theme survives the trip. */}

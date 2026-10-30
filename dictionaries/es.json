@@ -26,6 +26,11 @@
       "close": "Cerrar"
     }
   },
+  "experience": {
+    "heading": "Experiencia",
+    "present": "actualidad",
+    "more": "Ver el detalle en el CV"
+  },
   "skills": {
     "heading": "Habilidades"
   },
