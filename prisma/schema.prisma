@@ -130,6 +130,9 @@ model Project {
 model Experience {
   id            String    @id @default(uuid())
   company       String
+  /// The company's site, linked from its name on the CV. Normalised to
+  /// https by `normaliseUrl`, like the contact links.
+  companyUrl    String?
   role          String
   /// English, for `/en`. Null falls back to the Spanish field above it.
   roleEn        String?

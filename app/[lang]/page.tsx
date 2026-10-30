@@ -1,12 +1,12 @@
 import { lang } from "next/root-params";
 
 import About from "@/app/components/About";
-import BottomBar, { BAR_ITEM_PRIMARY } from "@/app/components/BottomBar";
+import BottomBar, { BAR_ITEM, BAR_ITEM_PRIMARY } from "@/app/components/BottomBar";
 import Certificates from "@/app/components/Certificates";
 import Contact from "@/app/components/Contact";
 import ContactCta from "@/app/components/ContactCta";
 import Footer from "@/app/components/Footer";
-import { FileIcon } from "@/app/components/icons";
+import { FileIcon, UserIcon } from "@/app/components/icons";
 import Location from "@/app/components/Location";
 import Projects from "@/app/components/Projects";
 import Skills from "@/app/components/Skills";
@@ -63,6 +63,17 @@ export default async function Home() {
       <Footer />
 
       <BottomBar label={dict.cv.bar}>
+        {/*
+          Back to the top, where the greeting and the portrait are. `#top` is
+          the one fragment the browser scrolls to without an element of that
+          id; `globals.css` makes the trip smooth unless reduced motion is
+          asked for. Icon-only below `sm`, like the way back on the CV, so the
+          bar still clears the corner controls on a phone.
+        */}
+        <a href="#top" className={BAR_ITEM} aria-label={dict.cv.top}>
+          <UserIcon size={18} />
+          <span className="hidden sm:inline">{dict.cv.top}</span>
+        </a>
         {/* A plain anchor, like the language switch in `CornerControls`, so
             the chosen theme survives the trip. */}
         <a href={`/${locale}/cv`} className={BAR_ITEM_PRIMARY}>

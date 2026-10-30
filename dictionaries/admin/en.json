@@ -137,6 +137,7 @@
     "role": "Role",
     "rolePlaceholder": "Drupal developer",
     "company": "Company",
+    "companyUrl": "Company website",
     "location": "Location",
     "locationPlaceholder": "Quito, Ecuador · Remote",
     "submit": "Add experience"
