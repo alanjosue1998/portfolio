@@ -178,46 +178,49 @@
 }
 
 /*
- * The lane is as tall as a chip, and the chips are positioned in it, so the
- * page below never moves as categories come and go. Its edges fade into the
- * page. `container-type` gives the pass its width in `cqw`.
+ * The lane is as tall as a chip, so the page below never moves, and its edges
+ * fade into the page. The loop holds the sequence twice and slides from minus
+ * half its width to nothing — left to right, the second copy landing where the
+ * first began. It waits, unmoving, until `SkillLane` has measured how long a
+ * half takes at its speed.
  */
 .skill-lane-stage {
-  position: relative;
   height: 2.5rem;
   overflow: hidden;
-  container-type: inline-size;
   mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
 }
 
-.skill-lane-track {
-  position: absolute;
-  top: 0;
-  left: 0;
+.skill-lane-loop {
+  /* Positioned so its groups' `offsetLeft` is measured from it — see SkillLane. */
+  position: relative;
   display: flex;
-  gap: 0.5rem;
   width: max-content;
-  /* Waiting just out of sight on the left until its length is measured. */
-  translate: -100% 0;
 }
 
-.skill-lane-track[data-running] {
-  animation: skill-pass linear both;
+.skill-lane-loop[data-running] {
+  animation: skill-loop linear infinite;
 }
 
-/* From fully out on the left to fully out on the right. */
-@keyframes skill-pass {
+.skill-lane-run {
+  display: flex;
+  flex-shrink: 0;
+  gap: 0.5rem;
+  /* The gap after the last chip, so both copies are the same width. */
+  padding-right: 0.5rem;
+}
+
+@keyframes skill-loop {
   from {
-    translate: -100% 0;
+    translate: -50% 0;
   }
 
   to {
-    translate: 100cqw 0;
+    translate: 0 0;
   }
 }
 
-.skill-lane:hover .skill-lane-track,
-[data-paused] .skill-lane-track {
+.skill-lane:hover .skill-lane-loop,
+[data-paused] .skill-lane-loop {
   animation-play-state: paused;
 }
 
