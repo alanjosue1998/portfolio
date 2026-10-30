@@ -9,6 +9,7 @@ import { fill, getAdminDictionary, type AdminDictionary } from "@/lib/admin-i18n
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
+import { normaliseUrl } from "@/lib/urls";
 
 /** Every form on the admin page reports back the same way. */
 export type FormState = { status: "error" | "ok"; message: string } | undefined;
@@ -492,35 +493,6 @@ export async function saveAbout(_previous: FormState, formData: FormData): Promi
   revalidateSite();
 
   return { status: "ok", message: t.textUpdated };
-}
-
-/**
- * `mailto:` and `tel:` have no `//`, so a bare address has to be recognised
- * before it is treated as a web address. Anything without a scheme is assumed
- * to be a site — typing `github.com/me` into the form is the common case.
- */
-function normaliseUrl(raw: string, platform: string): string | null {
-  const value = raw.trim();
-  if (!value) return null;
-
-  if (platform === "email") {
-    const address = value.replace(/^mailto:/i, "");
-    // Deliberately loose: the only thing worth rejecting here is a typo that
-    // could not possibly be an address.
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address) ? `mailto:${address}` : null;
-  }
-
-  const withScheme = /^[a-z][a-z0-9+.-]*:/i.test(value) ? value : `https://${value}`;
-
-  try {
-    const parsed = new URL(withScheme);
-    // `https:` only. `javascript:` above all has no business being rendered
-    // into an href on the public site, and `http:` either warns in the address
-    // bar or gets upgraded — neither reads as credible on a public page.
-    return parsed.protocol === "https:" ? parsed.toString() : null;
-  } catch {
-    return null;
-  }
 }
 
 async function saveContactLink(formData: FormData, id: string | null): Promise<FormState> {
