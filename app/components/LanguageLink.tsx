@@ -6,6 +6,11 @@ type Props = {
   locale: string;
   label: string;
   className: string;
+  /**
+   * The language's own name, for a link that spells it out — the phone's
+   * section menu. Without it the link shows the bare code, as in the corner.
+   */
+  name?: string;
 };
 
 /**
@@ -19,7 +24,7 @@ type Props = {
  * Still a plain anchor rather than `next/link`, for the reason `CornerControls`
  * gives.
  */
-export default function LanguageLink({ locale, label, className }: Props) {
+export default function LanguageLink({ locale, label, className, name }: Props) {
   const pathname = usePathname();
   // Everything after the current locale segment: "" on the home page.
   const rest = pathname.split("/").slice(2).join("/");
@@ -29,11 +34,13 @@ export default function LanguageLink({ locale, label, className }: Props) {
       href={rest ? `/${locale}/${rest}` : `/${locale}`}
       hrefLang={locale}
       // Starts with the visible text, so a voice-control user saying "click
-      // EN" reaches it (WCAG 2.5.3, Label in Name).
-      aria-label={`${locale.toUpperCase()} — ${label}`}
+      // EN" reaches it (WCAG 2.5.3, Label in Name). A spelled-out name needs
+      // no help: "English" already says it, in English — hence `lang`.
+      aria-label={name ? undefined : `${locale.toUpperCase()} — ${label}`}
+      lang={name ? locale : undefined}
       className={className}
     >
-      {locale}
+      {name ?? locale}
     </a>
   );
 }

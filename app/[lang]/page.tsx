@@ -13,6 +13,7 @@ import ScrollReveal from "@/app/components/ScrollReveal";
 import SectionNav, { type SectionId } from "@/app/components/SectionNav";
 import Skills from "@/app/components/Skills";
 import { getDictionary } from "@/lib/dictionaries";
+import { locales } from "@/lib/i18n";
 import prisma from "@/lib/prisma";
 
 export default async function Home() {
@@ -97,12 +98,23 @@ export default async function Home() {
       <Footer />
       <ScrollReveal />
 
-      <BottomBar label={dict.nav.label}>
+      <BottomBar label={dict.nav.label} centered>
         <SectionNav
           sections={sections}
           top={dict.cv.top}
           cv={{ href: `/${locale}/cv`, label: dict.cv.link }}
           menu={{ label: dict.nav.menu, open: dict.nav.open }}
+          settings={{
+            theme: dict.theme,
+            language: dict.languages.label,
+            languages: locales
+              .filter((other) => other !== locale)
+              .map((other) => ({
+                locale: other,
+                name: dict.languages.names[other],
+                label: dict.languages.switchTo[other],
+              })),
+          }}
         />
       </BottomBar>
     </>

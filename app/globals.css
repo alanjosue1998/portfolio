@@ -66,6 +66,19 @@
 }
 
 /*
+ * On a phone, a page whose bottom bar has the section menu — the home page —
+ * moves the theme and the language into that menu, so the corner is emptied.
+ * Matched on the menu's presence rather than on the route: the controls live
+ * in the root layout, which is not told which page it holds. Every other page,
+ * the CV included, keeps them in the corner.
+ */
+@media (width < 48rem) {
+  body:has(.section-menu) .corner-controls {
+    display: none;
+  }
+}
+
+/*
  * Behind the whole home page: contour lines, as on a topographic map of the
  * Andes the palettes are named after. Fixed to the window, so the page scrolls
  * over them like a sheet laid on a survey chart, and the map of Ibarra is one
