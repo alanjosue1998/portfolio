@@ -88,6 +88,7 @@ export default async function SkillsPage() {
                           id={skill.id}
                           label={dict.common.delete}
                           confirmation={fill(dict.common.confirmDelete, { name: skill.name })}
+                          name={skill.name}
                         />
                       </div>
                     </li>

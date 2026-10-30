@@ -79,6 +79,7 @@ export default async function ProfilePage() {
                     id={link.id}
                     label={dict.common.delete}
                     confirmation={fill(dict.common.confirmDelete, { name: link.label })}
+                    name={link.label}
                   />
                 </div>
               </li>

@@ -6,6 +6,11 @@ type Props = {
   action: (formData: FormData) => Promise<void>;
   id: string;
   label: string;
+  /**
+   * What the row is called. "Delete" alone is the same on every row, so a
+   * screen reader listing the buttons could not tell them apart.
+   */
+  name: string;
   /** Asked before anything is sent; cancelling sends nothing. */
   confirmation: string;
 };
@@ -16,7 +21,7 @@ type Props = {
  * uploaded image with it. The browser's own `confirm()` is enough here: it is
  * modal, keyboard-friendly and read out, and this is a tool for one person.
  */
-export default function DeleteButton({ action, id, label, confirmation }: Props) {
+export default function DeleteButton({ action, id, label, name, confirmation }: Props) {
   return (
     <form
       action={action}
@@ -25,7 +30,7 @@ export default function DeleteButton({ action, id, label, confirmation }: Props)
       }}
     >
       <input type="hidden" name="id" value={id} />
-      <button type="submit" className={DELETE}>
+      <button type="submit" aria-label={`${label}: ${name}`} className={DELETE}>
         {label}
       </button>
     </form>

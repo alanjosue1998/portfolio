@@ -106,6 +106,7 @@ export default async function CertificatesPage() {
                     id={certificate.id}
                     label={dict.common.delete}
                     confirmation={fill(dict.common.confirmDelete, { name: certificate.title })}
+                    name={certificate.title}
                   />
                 </div>
               </li>

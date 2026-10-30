@@ -65,6 +65,7 @@ export default function CertificateImage({ src, title, labels }: Props) {
       */}
       <dialog
         ref={dialog}
+        aria-label={title}
         /**
          * Any click closes it, the image included. A viewer is a detour, and
          * the way out of a detour should not be a target to aim at.
