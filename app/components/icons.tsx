@@ -146,6 +146,17 @@ export function TextIcon(props: IconProps) {
   );
 }
 
+/** Three even lines: the section menu on a phone. */
+export function MenuIcon(props: IconProps) {
+  return (
+    <Stroke {...props}>
+      <path d="M4 7h16" />
+      <path d="M4 12h16" />
+      <path d="M4 17h16" />
+    </Stroke>
+  );
+}
+
 export function BriefcaseIcon(props: IconProps) {
   return (
     <Stroke {...props}>

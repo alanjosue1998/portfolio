@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
-import { BriefcaseIcon, CodeIcon, FileIcon, GridIcon, TextIcon, UserIcon } from "./icons";
+import { BriefcaseIcon, CodeIcon, FileIcon, GridIcon, MenuIcon, TextIcon, UserIcon } from "./icons";
 
 /** The sections the bar can point at, by the `id` each one carries. */
 export type SectionId = "about" | "experience" | "skills" | "projects";
@@ -19,14 +19,15 @@ type Props = {
   sections: { id: SectionId; label: string }[];
   top: string;
   cv: { href: string; label: string };
+  /** The phone's menu button: what it says outside any section, and what it does. */
+  menu: { label: string; open: string };
 };
 
 /**
- * Every item shares the bar's shape. Icon-only and 40px below `lg`, where the
- * bar has to fit six of them beside the corner controls on a 360px phone. From
- * `lg` the sections spell out their names: at `md` they did fit, in Spanish,
- * with 6px to spare before the corner controls — one more section and the two
- * would overlap.
+ * Every item shares the bar's shape. Icon-only from `md` to `lg`; from `lg`
+ * the sections spell out their names — at `md` they did fit, in Spanish, with
+ * 6px to spare before the corner controls, and one more section would have
+ * made the two overlap. Below `md` the sections fold into a menu instead.
  */
 const ITEM =
   "inline-flex h-10 min-w-10 items-center justify-center gap-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors duration-200 lg:h-11 lg:px-4";
@@ -70,8 +71,10 @@ function current(tracked: SectionId[]): SectionId | "top" | null {
  * component's script; the script only adds the highlight. It starts on "top",
  * which is where a fresh load lands, so the server's HTML is already right.
  */
-export default function SectionNav({ sections, top, cv }: Props) {
+export default function SectionNav({ sections, top, cv, menu }: Props) {
   const [active, setActive] = useState<SectionId | "top" | null>("top");
+  const menuId = useId();
+  const panel = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const tracked = sections.map((section) => section.id);
@@ -94,36 +97,88 @@ export default function SectionNav({ sections, top, cv }: Props) {
     };
   }, [sections]);
 
+  /**
+   * Every destination, the top of the page first. `#top` is the one fragment
+   * the browser scrolls to with no element of that id.
+   */
+  const entries = [
+    { id: "top" as const, href: "#top", label: top, Icon: UserIcon },
+    ...sections.map(({ id, label }) => ({ id, href: `#${id}`, label, Icon: ICONS[id] })),
+  ];
+
+  const here = entries.find((entry) => entry.id === active);
+
   return (
     <>
-      {/* `#top` is the one fragment the browser scrolls to with no element of that id. */}
-      <a
-        href="#top"
-        aria-label={top}
-        title={top}
-        aria-current={active === "top" ? "true" : undefined}
-        className={`${ITEM} ${active === "top" ? ACTIVE : IDLE}`}
-      >
-        <UserIcon size={18} />
-      </a>
+      {/*
+        Below `md`: one button that names the section on screen and opens the
+        rest as a menu. Six icons in a row were a puzzle at 40px each; a word
+        says where you are, and the menu says where else you can go.
 
-      {sections.map(({ id, label }) => {
-        const Icon = ICONS[id];
+        A native popover, like the theme picker's: Escape, a tap outside and
+        the top layer come from the browser. Its name starts with the visible
+        text, so voice control finds it by what it shows.
+      */}
+      <button
+        type="button"
+        popoverTarget={menuId}
+        className={`${ITEM} gap-2 px-3 md:hidden ${here ? ACTIVE : IDLE}`}
+      >
+        <MenuIcon size={18} />
+        {here?.label ?? menu.label}
+        <span className="sr-only">, {menu.open}</span>
+      </button>
+
+      <div
+        ref={panel}
+        id={menuId}
+        popover="auto"
+        aria-label={menu.label}
+        /*
+         * Above the bar, from its left edge, where the button that opened it
+         * sits: the bar is 48px tall at `bottom-4`, `bottom-6` from `sm`. It
+         * rises and fades in, and out again, unless less motion is asked for.
+         * `md:hidden` also closes it for good if the window grows past phones.
+         */
+        className="fixed inset-auto bottom-18 left-4 m-0 w-60 translate-y-2 rounded-2xl border border-border bg-surface p-1.5 text-foreground opacity-0 shadow-[0_12px_32px_-12px_rgb(0_0_0/0.4)] transition-[opacity,translate,display,overlay] transition-discrete duration-200 open:translate-y-0 open:opacity-100 motion-reduce:transition-none sm:bottom-20 md:hidden starting:open:translate-y-2 starting:open:opacity-0"
+      >
+        <ul className="flex flex-col gap-0.5">
+          {entries.map(({ id, href, label, Icon }) => (
+            <li key={id}>
+              <a
+                href={href}
+                // The link scrolls; this puts the menu away so the section
+                // it went to is what is left on screen.
+                onClick={() => panel.current?.hidePopover()}
+                aria-current={active === id ? "true" : undefined}
+                className={`flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition-colors ${active === id ? ACTIVE : IDLE}`}
+              >
+                <Icon size={18} />
+                {label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* From `md`: every destination in the bar itself. */}
+      {entries.map(({ id, href, label, Icon }) => {
         const isActive = active === id;
 
         return (
           <a
             key={id}
-            href={`#${id}`}
+            href={href}
             // Named for screen readers and hover while the label is hidden;
-            // from `lg` the label is visible and says the same.
+            // from `lg` the label is visible and says the same. The top of the
+            // page keeps to its icon at every width.
             aria-label={label}
             title={label}
             aria-current={isActive ? "true" : undefined}
-            className={`${ITEM} ${isActive ? ACTIVE : IDLE}`}
+            className={`${ITEM} max-md:hidden ${isActive ? ACTIVE : IDLE}`}
           >
             <Icon size={18} />
-            <span className="hidden lg:inline">{label}</span>
+            {id !== "top" && <span className="hidden lg:inline">{label}</span>}
           </a>
         );
       })}
@@ -131,15 +186,17 @@ export default function SectionNav({ sections, top, cv }: Props) {
       {/*
         A plain anchor, like the language switch in `CornerControls`, so the
         chosen theme survives the trip. Still the one filled item: the CV is
-        the bar's call to action, the sections are only a way around.
+        the bar's call to action, the sections are only a way around. Its
+        label shows wherever there is room for it: on a phone, beside the
+        menu, and from `lg`.
       */}
       <a
         href={cv.href}
         aria-label={cv.label}
-        className={`${ITEM} bg-accent text-on-accent hover:bg-accent-strong lg:ml-1`}
+        className={`${ITEM} bg-accent px-3 text-on-accent hover:bg-accent-strong md:px-0 lg:ml-1 lg:px-4`}
       >
         <FileIcon size={18} />
-        <span className="hidden lg:inline">{cv.label}</span>
+        <span className="md:max-lg:hidden">{cv.label}</span>
       </a>
     </>
   );

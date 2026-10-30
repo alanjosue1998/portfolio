@@ -106,6 +106,7 @@ export default async function Home() {
           sections={sections}
           top={dict.cv.top}
           cv={{ href: `/${locale}/cv`, label: dict.cv.link }}
+          menu={{ label: dict.nav.menu, open: dict.nav.open }}
         />
       </BottomBar>
     </>
