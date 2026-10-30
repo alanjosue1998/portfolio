@@ -34,6 +34,11 @@ const nextConfig: NextConfig = {
    *   came from, never the path.
    * - `Permissions-Policy`: none of these is used, so none can be switched on
    *   by anything injected later.
+   * - `Strict-Transport-Security`: Vercel terminates TLS but does not send
+   *   HSTS itself, so a returning visitor who types the bare domain would go
+   *   out over plain HTTP before the redirect. Two years, with `preload`,
+   *   which is what the browsers' preload list asks for — the token alone
+   *   changes nothing until the domain is submitted to hstspreload.org.
    */
   async headers() {
     return [
@@ -44,6 +49,10 @@ const nextConfig: NextConfig = {
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
+          },
         ],
       },
     ];
