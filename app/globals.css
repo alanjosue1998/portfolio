@@ -122,6 +122,103 @@
   }
 }
 
+/*
+ * The cursor after the typed name in the greeting — see `TypedName`. A bar in
+ * the accent, a little shorter than the capitals, that blinks on and off
+ * rather than fading, the way a text cursor does. It holds still under reduced
+ * motion, where nothing is being typed anyway.
+ */
+.typed-caret {
+  display: inline-block;
+  width: 0.08em;
+  height: 0.9em;
+  margin-left: 0.08em;
+  vertical-align: -0.08em;
+  background: var(--accent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .typed-caret {
+    animation: caret-blink 1s steps(1) infinite;
+  }
+}
+
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/*
+ * The skills strips — see `Marquee` in `app/components/Skills.tsx`. The track
+ * holds the same run twice and slides from minus half its width to nothing,
+ * so it moves left to right and the second run lands where the first began.
+ * The edges fade into the page rather than cutting chips in half.
+ *
+ * It stops under a pointer, under keyboard focus, and when the section's
+ * pause button sets `data-paused`. Under reduced motion nothing moves: the
+ * repeats are not drawn and the first run wraps onto as many lines as it needs.
+ */
+.marquee {
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent, black 6%, black 94%, transparent);
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+}
+
+.marquee-run {
+  display: flex;
+  flex-shrink: 0;
+  gap: 0.5rem;
+  /* The gap after the last chip, so both runs are the same width. */
+  padding-right: 0.5rem;
+}
+
+@keyframes marquee {
+  from {
+    translate: -50% 0;
+  }
+
+  to {
+    translate: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .marquee-track {
+    animation: marquee var(--marquee-duration, 30s) linear infinite;
+  }
+
+  .marquee:hover .marquee-track,
+  .marquee:focus-within .marquee-track,
+  [data-paused] .marquee-track {
+    animation-play-state: paused;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee {
+    mask-image: none;
+  }
+
+  .marquee-track {
+    width: auto;
+  }
+
+  .marquee-run {
+    flex-wrap: wrap;
+    padding-right: 0;
+  }
+
+  .marquee-run:not(:first-child),
+  .marquee-run > li[aria-hidden] {
+    display: none;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

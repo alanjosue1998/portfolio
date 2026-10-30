@@ -157,6 +157,23 @@ export function MenuIcon(props: IconProps) {
   );
 }
 
+export function PauseIcon(props: IconProps) {
+  return (
+    <Stroke {...props}>
+      <path d="M9 5.5v13" />
+      <path d="M15 5.5v13" />
+    </Stroke>
+  );
+}
+
+export function PlayIcon(props: IconProps) {
+  return (
+    <Stroke {...props}>
+      <path d="M7.5 5.2v13.6a.6.6 0 0 0 .9.5l10.8-6.8a.6.6 0 0 0 0-1L8.4 4.7a.6.6 0 0 0-.9.5Z" />
+    </Stroke>
+  );
+}
+
 export function BriefcaseIcon(props: IconProps) {
   return (
     <Stroke {...props}>
