@@ -72,12 +72,14 @@ export default async function Home() {
           Back to the top, where the greeting and the portrait are. `#top` is
           the one fragment the browser scrolls to without an element of that
           id; `globals.css` makes the trip smooth unless reduced motion is
-          asked for. Icon-only below `sm`, like the way back on the CV, so the
-          bar still clears the corner controls on a phone.
+          asked for.
+
+          Icon only, at every width: the CV is what the bar is for, and the
+          word next to it only competed with that. The name stays for screen
+          readers, and `title` gives it to a mouse hovering over the icon.
         */}
-        <a href="#top" className={BAR_ITEM} aria-label={dict.cv.top}>
+        <a href="#top" className={BAR_ITEM} aria-label={dict.cv.top} title={dict.cv.top}>
           <UserIcon size={18} />
-          <span className="hidden sm:inline">{dict.cv.top}</span>
         </a>
         {/* A plain anchor, like the language switch in `CornerControls`, so
             the chosen theme survives the trip. */}
