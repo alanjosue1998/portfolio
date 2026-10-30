@@ -79,6 +79,7 @@ export default async function ExperiencePage() {
                     id={job.id}
                     label={dict.common.delete}
                     confirmation={fill(dict.common.confirmDelete, { name: job.role })}
+                    name={job.role}
                   />
                 </div>
               </li>

@@ -128,7 +128,19 @@ export default function LocationMap({ city, country, description, unavailable, c
         map.on("error", () => {
           // Tile hiccups after the style is up are not worth a fallback; a
           // style that never arrives means there is no map to show at all.
-          if (!styleLoaded) setFailed(true);
+          if (styleLoaded) return;
+
+          /**
+           * Released here rather than left to the unmount: the fallback takes
+           * the container's place but the component stays mounted, so the
+           * WebGL context would otherwise outlive the map it belonged to, and
+           * a later theme toggle would restyle a map nobody can see.
+           * `follow` checks for `map`, so clearing it stops that too.
+           */
+          clearTimeout(timer);
+          map?.remove();
+          map = undefined;
+          setFailed(true);
         });
 
         /**

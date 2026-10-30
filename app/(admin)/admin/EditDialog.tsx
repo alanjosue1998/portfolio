@@ -51,7 +51,14 @@ export default function EditDialog({ trigger, title, cancel, children }: Props) 
 
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)} className="text-sm underline">
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        // "Edit" alone is the same on every row; the title says which one, and
+        // starts with the visible word so voice control still finds it.
+        aria-label={title}
+        className="text-sm underline"
+      >
         {trigger}
       </button>
 

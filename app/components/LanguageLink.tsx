@@ -28,7 +28,9 @@ export default function LanguageLink({ locale, label, className }: Props) {
     <a
       href={rest ? `/${locale}/${rest}` : `/${locale}`}
       hrefLang={locale}
-      aria-label={label}
+      // Starts with the visible text, so a voice-control user saying "click
+      // EN" reaches it (WCAG 2.5.3, Label in Name).
+      aria-label={`${locale.toUpperCase()} — ${label}`}
       className={className}
     >
       {locale}

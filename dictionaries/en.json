@@ -15,21 +15,7 @@
   },
   "projects": {
     "heading": "Projects",
-    "typeLabel": "Type",
-    "items": [
-      {
-        "title": "Corporate site in Drupal",
-        "type": "Drupal",
-        "description": "A fast site the team can manage on its own.",
-        "technologies": ["Drupal", "PHP", "Twig"]
-      },
-      {
-        "title": "WordPress store",
-        "type": "WordPress",
-        "description": "An e-commerce site built with WordPress.",
-        "technologies": ["WordPress", "PHP", "ACF"]
-      }
-    ]
+    "typeLabel": "Type"
   },
   "certificates": {
     "heading": "Certificates",
@@ -72,7 +58,7 @@
   },
   "cv": {
     "bar": "Actions",
-    "link": "Download CV",
+    "link": "View CV",
     "name": "Alan Josué Guamán Rueda",
     "title": "CV — Alan Josué Guamán Rueda",
     "description": "Résumé of Alan Josué Guamán Rueda, systems engineer focused on CMS.",

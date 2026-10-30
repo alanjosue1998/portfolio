@@ -42,13 +42,30 @@ export function subscribeToTheme(onChange: () => void) {
   const systemSetting = window.matchMedia(DARK_SETTING);
   systemSetting.addEventListener("change", onChange);
 
-  // Another tab choosing a theme writes to storage, not to this document.
-  window.addEventListener("storage", onChange);
+  /**
+   * Another tab choosing a theme writes to storage, not to this document, so
+   * the value is copied across here. The observer above then sees the
+   * attribute change and calls `onChange` — calling it directly would only
+   * re-read this tab's own, unchanged attribute.
+   */
+  function fromAnotherTab(event: StorageEvent) {
+    if (event.key !== "theme") return;
+
+    const html = document.documentElement;
+
+    if (event.newValue === "light" || event.newValue === "dark") {
+      html.dataset.theme = event.newValue;
+    } else {
+      delete html.dataset.theme;
+    }
+  }
+
+  window.addEventListener("storage", fromAnotherTab);
 
   return () => {
     attribute.disconnect();
     systemSetting.removeEventListener("change", onChange);
-    window.removeEventListener("storage", onChange);
+    window.removeEventListener("storage", fromAnotherTab);
   };
 }
 

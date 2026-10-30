@@ -91,5 +91,15 @@
       matchPackageNames: ["eslint"],
       allowedVersions: "<10",
     },
+    /**
+     * The types describe the runtime, and the runtime is Node 24 — CI, Vercel
+     * (`engines` in `package.json`) and `.nvmrc` all say so. A newer major
+     * would type APIs that do not exist where the code runs. Move this with
+     * the Node version, not on its own.
+     */
+    {
+      matchPackageNames: ["@types/node"],
+      allowedVersions: "<25",
+    },
   ],
 }

@@ -78,6 +78,7 @@ export default async function ProjectsPage() {
                     id={project.id}
                     label={dict.common.delete}
                     confirmation={fill(dict.common.confirmDelete, { name: project.title })}
+                    name={project.title}
                   />
                 </div>
               </li>

@@ -73,6 +73,7 @@ export default async function EducationPage() {
                     id={study.id}
                     label={dict.common.delete}
                     confirmation={fill(dict.common.confirmDelete, { name: study.degree })}
+                    name={study.degree}
                   />
                 </div>
               </li>

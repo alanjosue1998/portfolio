@@ -172,7 +172,7 @@
     "invalidUrl": "Enter a valid https:// address — http:// is not accepted.",
     "verificationHttps": "The verification link has to be https:// — http:// is not accepted.",
     "chooseImage": "Choose an image.",
-    "notImage": "The file has to be an image.",
+    "notImage": "The file has to be a JPG, PNG, WebP, AVIF or GIF image.",
     "imageTooBig": "The image cannot be larger than 4 MB.",
     "uploadFailed": "The image could not be uploaded.",
     "updated": "Saved changes to “{name}”.",

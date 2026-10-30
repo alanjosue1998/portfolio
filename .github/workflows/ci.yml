@@ -8,6 +8,18 @@ on:
   push:
     branches: [main]
 
+# Reads the code and nothing else. Without this the token gets whatever the
+# repository default is, which may be write access to everything.
+permissions:
+  contents: read
+
+# A new push to a pull request makes the run for the previous one moot, so it
+# is cancelled rather than left to finish. Runs on `main` are never cancelled:
+# each one is the record of what got merged.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -58,6 +70,14 @@ jobs:
       # The schema has to exist before the build queries it.
       - name: Apply migrations
         run: npx prisma migrate deploy
+
+      # The database now has exactly what the migrations build. If
+      # `schema.prisma` describes anything else, a change to it was committed
+      # without the migration that goes with it — which `migrate deploy` in
+      # production would never apply. `--exit-code` turns a non-empty diff into
+      # a failure.
+      - name: Check the schema matches the migrations
+        run: npx prisma migrate diff --from-config-datasource --to-schema prisma/schema.prisma --exit-code
 
       - run: npm run lint
 

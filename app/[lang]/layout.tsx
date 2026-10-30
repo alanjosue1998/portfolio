@@ -12,6 +12,8 @@ import { siteUrl } from "@/lib/site";
 
 import "../globals.css";
 
+export { viewport } from "@/lib/viewport";
+
 export function generateStaticParams() {
   return locales.map((locale) => ({ lang: locale }));
 }
@@ -41,6 +43,12 @@ export default async function RootLayout({ children }: LayoutProps<"/[lang]">) {
   return (
     <html
       lang={await lang()}
+      /**
+       * `ThemeScript` sets `data-theme` here before React hydrates, so the
+       * attribute is on the element but not in the server HTML. Expected, and
+       * only this element's own attributes are exempted — not its children.
+       */
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
       <head>
