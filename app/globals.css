@@ -352,9 +352,16 @@ body {
  * The CV page as a PDF. The browser's "Save as PDF" is the whole pipeline, so
  * these rules are its entire design. See `app/[lang]/cv/page.tsx`.
  */
+/*
+ * No page margin at all. The browser prints its own header and footer — the
+ * date, the title, the address, "1/2" — in that margin, and with none there is
+ * nowhere to put them, so the CV comes out clean whatever the print dialog's
+ * "Headers and footers" box says. The 15mm of white the margin used to give is
+ * padding on the CV itself instead — see `.cv-page` below.
+ */
 @page {
   size: A4;
-  margin: 15mm;
+  margin: 0;
 }
 
 @media print {
@@ -370,6 +377,17 @@ body {
 
   .no-print {
     display: none !important;
+  }
+
+  /*
+   * The sheet's white border, now that the page has no margin. `clone` repeats
+   * the padding on every page the CV runs onto, not just above the first and
+   * below the last, so the second sheet starts 15mm down like the first.
+   */
+  .cv-page {
+    padding: 15mm;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
   }
 
   /* No CV entry is split across two sheets. */

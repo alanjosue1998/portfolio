@@ -113,7 +113,7 @@ export default async function CvPage() {
 
   return (
     <>
-      <main className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-4 pt-12 pb-28 sm:px-6 print:max-w-none print:gap-7 print:p-0">
+      <main className="cv-page mx-auto flex w-full max-w-3xl flex-col gap-10 px-4 pt-12 pb-28 sm:px-6 print:max-w-none print:gap-7">
         <header className="flex flex-col gap-2">
           <h1 className="text-3xl leading-tight sm:text-4xl">{dict.cv.name}</h1>
           <p className="text-lg">
