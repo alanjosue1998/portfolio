@@ -23,12 +23,14 @@ export const BAR_ITEM_PRIMARY =
  * `bottom-4` / `sm:bottom-6`, level with `CornerControls`, which sits in the
  * right-hand corner on the same line.
  *
- * Below `md` the bar is pinned to the left rather than centred. The home page's
- * holds six items, and centred it would have to stay clear of the controls on
- * both sides; from the left it only has to clear them on the right — their
- * 44px, their 16px inset, its own 16px and a little air, 5.5rem in all. From
- * `md` there is room to centre it again, which takes that clearance from both
- * sides — 4.5rem a side, 9rem in all.
+ * Below `md` the bar is pinned to the left rather than centred. The home
+ * page's holds the section menu, named after the section on screen, and the
+ * CV with its label — about 250px, which centred, clearing the controls on
+ * both sides, a 375px phone does not have. From the left it only has to clear
+ * them on the right — their 44px, their 16px inset, its own 16px and a little
+ * air, 5.5rem in all. The menu opens from the same left edge. From `md` there
+ * is room to centre it again, which takes that clearance from both sides —
+ * 4.5rem a side, 9rem in all.
  *
  * `no-print`: neither the bar nor the space reserved for it has any business on
  * paper.

@@ -63,7 +63,9 @@
     }
   },
   "nav": {
-    "label": "Sections"
+    "label": "Sections",
+    "menu": "Menu",
+    "open": "open the menu"
   },
   "cv": {
     "bar": "Actions",
