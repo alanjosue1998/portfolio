@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 
 import { fill, getAdminDictionary, type AdminDictionary } from "@/lib/admin-i18n";
 import { auth } from "@/lib/auth";
+import { sniffImageType } from "@/lib/image-type";
 import prisma from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 import { normaliseUrl } from "@/lib/urls";
@@ -392,24 +393,32 @@ async function uploadImage(
     return { ok: false, message: t.chooseImage };
   }
 
-  if (!file.type.startsWith("image/")) {
-    return { ok: false, message: t.notImage };
-  }
-
   if (file.size > MAX_IMAGE_BYTES) {
     return { ok: false, message: t.imageTooBig };
   }
 
+  /**
+   * Decided from the file's own bytes. `file.type` and `file.name` both come
+   * from the client: a page saved as `x.svg` or `x.html` with an `image/png`
+   * type used to pass, and Blob — given no `contentType` — served it by its
+   * extension, as a document that runs script on the store's origin.
+   */
+  const type = sniffImageType(new Uint8Array(await file.slice(0, 16).arrayBuffer()));
+
+  if (!type) {
+    return { ok: false, message: t.notImage };
+  }
+
   try {
     /**
-     * `addRandomSuffix` keeps a re-upload from colliding with the previous
-     * file, and means the new URL differs from the old one — so the CDN and
-     * every browser that cached the last image fetch this one instead of
-     * serving a stale copy from the same address.
+     * Named here rather than after `file.name`, so nothing the client typed
+     * reaches the path, and typed explicitly so Blob does not guess. A fresh
+     * UUID also gives every upload a new URL, so the CDN and every browser
+     * that cached the last image fetch this one instead of a stale copy.
      */
-    const uploaded = await put(`${folder}/${file.name}`, file, {
+    const uploaded = await put(`${folder}/${crypto.randomUUID()}.${type.extension}`, file, {
       access: "public",
-      addRandomSuffix: true,
+      contentType: type.mime,
     });
 
     return { ok: true, url: uploaded.url };

@@ -2,6 +2,7 @@
 
 import type { Project } from "@/generated/prisma/browser";
 import type { AdminDictionary } from "@/lib/admin-i18n";
+import { IMAGE_TYPES } from "@/lib/image-type";
 
 import { createProject, updateProject } from "./actions";
 import { BilingualField, FIELD, FormStatus, HINT, SUBMIT } from "./form-ui";
@@ -83,7 +84,7 @@ export default function ProjectForm({ t, common, initial }: Props) {
           id={`${p}image`}
           name="image"
           type="file"
-          accept="image/*"
+          accept={IMAGE_TYPES}
           aria-describedby={`${p}image-hint`}
           className="text-sm"
         />

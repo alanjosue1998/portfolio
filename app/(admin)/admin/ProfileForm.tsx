@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import type { AdminDictionary } from "@/lib/admin-i18n";
+import { IMAGE_TYPES } from "@/lib/image-type";
 
 import { saveProfileImage } from "./actions";
 import { FormStatus, HINT, SUBMIT } from "./form-ui";
@@ -38,7 +39,7 @@ export default function ProfileForm({ imageUrl, t }: Props) {
             id="image"
             name="image"
             type="file"
-            accept="image/*"
+            accept={IMAGE_TYPES}
             required
             aria-describedby="image-hint"
             className="text-sm"
