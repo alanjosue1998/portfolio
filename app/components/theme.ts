@@ -11,7 +11,7 @@
  * Browser only. Every function here touches `document` or `window`.
  */
 
-import { findTheme } from "./themes";
+import { findTheme, THEME_COLOR_ATTRIBUTE, themeColors } from "./themes";
 
 /** Whether what is painted is a light or a dark palette. */
 export type ResolvedTheme = "light" | "dark";
@@ -69,6 +69,8 @@ export function subscribeToTheme(onChange: () => void) {
     } else {
       delete html.dataset.theme;
     }
+
+    syncThemeColor(theme?.id ?? null);
   }
 
   window.addEventListener("storage", fromAnotherTab);
@@ -78,6 +80,23 @@ export function subscribeToTheme(onChange: () => void) {
     systemSetting.removeEventListener("change", onChange);
     window.removeEventListener("storage", fromAnotherTab);
   };
+}
+
+/**
+ * Rewrites the `theme-color` tags `ThemeScript` wrote, for a new choice. They
+ * are not React's, so replacing them here cannot fight a render.
+ */
+function syncThemeColor(id: string | null) {
+  document.querySelectorAll(`meta[${THEME_COLOR_ATTRIBUTE}]`).forEach((meta) => meta.remove());
+
+  for (const { color, media } of themeColors(id)) {
+    const meta = document.createElement("meta");
+    meta.name = "theme-color";
+    meta.content = color;
+    if (media) meta.media = media;
+    meta.setAttribute(THEME_COLOR_ATTRIBUTE, "");
+    document.head.appendChild(meta);
+  }
 }
 
 /**
@@ -97,6 +116,8 @@ export function applyTheme(id: string | null) {
     } else {
       delete html.dataset.theme;
     }
+
+    syncThemeColor(id);
 
     try {
       if (id) {
