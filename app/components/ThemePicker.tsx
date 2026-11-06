@@ -44,8 +44,15 @@ function Swatches({ colors }: { colors: string[] }) {
   );
 }
 
+/**
+ * The outline marks two things: the theme in use, in the accent, and keyboard
+ * focus, in the text colour. `outline-transparent` used to beat the global
+ * `:focus-visible` ring, so tabbing through the cards showed nothing moving.
+ * Focus wins with `!` because a pressed card is also one a keyboard lands on,
+ * and there the accent alone would not change.
+ */
 const CARD =
-  "flex flex-col items-start gap-2 rounded-xl border p-3 text-left text-sm font-medium transition-[outline-color,translate] outline-2 outline-offset-2 outline-transparent hover:-translate-y-0.5 aria-pressed:outline-accent";
+  "flex flex-col items-start gap-2 rounded-xl border p-3 text-left text-sm font-medium transition-[outline-color,translate] outline-2 outline-offset-2 outline-transparent aria-pressed:outline-accent focus-visible:outline-foreground! motion-safe:hover:-translate-y-0.5";
 
 /**
  * The corner button that opens a panel of every theme, each card painted in its
@@ -166,7 +173,7 @@ export function ThemeSwatches({ labels }: { labels: ThemeLabels }) {
           aria-pressed={chosen === id}
           aria-label={name}
           title={name}
-          className="size-8 rounded-full ring-1 ring-black/15 outline-2 outline-offset-2 outline-transparent transition-[outline-color] aria-pressed:outline-accent"
+          className="size-8 rounded-full ring-1 ring-black/15 outline-2 outline-offset-2 outline-transparent transition-[outline-color] focus-visible:outline-foreground! aria-pressed:outline-accent"
           style={{ background: `linear-gradient(135deg, ${a} 50%, ${b} 50%)` }}
         />
       ))}
