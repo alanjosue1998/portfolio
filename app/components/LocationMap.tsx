@@ -272,7 +272,10 @@ export default function LocationMap({ city, country, description, unavailable, c
         <p className="text-muted">
           {unavailable} {city}, {country}.
         </p>
-        <div className="flex items-end justify-between gap-4">{children}</div>
+        {/* Stacked on a phone for the same reason as over the map, below. */}
+        <div className="flex flex-col-reverse items-end gap-3 sm:flex-row sm:justify-between sm:gap-4 [&>:first-child]:self-stretch sm:[&>:first-child]:self-auto">
+          {children}
+        </div>
       </div>
     );
   }
@@ -331,9 +334,12 @@ export default function LocationMap({ city, country, description, unavailable, c
         rose past the gradient onto the streets. So there the greeting drops
         below the map, at full width on the plain page, and the portrait —
         reversed to come first — hangs half over the map's bottom edge on the
-        right, which is what still ties the two together.
+        right, which is what still ties the two together. Off the map, the
+        greeting takes pointer events back so it can be selected; the wrapper
+        keeps them off, or the empty strip beside the portrait would stop the
+        map underneath from being dragged.
       */}
-      <div className="pointer-events-none relative -mt-14 flex flex-col-reverse items-end gap-3 sm:absolute sm:inset-x-0 sm:bottom-0 sm:mt-0 sm:flex-row sm:justify-between sm:gap-4 sm:py-6 sm:pl-6 [&>:first-child]:self-stretch sm:[&>:first-child]:self-auto">
+      <div className="pointer-events-none relative -mt-14 flex flex-col-reverse items-end gap-3 sm:absolute sm:inset-x-0 sm:bottom-0 sm:mt-0 sm:flex-row sm:justify-between sm:gap-4 sm:py-6 sm:pl-6 [&>:first-child]:self-stretch max-sm:[&>:first-child]:pointer-events-auto sm:[&>:first-child]:self-auto">
         {children}
       </div>
     </div>
