@@ -1,4 +1,4 @@
-import { THEME_IDS, themeCss } from "./themes";
+import { THEME_COLOR_ATTRIBUTE, THEME_IDS, themeColors, themeCss } from "./themes";
 
 /**
  * Applies a saved theme before the browser paints.
@@ -11,12 +11,34 @@ import { THEME_IDS, themeCss } from "./themes";
  * `localStorage` throws rather than returns null when a browser blocks storage,
  * hence the try. Only a known theme id is applied — a stale or tampered value is
  * left alone, which leaves `prefers-color-scheme` in charge.
+ *
+ * It also writes the `theme-color` tags — see `themeColors` — so the browser's
+ * toolbar starts out in the chosen theme too. That part sits outside the `try`,
+ * so a browser that blocks storage still gets the system pair. Wrapped in a
+ * function so none of its names land on `window`.
  */
-const script = `
-try {
-  var t = localStorage.getItem("theme");
-  if (${JSON.stringify(THEME_IDS)}.indexOf(t) > -1) document.documentElement.dataset.theme = t;
-} catch (e) {}
+const colors = Object.fromEntries([...THEME_IDS, ""].map((id) => [id, themeColors(id || null)]));
+
+export const themeScript = `
+(function () {
+  var t = "";
+  try {
+    var s = localStorage.getItem("theme");
+    if (${JSON.stringify(THEME_IDS)}.indexOf(s) > -1) {
+      document.documentElement.dataset.theme = s;
+      t = s;
+    }
+  } catch (e) {}
+  var colors = ${JSON.stringify(colors)};
+  colors[t].forEach(function (c) {
+    var m = document.createElement("meta");
+    m.name = "theme-color";
+    m.content = c.color;
+    if (c.media) m.media = c.media;
+    m.setAttribute("${THEME_COLOR_ATTRIBUTE}", "");
+    document.head.appendChild(m);
+  });
+})();
 `;
 
 /**
@@ -28,7 +50,7 @@ export default function ThemeScript() {
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: themeCss() }} />
-      <script dangerouslySetInnerHTML={{ __html: script }} />
+      <script dangerouslySetInnerHTML={{ __html: themeScript }} />
     </>
   );
 }

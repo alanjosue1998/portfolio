@@ -8,8 +8,6 @@ import AdminControls from "./AdminControls";
 
 import "../globals.css";
 
-export { viewport } from "@/lib/viewport";
-
 export async function generateMetadata(): Promise<Metadata> {
   const dict = await getAdminDictionary();
 

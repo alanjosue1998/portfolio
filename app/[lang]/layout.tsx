@@ -12,8 +12,6 @@ import { siteUrl } from "@/lib/site";
 
 import "../globals.css";
 
-export { viewport } from "@/lib/viewport";
-
 export function generateStaticParams() {
   return locales.map((locale) => ({ lang: locale }));
 }

@@ -184,6 +184,39 @@ export function findTheme(id: string | null | undefined): Theme | undefined {
   return THEMES.find((theme) => theme.id === id);
 }
 
+/**
+ * The `<meta name="theme-color">` tags for a choice — the colour mobile
+ * browsers paint their toolbar in, so it runs into the page instead of sitting
+ * on it as a bar of another colour.
+ *
+ * A chosen theme gets one tag, its own background. With nothing chosen there
+ * are two, one per system setting, and the browser picks by `media`.
+ *
+ * `ThemeScript` writes them before the first paint and `syncThemeColor` in
+ * `./theme.ts` rewrites them when the choice changes. They used to come from
+ * `viewport.themeColor` in the layouts, but those tags are React's: they could
+ * only follow the system setting, and anything added beside them for a chosen
+ * theme lost to them on order once React hydrated.
+ */
+export function themeColors(id: string | null): { color: string; media?: string }[] {
+  const chosen = findTheme(id);
+  if (chosen) return [{ color: chosen.palette.background }];
+
+  return [
+    {
+      media: "(prefers-color-scheme: light)",
+      color: findTheme(SYSTEM_THEMES.light)!.palette.background,
+    },
+    {
+      media: "(prefers-color-scheme: dark)",
+      color: findTheme(SYSTEM_THEMES.dark)!.palette.background,
+    },
+  ];
+}
+
+/** Marks the theme-color tags as ours, so they can be found and replaced. */
+export const THEME_COLOR_ATTRIBUTE = "data-theme-color";
+
 /** `accentStrong` → `--accent-strong`, the names `app/globals.css` maps to Tailwind. */
 function declarations(theme: Theme) {
   const variables = Object.entries(theme.palette).map(
