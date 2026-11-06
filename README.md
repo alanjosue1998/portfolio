@@ -1,6 +1,6 @@
 # Portfolio
 
-Personal site of Alan Rueda — systems engineer focused on CMS work, building with Drupal and WordPress.
+Personal site of Alan Guamán Rueda — systems engineer focused on CMS work, building with Drupal and WordPress.
 
 ## Stack
 
