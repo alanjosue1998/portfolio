@@ -48,7 +48,12 @@ export default async function Contact() {
            * site and gets `noreferrer` with it.
            */
           const external = !link.url.startsWith("mailto:");
-          const Icon = icons[link.platform] ?? icons.other;
+          /**
+           * `hasOwn`, not a bare lookup: `platform` is a free string, and on a
+           * plain object `constructor` or `toString` would resolve to a
+           * function from the prototype and break the render.
+           */
+          const Icon = Object.hasOwn(icons, link.platform) ? icons[link.platform] : icons.other;
 
           return (
             <li key={link.id}>
