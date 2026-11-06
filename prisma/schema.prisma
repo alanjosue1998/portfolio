@@ -46,6 +46,8 @@ model ContactLink {
   platform  String
   /// What the link says, and what a screen reader announces.
   label     String
+  /// English, for `/en`. Null falls back to the Spanish field above it.
+  labelEn   String?
   /// Stored ready to use: `mailto:` for email, `https://` for the rest.
   url       String
   /// Ascending. Ties are broken by `createdAt` so the order is never arbitrary.
