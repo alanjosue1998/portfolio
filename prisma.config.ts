@@ -10,7 +10,37 @@ import { defineConfig } from "prisma/config";
 // `db push`, `studio` and `db pull` need a datasource, so it is left out when
 // the variable is absent — those commands then fail with their own message
 // instead of taking the whole install down with them.
-const databaseUrl = process.env.DATABASE_URL;
+//
+// The CLI also needs a direct connection, not a pooled one. `migrate deploy`
+// holds a Postgres advisory lock for the whole run, and a transaction-mode
+// pooler such as Neon's hands each statement to whichever server connection is
+// free, so the lock never settles and the run times out with P1002. The app
+// itself keeps the pooled `DATABASE_URL` — see `lib/prisma.ts` — since that is
+// what serverless functions need; only the CLI goes direct.
+//
+// Neon's Vercel integration sets the direct URL as `DATABASE_URL_UNPOOLED`.
+// Without it, a Neon pooled host is turned into its direct one by dropping the
+// `-pooler` suffix, which is how Neon names the two; any other URL is used as
+// it is.
+function directUrl(): string | undefined {
+  const explicit = process.env.DATABASE_URL_UNPOOLED ?? process.env.DIRECT_URL;
+  if (explicit) return explicit;
+
+  const pooled = process.env.DATABASE_URL;
+  if (!pooled) return undefined;
+
+  try {
+    const url = new URL(pooled);
+    if (url.hostname.endsWith(".neon.tech")) {
+      url.hostname = url.hostname.replace(/-pooler(?=\.)/, "");
+    }
+    return url.toString();
+  } catch {
+    return pooled;
+  }
+}
+
+const databaseUrl = directUrl();
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
