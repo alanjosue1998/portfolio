@@ -1,4 +1,7 @@
+import { lang } from "next/root-params";
+
 import { getDictionary } from "@/lib/dictionaries";
+import { localized } from "@/lib/i18n";
 import prisma from "@/lib/prisma";
 
 import { FileIcon, GitHubIcon, LinkIcon, LinkedInIcon, MailIcon, XIcon } from "./icons";
@@ -18,8 +21,9 @@ const icons: Record<string, React.ComponentType> = {
 };
 
 export default async function Contact() {
-  const [dict, links] = await Promise.all([
+  const [dict, locale, links] = await Promise.all([
     getDictionary(),
+    lang(),
     prisma.contactLink.findMany({
       orderBy: [{ position: "asc" }, { createdAt: "asc" }],
     }),
@@ -63,7 +67,7 @@ export default async function Contact() {
                 className="flex h-11 items-center gap-2.5 rounded-[10px] border border-border bg-background px-4 font-medium text-foreground transition-colors hover:border-accent hover:text-accent"
               >
                 <Icon />
-                {link.label}
+                {localized(locale, link.label, link.labelEn)}
               </a>
             </li>
           );

@@ -5,7 +5,7 @@ import type { AdminDictionary } from "@/lib/admin-i18n";
 import { contactPlatforms } from "@/lib/contact-platforms";
 
 import { createContactLink, updateContactLink } from "./actions";
-import { FIELD, FormStatus, HINT, SUBMIT } from "./form-ui";
+import { BilingualField, FIELD, FormStatus, HINT, SUBMIT } from "./form-ui";
 import { useAdminForm } from "./use-admin-form";
 
 type Props = {
@@ -44,21 +44,17 @@ export default function ContactLinkForm({ t, common, initial }: Props) {
         </select>
       </div>
 
-      <div className="flex flex-col gap-1">
-        <label htmlFor={`${p}label`}>{t.label}</label>
-        <input
-          id={`${p}label`}
-          name="label"
-          required
-          defaultValue={initial?.label}
-          placeholder="GitHub"
-          aria-describedby={`${p}label-hint`}
-          className={FIELD}
-        />
-        <p id={`${p}label-hint`} className={HINT}>
-          {t.labelHint}
-        </p>
-      </div>
+      <BilingualField
+        name="label"
+        idPrefix={p}
+        defaultValue={initial?.label}
+        defaultValueEn={initial?.labelEn}
+        label={t.label}
+        labels={common}
+        required
+        placeholder="GitHub"
+        hint={t.labelHint}
+      />
 
       <div className="flex flex-col gap-1">
         <label htmlFor={`${p}url`}>{t.url}</label>

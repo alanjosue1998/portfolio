@@ -534,6 +534,7 @@ async function saveContactLink(formData: FormData, id: string | null): Promise<F
   const data = {
     platform,
     label,
+    labelEn: englishText(formData, "labelEn"),
     url,
     position,
   };
