@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 
 import { fill, getAdminDictionary, type AdminDictionary } from "@/lib/admin-i18n";
 import { auth } from "@/lib/auth";
+import { contactPlatforms } from "@/lib/contact-platforms";
 import { sniffImageType } from "@/lib/image-type";
 import prisma from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
@@ -508,7 +509,13 @@ async function saveContactLink(formData: FormData, id: string | null): Promise<F
   await requireSession();
   const t = (await getAdminDictionary()).actions;
 
-  const platform = String(formData.get("platform") ?? "other").trim();
+  /**
+   * The select only offers the presets, so anything else came from a
+   * hand-made request. It is stored as `other` rather than refused, which is
+   * what the public page would have shown for it anyway.
+   */
+  const requested = String(formData.get("platform") ?? "other").trim();
+  const platform = contactPlatforms.some((p) => p.value === requested) ? requested : "other";
   const label = String(formData.get("label") ?? "").trim();
   const url = normaliseUrl(String(formData.get("url") ?? ""), platform);
   const position = parsePosition(formData.get("position"));
