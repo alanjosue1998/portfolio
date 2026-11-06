@@ -181,3 +181,10 @@ there is a custom domain; without either, the URLs point at `localhost:3000`.
 The other variables in `.env.example` have to be set in the Vercel project too —
 `DATABASE_URL`, `BETTER_AUTH_SECRET` (a new one, not the local one),
 `BETTER_AUTH_URL` and `BLOB_READ_WRITE_TOKEN`.
+
+Vercel builds with `npm run vercel-build`, which runs `prisma migrate deploy`
+before `next build`. The pages are prerendered from the database, so the
+schema has to be up to date before the build queries it; a migration that
+fails stops the build, and the deployment already live stays up. It needs a
+`DATABASE_URL` that can take a migration — a direct connection, not a
+transaction-mode pooler (Neon's `-pooler` host, Supabase's port 6543).
