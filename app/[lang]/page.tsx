@@ -13,8 +13,10 @@ import ScrollReveal from "@/app/components/ScrollReveal";
 import SectionNav, { type SectionId } from "@/app/components/SectionNav";
 import Skills from "@/app/components/Skills";
 import { getDictionary } from "@/lib/dictionaries";
-import { locales } from "@/lib/i18n";
+import { locales, localized } from "@/lib/i18n";
+import { personLd, serializeLd } from "@/lib/person-ld";
 import prisma from "@/lib/prisma";
+import { siteUrl } from "@/lib/site";
 
 export default async function Home() {
   const [dict, locale, jobs, skills, projects] = await Promise.all([
@@ -30,6 +32,32 @@ export default async function Home() {
     prisma.skill.count(),
     prisma.project.count(),
   ]);
+
+  /**
+   * What the `Person` structured data below needs beyond the counts. These
+   * repeat reads the sections make on their own, which is cheap here: the page
+   * is prerendered, so they run at build and on revalidation, not per visit.
+   */
+  const [profile, links, skillRows] = await Promise.all([
+    prisma.profile.findUnique({ where: { id: "main" } }),
+    prisma.contactLink.findMany({ select: { url: true } }),
+    prisma.skill.findMany({
+      select: { name: true, nameEn: true },
+      orderBy: [{ position: "asc" }, { createdAt: "asc" }],
+    }),
+  ]);
+
+  const person = personLd({
+    name: dict.cv.name,
+    jobTitle: dict.hero.role,
+    description: (locale === "en" ? profile?.aboutEn : profile?.aboutEs)?.trim() || dict.about.body,
+    url: `${siteUrl}/${locale}`,
+    imageUrl: profile?.imageUrl ?? null,
+    links: links.map((link) => link.url),
+    place: dict.location.city,
+    countryCode: "EC",
+    skills: skillRows.map((skill) => localized(locale, skill.name, skill.nameEn)),
+  });
 
   // In the order they appear on the page. About always renders: with nothing
   // saved in the admin it falls back to the dictionary's text.
@@ -76,6 +104,14 @@ export default async function Home() {
         `.backdrop` in `app/globals.css`.
       */}
       <div aria-hidden="true" className="backdrop pointer-events-none fixed inset-0 -z-10" />
+      {/*
+        Structured data for search engines — see `lib/person-ld.ts`. A Server
+        Component, so it arrives in the HTML and costs no JavaScript.
+      */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeLd(person) }}
+      />
       <main className="reveal-sections mx-auto flex w-full max-w-3xl flex-col gap-20 px-4 [counter-reset:section] sm:gap-28 sm:px-6">
         <div className="flex flex-col gap-6">
           {/* The map opens the page, and carries the greeting and the portrait. */}
