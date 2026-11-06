@@ -217,7 +217,17 @@ export default function LocationMap({ city, country, description, unavailable, c
                * framed against the whole map, which is what lets the planet
                * fill it instead of sitting high in it.
                */
-              padding: { top: 0, right: 0, bottom: 96, left: 0 },
+              padding: {
+                top: 0,
+                right: 0,
+                /**
+                 * On a phone the greeting sits under the map and only the top
+                 * half of the portrait reaches over it, so there is less to
+                 * clear. Read once, at take-off: the landing is what it frames.
+                 */
+                bottom: window.matchMedia("(min-width: 640px)").matches ? 96 : 56,
+                left: 0,
+              },
               duration: 7000,
             });
           }, 2000);
@@ -270,47 +280,60 @@ export default function LocationMap({ city, country, description, unavailable, c
   /**
    * Square corners: with the bottom already dissolving into the page, rounded
    * ones only softened the two edges that are still meant to be edges.
-   * `overflow-hidden` stays — it is what keeps the canvas inside the frame.
+   * `overflow-hidden` stays on the frame — it is what keeps the canvas inside
+   * it — but not on the outer box, because on a phone the portrait reaches out
+   * of the frame and would be cut in half.
    */
   return (
-    <div className="relative h-60 w-full overflow-hidden sm:h-72">
-      <div
-        ref={container}
-        role="img"
-        aria-label={description}
-        className="h-full w-full bg-border"
-      />
+    <div className="relative">
+      <div className="relative h-60 w-full overflow-hidden sm:h-72">
+        <div
+          ref={container}
+          role="img"
+          aria-label={description}
+          className="h-full w-full bg-border"
+        />
+
+        {/*
+          Dissolves the bottom of the map into the page — there is no border
+          now, so this is what ends it. From `sm` it also gives the greeting a
+          ground to be read against; on a phone the greeting sits below the
+          map, so only the fade is left.
+        */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-background via-background/85 to-transparent sm:h-32" />
+
+        {/*
+          The place, in the corner the eye starts from. It sat with the greeting
+          for a while because on a narrow screen it ran straight into the
+          attribution across from it — but `foldCredit` tucks that away into its
+          ⓘ at the same moment this appears, so the two no longer meet.
+
+          Still held back until the flight lands, so it reads as the destination
+          rather than as a caption that was always there.
+        */}
+        {arrived && (
+          <p className="pointer-events-none absolute top-5 left-5 flex h-8 items-center gap-1.5 rounded-lg border border-border bg-surface/95 px-3 text-[13px] font-medium text-foreground shadow-[0_2px_8px_-4px_rgb(0_0_0/0.2)] sm:top-6 sm:left-6">
+            <MapPinIcon size={16} className="shrink-0 text-accent" />
+            {city} · {country}
+          </p>
+        )}
+      </div>
 
       {/*
-        Dissolves the bottom of the map into the page — there is no border now,
-        so this is what ends it — and gives the greeting a ground light or dark
-        enough to be read against whatever terrain happens to be underneath.
-      */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background via-background/85 to-transparent" />
+        The greeting and the portrait.
 
-      {/*
-        The place, in the corner the eye starts from. It sat with the greeting
-        for a while because on a narrow screen it ran straight into the
-        attribution across from it — but `foldCredit` tucks that away into its
-        ⓘ at the same moment this appears, so the two no longer meet.
+        From `sm`, laid over the bottom of the map. The left padding matches the
+        place label's inset in the top corner, so the greeting sits in the map
+        rather than on its edge and the two line up.
 
-        Still held back until the flight lands, so it reads as the destination
-        rather than as a caption that was always there.
+        On a phone, a map 240px tall could not hold both: the portrait took half
+        the width, the heading broke mid-word over three lines, and the greeting
+        rose past the gradient onto the streets. So there the greeting drops
+        below the map, at full width on the plain page, and the portrait —
+        reversed to come first — hangs half over the map's bottom edge on the
+        right, which is what still ties the two together.
       */}
-      {arrived && (
-        <p className="pointer-events-none absolute top-5 left-5 flex h-8 items-center gap-1.5 rounded-lg border border-border bg-surface/95 px-3 text-[13px] font-medium text-foreground shadow-[0_2px_8px_-4px_rgb(0_0_0/0.2)] sm:top-6 sm:left-6">
-          <MapPinIcon size={16} className="shrink-0 text-accent" />
-          {city} · {country}
-        </p>
-      )}
-
-      {/*
-        The greeting and the portrait, over the bottom of the map. The left
-        padding matches the place label's inset in the top corner, so the
-        greeting sits in the map rather than on its edge and the two line up;
-        the portrait keeps its own margin on the right.
-      */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 py-5 pl-5 sm:py-6 sm:pl-6">
+      <div className="pointer-events-none relative -mt-14 flex flex-col-reverse items-end gap-3 sm:absolute sm:inset-x-0 sm:bottom-0 sm:mt-0 sm:flex-row sm:justify-between sm:gap-4 sm:py-6 sm:pl-6 [&>:first-child]:self-stretch sm:[&>:first-child]:self-auto">
         {children}
       </div>
     </div>
