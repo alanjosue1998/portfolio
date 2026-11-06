@@ -90,5 +90,11 @@
     "experience": "Experience",
     "education": "Education",
     "present": "Present"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "heading": "This page doesn't exist",
+    "body": "The link may be mistyped, or the page may have moved.",
+    "home": "Back to the home page"
   }
 }
